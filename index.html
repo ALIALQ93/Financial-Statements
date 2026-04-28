@@ -4451,7 +4451,7 @@
                   <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${fmt(expPY)}</td>
                 </tr>
                 <tr class="row-total">
-                  <td colspan="3" contenteditable="false" style="font-weight:700">فائض العمليات الجارية</td>
+                  <td colspan="3" contenteditable="false" style="font-weight:700">${(pbtCY < 0) ? "عجز العمليات الجارية" : "فائض العمليات الجارية"}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${fmt(pbtCY)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${fmt(pbtPY)}</td>
                 </tr>
@@ -4812,7 +4812,8 @@
           { k:"surplus", name:"الفائض المتراكم", code:"224" },
           { k:"deficit", name:"العجز المتراكم", code:"225" }
         ];
-        const sumCols = (obj)=> colKeys.reduce((s,k)=> s + numOf(obj?.[k]), 0);
+        // In equity statement, "deficit" reduces equity (contra account)
+        const sumCols = (obj)=> colKeys.reduce((s,k)=> s + ((k === "deficit") ? (-numOf(obj?.[k])) : numOf(obj?.[k])), 0);
         const closing = {};
         for(const k of colKeys){
           const op = numOf(eq.opening?.[k]);
