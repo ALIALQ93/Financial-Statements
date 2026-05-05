@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Financial Statements – لوحة التحكم</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script type="text/javascript" nonce="7e5e41e13e914b7980cb6d4c29c" src="//local.adguard.org?ts=1777976666854&amp;type=content-script&amp;dmn=onedrive.live.com&amp;url=https%3A%2F%2Fonedrive.live.com%2Fpersonal%2F833d97c028c7d8a3%2F_layouts%2F15%2Fdownload.aspx%3FUniqueId%3D63142f74%252Db7d2%252D4df2%252D805a%252D56afd5fd5f6e&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=0"></script><script type="text/javascript" nonce="7e5e41e13e914b7980cb6d4c29c" src="//local.adguard.org?ts=1777976666854&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet"/>
   <style>
     :root{
       --navy:#1a3a5c; --blue:#1F4E79; --blue-ultra:#EBF3FB;
@@ -284,6 +284,22 @@
       box-shadow:0 2px 18px rgba(0,0,0,.12);
       border-radius:3px;
       padding:14mm 12mm 10mm;
+    }
+    /* تواقيع بيان أ / بيان ب: نفس أسلوب تقرير المدير (sig-row / sig-box) */
+    .fs-balance-sigs{
+      margin-top: 14mm;
+      padding-top: 8mm;
+      border-top: 1px solid rgba(176,196,216,.95);
+    }
+    .fs-balance-sigs .fs-balance-sig-stack{
+      display:flex;
+      flex-direction:column;
+      gap:18mm;
+      align-items:stretch;
+      width:100%;
+    }
+    @media print {
+      .no-print-fs{ display:none !important; }
     }
     .page-label{font-size:8pt;color:#aaa;margin-bottom:8px;font-style:italic;}
 
@@ -2210,6 +2226,34 @@
       m.selActivityExtraIndex = null;
     }
 
+    /** Apply Firestore `meta.directorReport.v01` onto a fresh in-memory model (no merge with prior company/year). */
+    function mdV01ApplyFirestoreV01ToModel(m, v01){
+      if(!m || !v01 || typeof v01 !== "object") return;
+      if(Array.isArray(v01.aboutLines)) m.aboutLines = v01.aboutLines.map((x)=>String(x||"").trim()).filter(Boolean);
+      if(Array.isArray(v01.activitySubLines)) m.activitySubLines = v01.activitySubLines.map((x)=>String(x||"").trim()).filter(Boolean);
+      if(typeof v01.bankTableEnabled === "boolean") m.bankTableEnabled = !!v01.bankTableEnabled;
+      if(Array.isArray(v01.bankTableRows)) m.bankTableRows = v01.bankTableRows.map((r)=>({ name:String(r?.name||"").trim(), amount:String(r?.amount||"").trim() })).filter((r)=>r.name||r.amount);
+      if(Array.isArray(v01.shareholdersRows)) m.shareholdersRows = v01.shareholdersRows.map((r)=>({ name:String(r?.name||"").trim(), amount:String(r?.amount||"").trim() })).filter((r)=>r.name||r.amount);
+      if(Array.isArray(v01.policiesLines)) m.policiesLines = v01.policiesLines.map((x)=>String(x||"").trim()).filter(Boolean);
+      if(Array.isArray(v01.eventsLines)) m.eventsLines = v01.eventsLines.map((x)=>String(x||"").trim()).filter(Boolean);
+      if(typeof v01.commitmentText === "string") m.commitmentText = v01.commitmentText;
+      if(typeof v01.closingText === "string") m.closingText = v01.closingText;
+      if(v01.activityEdits && typeof v01.activityEdits === "object") m.activityEdits = { ...v01.activityEdits };
+      else delete m.activityEdits;
+      if(v01.activityEnabled && typeof v01.activityEnabled === "object") m.activityEnabled = { ...v01.activityEnabled };
+      else delete m.activityEnabled;
+      if(Array.isArray(v01.activityExtraLines)) m.activityExtraLines = v01.activityExtraLines.map((x)=>String(x||"").trim()).filter(Boolean);
+      else delete m.activityExtraLines;
+    }
+
+    /** Replace session MD model from defaults + optional saved v01 (call whenever company/year context changes). */
+    function mdV01ResetModelFromFirestore(v01){
+      const m = mdV01Defaults();
+      state._mdReportV01 = m;
+      mdV01ApplyFirestoreV01ToModel(m, v01);
+      return m;
+    }
+
     function mdV01SafeText(s){ return String(s ?? ""); }
 
     // Note: report content is rendered in multiple sections; avoid global getElementById by scoping
@@ -2922,14 +2966,14 @@
         <div class="doc-body centered" contenteditable="false">ـــــــــ مع التقدير ـــــــــ</div>
         <div class="sig-row" style="margin-top:14px;text-align:center;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
           <div class="sig-box" style="font-size:9.5pt;padding:5px;">
-            <div class="sig-title" contenteditable="false">المدير المفوض</div>
-            <div contenteditable="false">${mdV01SafeText(ctx.mdName || "")}</div>
+            <div class="sig-title" contenteditable="false">${mdV01SafeText(ctx.audName || "")}</div>
+            <div contenteditable="false" style="font-size:9pt;">${mdV01SafeText(ctx.audTitleAr || "محاسب قانوني ومراقب حسابات")}</div>
             <div class="sig-name">_______________</div>
           </div>
           <div></div>
           <div class="sig-box" style="font-size:9.5pt;padding:5px;">
-            <div class="sig-title" contenteditable="false">${mdV01SafeText(ctx.audName || "")}</div>
-            <div contenteditable="false" style="font-size:9pt;">${mdV01SafeText(ctx.audTitleAr || "محاسب قانوني ومراقب حسابات")}</div>
+            <div class="sig-title" contenteditable="false">المدير المفوض</div>
+            <div contenteditable="false">${mdV01SafeText(ctx.mdName || "")}</div>
             <div class="sig-name">_______________</div>
           </div>
         </div>
@@ -3472,21 +3516,7 @@
         const meta = yearDoc?.meta || {};
         const saved = meta?.directorReport || {};
         const v01 = saved?.v01 || null;
-        const m = state._mdReportV01 || (state._mdReportV01 = mdV01Defaults());
-        if(v01){
-          if(Array.isArray(v01.aboutLines)) m.aboutLines = v01.aboutLines.map((x)=>String(x||"").trim()).filter(Boolean);
-          if(Array.isArray(v01.activitySubLines)) m.activitySubLines = v01.activitySubLines.map((x)=>String(x||"").trim()).filter(Boolean);
-          if(typeof v01.bankTableEnabled === "boolean") m.bankTableEnabled = !!v01.bankTableEnabled;
-          if(Array.isArray(v01.bankTableRows)) m.bankTableRows = v01.bankTableRows.map((r)=>({ name:String(r?.name||"").trim(), amount:String(r?.amount||"").trim() })).filter((r)=>r.name||r.amount);
-          if(Array.isArray(v01.shareholdersRows)) m.shareholdersRows = v01.shareholdersRows.map((r)=>({ name:String(r?.name||"").trim(), amount:String(r?.amount||"").trim() })).filter((r)=>r.name||r.amount);
-          if(Array.isArray(v01.policiesLines)) m.policiesLines = v01.policiesLines.map((x)=>String(x||"").trim()).filter(Boolean);
-          if(Array.isArray(v01.eventsLines)) m.eventsLines = v01.eventsLines.map((x)=>String(x||"").trim()).filter(Boolean);
-          if(typeof v01.commitmentText === "string") m.commitmentText = v01.commitmentText;
-          if(typeof v01.closingText === "string") m.closingText = v01.closingText;
-          if(v01.activityEdits && typeof v01.activityEdits === "object") m.activityEdits = { ...(m.activityEdits||{}), ...v01.activityEdits };
-          if(v01.activityEnabled && typeof v01.activityEnabled === "object") m.activityEnabled = { ...(m.activityEnabled||{}), ...v01.activityEnabled };
-          if(Array.isArray(v01.activityExtraLines)) m.activityExtraLines = v01.activityExtraLines.map((x)=>String(x||"").trim()).filter(Boolean);
-        }
+        const m = mdV01ResetModelFromFirestore(v01);
         mdV01MigrateActivityStorage(m);
 
         // compute revenue/expenses for activity lines (CY)
@@ -4187,6 +4217,28 @@
       const contractsExpCY = (hasContracts ? conRows.reduce((s,r)=>s + contractRowComputed(r).expensesIqd, 0) : 0);
       // PY contracts revenue is a single manual field on schedule (8)
       const revenuePY = (hasContracts ? (n(contracts.revPyTotalIqd) || 0) : 0) + (revenueVertTotals.py || 0);
+      /** رمز/رموز الدليل لصف الإيرادات الواحد: كشف العقود + كشوف مصنّفة إيرادات، بدون تكرار */
+      const revenueAcctCodesCombined = (()=>{
+        const parts = [];
+        if(hasContracts){
+          const c0 = toWesternDigits(String(contracts?.revenueAcctCode || "").trim());
+          parts.push(c0 || "41-45");
+        }
+        for(const sch of incomeRevenueSchedules){
+          const c = toWesternDigits(String(sch.acctCode || "").trim());
+          if(c) parts.push(c);
+        }
+        const seen = new Set();
+        const out = [];
+        for(const p of parts){
+          if(!p) continue;
+          const key = p.toLowerCase();
+          if(seen.has(key)) continue;
+          seen.add(key);
+          out.push(p);
+        }
+        return out.join("، ");
+      })();
       const hasInv = String(meta.companyHasInventory || "no") === "yes";
       const invBox = hasInv ? (dataById?.["_invBox"] || {}) : {};
       const openInv = n(invBox.openInv);
@@ -4308,7 +4360,7 @@
 
         // Balance sheet: inventory (current assets) — CY closing, PY opening (which is PY year ending)
         linkedBalance.push({
-          scheduleNo: "",
+          scheduleNo: "بيان د",
           acctCode: "15",
           acctName: "المخزون",
           cy: closeInv || 0,
@@ -4318,7 +4370,7 @@
         });
         // Income statement: used materials
         linkedIncome.push({
-          scheduleNo: "",
+          scheduleNo: "بيان د",
           acctCode: "321",
           acctName: "الخامات و المواد الاولية",
           cy: usedMaterials || 0,
@@ -4355,7 +4407,6 @@
         }
       }
 
-      const toArabYear = (y)=>toArabicIndicDigits(String(y||""));
       const fmtNeg = (v)=>{
         const num = Number(v||0);
         if(!num) return "-";
@@ -4370,8 +4421,8 @@
         .replace(/"/g,"&quot;");
       const expenseRowsHtml = incomeExpenseSchedules.length ? incomeExpenseSchedules.map(sch=>{
         const tot = sumVertical(sch.id);
-        const no = toArabicIndicDigits(sch.scheduleNo ?? "");
-        const code = escHtml(sch.acctCode || "");
+        const no = escHtml(toWesternDigits(String(sch.scheduleNo ?? "")));
+        const code = escHtml(toWesternDigits(String(sch.acctCode || "")));
         const name = escHtml(sch.acctName || sch.baseTitle || sch.title || "");
         return `<tr>
                   <td class="num-col" contenteditable="false">${no}</td>
@@ -4385,8 +4436,10 @@
       const fsCard = document.createElement("div");
       fsCard.className = "card";
       fsCard.innerHTML = `
+        <div class="no-print-fs">
         <div style="font-weight:900;color:var(--navy)">القوائم التلقائية (إجمالي الكشوفات فقط)</div>
-        <div class="hint" style="margin-top:6px">أي حفظ لكشف عمودي/موجودات ثابتة/عقود ينعكس هنا مباشرة (${CY}/${PY}). صفوف مصروفات «بيان ب» تُبنى من الكشوفات النشطة المصنّفة قائمة دخل ← مصروفات؛ الإيرادات الإضافية من كشوف مصنّفة إيرادات تُجمع مع إيراد العقود.</div>
+        <div class="hint" style="margin-top:6px">أي حفظ لكشف عمودي/موجودات ثابتة/عقود ينعكس هنا مباشرة (${CY}/${PY}). صفوف مصروفات «بيان ب» تُبنى من الكشوفات النشطة المصنّفة قائمة دخل ← مصروفات؛ صف الإيرادات واحد ويُجمع إيراد العقود مع كشوف مصنّفة إيرادات، وعمود «رقم الدليل» يُبنى تلقائياً من رمز الإيرادات في كشف العقود (أو 41-45 إن تُرك فارغاً) ثم رموز دليل الكشوف المصنّفة إيرادات.</div>
+        </div>
         ${!balOk ? `
           <div class="msg err" style="margin-top:10px">
             تنبيه توازن الميزانية:
@@ -4411,14 +4464,14 @@
                 <th style="width:8%">رقم الكشف</th>
                 <th style="width:10%">رقم الدليل المحاسبي</th>
                 <th style="width:46%">اسم الحساب</th>
-                <th style="width:18%">${toArabYear(CY)} دينار</th>
-                <th style="width:18%">${toArabYear(PY)} دينار</th>
+                <th style="width:18%">${CY} دينار</th>
+                <th style="width:18%">${PY} دينار</th>
               </tr></thead>
               <tbody>
                 <tr class="row-subheader"><td colspan="5" contenteditable="false">الايرادات</td></tr>
                 <tr>
-                  <td class="num-col" contenteditable="false">${toArabicIndicDigits(contractsSchNo)}</td>
-                  <td class="num-col" contenteditable="false">٤١-٤٥</td>
+                  <td class="num-col" contenteditable="false">${escHtml(String(contractsSchNo))}</td>
+                  <td class="num-col" dir="ltr" contenteditable="false">${escHtml(revenueAcctCodesCombined || "—")}</td>
                   <td contenteditable="false">ايراد النشاط التشغيلي</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(revenueCY)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(revenuePY)}</td>
@@ -4428,8 +4481,8 @@
                 ${expenseRowsHtml}
                 ${hasFA ? `
                 <tr>
-                  <td class="num-col" contenteditable="false">${toArabicIndicDigits(1)}</td>
-                  <td class="num-col" contenteditable="false">٣٧</td>
+                  <td class="num-col" contenteditable="false">1</td>
+                  <td class="num-col" contenteditable="false">37</td>
                   <td contenteditable="false">الاندثارات والاطفاءات</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(faTotals.depCY||0)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(faTotals.depPY||0)}</td>
@@ -4437,8 +4490,8 @@
                 ` : ``}
                 ${hasInv ? `
                 <tr>
-                  <td class="num-col" contenteditable="false"></td>
-                  <td class="num-col" contenteditable="false">٣٢١</td>
+                  <td class="num-col" contenteditable="false">بيان د</td>
+                  <td class="num-col" contenteditable="false">321</td>
                   <td contenteditable="false">الخامات و المواد الاولية</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(usedMaterialsCY)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(usedMaterialsPY)}</td>
@@ -4456,7 +4509,7 @@
                   <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${fmt(pbtPY)}</td>
                 </tr>
                 <tr>
-                  <td colspan="3" contenteditable="false">تخصيصات ضريبة الدخل ${toArabicIndicDigits(n(meta.incomeTaxRatePct))}٪</td>
+                  <td colspan="3" contenteditable="false">تخصيصات ضريبة الدخل ${n(meta.incomeTaxRatePct)}٪</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmtNeg(taxCY)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmtNeg(taxPY)}</td>
                 </tr>
@@ -4471,7 +4524,7 @@
                   <td class="amount-col" contenteditable="false"></td>
                 </tr>
                 <tr>
-                  <td colspan="3" contenteditable="false">احتياطي قانوني ${toArabicIndicDigits(n(meta.legalReserveRatePct))}٪ من صافي الربح بعد الضريبة</td>
+                  <td colspan="3" contenteditable="false">احتياطي قانوني ${n(meta.legalReserveRatePct)}٪ من صافي الربح بعد الضريبة</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(reserveCY)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(reservePY)}</td>
                 </tr>
@@ -4492,6 +4545,28 @@
                 </tr>
               </tbody>
             </table>
+            <div class="fs-balance-sigs">
+              <div class="sig-row" style="margin-top:0;text-align:center;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+                <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+                  <div class="sig-title" contenteditable="false">المحاسب</div>
+                  <div contenteditable="false">${escHtml(meta.accountantName || "")}</div>
+                  <div class="sig-name">_______________</div>
+                </div>
+                <div></div>
+                <div class="fs-balance-sig-stack">
+                  <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+                    <div class="sig-title" contenteditable="false">المدير المفوض</div>
+                    <div contenteditable="false">${escHtml(meta.mdName || "")}</div>
+                    <div class="sig-name">_______________</div>
+                  </div>
+                  <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+                    <div class="sig-title" contenteditable="false">مراقب الحسابات</div>
+                    <div contenteditable="false">${escHtml(meta.auditorNameAr || "")}</div>
+                    <div class="sig-name">_______________</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="page" data-fs-order="1">
@@ -4504,15 +4579,15 @@
                 <th style="width:8%">رقم الكشف</th>
                 <th style="width:10%">رقم الدليل المحاسبي</th>
                 <th style="width:44%">اسم الحساب</th>
-                <th style="width:19%">${toArabYear(CY)} دينار</th>
-                <th style="width:19%">${toArabYear(PY)} دينار</th>
+                <th style="width:19%">${CY} دينار</th>
+                <th style="width:19%">${PY} دينار</th>
               </tr></thead>
               <tbody>
                 <tr class="row-header"><td colspan="5" contenteditable="false">الموجودات</td></tr>
                 <tr class="row-subheader"><td colspan="5" contenteditable="false">الموجودات الثابتة</td></tr>
                 <tr>
-                  <td class="num-col" contenteditable="false">${toArabicIndicDigits(1)}</td>
-                  <td class="num-col" contenteditable="false">١١</td>
+                  <td class="num-col" contenteditable="false">1</td>
+                  <td class="num-col" contenteditable="false">11</td>
                   <td contenteditable="false">الموجودات الثابتة (بالقيمة الدفترية)</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(bs.assets.fixedAssetsNet.cy)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(bs.assets.fixedAssetsNet.py)}</td>
@@ -4526,22 +4601,22 @@
 
                 <tr class="row-subheader"><td colspan="5" contenteditable="false">الموجودات المتداولة</td></tr>
                 <tr>
-                  <td class="num-col" contenteditable="false"></td>
-                  <td class="num-col" contenteditable="false">١٥</td>
+                  <td class="num-col" contenteditable="false">${hasInv ? "بيان د" : ""}</td>
+                  <td class="num-col" contenteditable="false">15</td>
                   <td contenteditable="false">المخزون</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(bs.assets.inventory.cy)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(bs.assets.inventory.py)}</td>
                 </tr>
                 <tr>
-                  <td class="num-col" contenteditable="false">${toArabicIndicDigits(2)}</td>
-                  <td class="num-col" contenteditable="false">١٦</td>
+                  <td class="num-col" contenteditable="false">2</td>
+                  <td class="num-col" contenteditable="false">16</td>
                   <td contenteditable="false">المدينون</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(bs.assets.receivables.cy)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(bs.assets.receivables.py)}</td>
                 </tr>
                 <tr>
-                  <td class="num-col" contenteditable="false">${toArabicIndicDigits(3)}</td>
-                  <td class="num-col" contenteditable="false">١٨</td>
+                  <td class="num-col" contenteditable="false">3</td>
+                  <td class="num-col" contenteditable="false">18</td>
                   <td contenteditable="false">النقود</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(bs.assets.cash.cy)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(bs.assets.cash.py)}</td>
@@ -4562,14 +4637,14 @@
                 <tr class="row-header"><td colspan="5" contenteditable="false">مصادر التمويل طويلة الاجل</td></tr>
                 <tr>
                   <td class="num-col" contenteditable="false">بيان ج</td>
-                  <td class="num-col" contenteditable="false">٢١</td>
+                  <td class="num-col" contenteditable="false">21</td>
                   <td contenteditable="false">راس المال</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(ltCapitalCY)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(ltCapitalPY)}</td>
                 </tr>
                 <tr>
                   <td class="num-col" contenteditable="false">بيان ج</td>
-                  <td class="num-col" contenteditable="false">٢٢</td>
+                  <td class="num-col" contenteditable="false">22</td>
                   <td contenteditable="false">الاحتياطيات</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(ltReservesCY)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(ltReservesPY)}</td>
@@ -4584,14 +4659,14 @@
                 <tr class="row-header"><td colspan="5" contenteditable="false">مصادر التمويل قصيرة الاجل</td></tr>
                 <tr>
                   <td class="num-col" contenteditable="false"></td>
-                  <td class="num-col" contenteditable="false">٢٣</td>
+                  <td class="num-col" contenteditable="false">23</td>
                   <td contenteditable="false">تخصيصات قصيرة الاجل</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(bs.liabilities.shortTermProvisions.cy)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(bs.liabilities.shortTermProvisions.py)}</td>
                 </tr>
                 <tr>
-                  <td class="num-col" contenteditable="false">${toArabicIndicDigits(4)}</td>
-                  <td class="num-col" contenteditable="false">٢٦</td>
+                  <td class="num-col" contenteditable="false">4</td>
+                  <td class="num-col" contenteditable="false">26</td>
                   <td contenteditable="false">الدائنون</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(bs.liabilities.creditors.cy)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(bs.liabilities.creditors.py)}</td>
@@ -4610,9 +4685,32 @@
                 </tr>
               </tbody>
             </table>
+            <div class="fs-balance-sigs">
+              <div class="sig-row" style="margin-top:0;text-align:center;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+                <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+                  <div class="sig-title" contenteditable="false">المحاسب</div>
+                  <div contenteditable="false">${escHtml(meta.accountantName || "")}</div>
+                  <div class="sig-name">_______________</div>
+                </div>
+                <div></div>
+                <div class="fs-balance-sig-stack">
+                  <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+                    <div class="sig-title" contenteditable="false">المدير المفوض</div>
+                    <div contenteditable="false">${escHtml(meta.mdName || "")}</div>
+                    <div class="sig-name">_______________</div>
+                  </div>
+                  <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+                    <div class="sig-title" contenteditable="false">مراقب الحسابات</div>
+                    <div contenteditable="false">${escHtml(meta.auditorNameAr || "")}</div>
+                    <div class="sig-name">_______________</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
+        <div class="no-print-fs">
         <div class="spacer"></div>
         <div style="font-weight:900;margin:6px 0">تفاصيل الترحيل — الميزانية (بيان أ)</div>
         <div class="hint" style="margin-top:4px;margin-bottom:6px">الكشوفات والقيم المرحّلة إلى قائمة المركز المالي</div>
@@ -4628,10 +4726,10 @@
               <tbody>
                 ${linkedBalance.map(r=>`
                   <tr>
-                    <td class="num-col" dir="ltr">${r.scheduleNo ?? ""}</td>
-                    <td class="num-col" dir="ltr">${r.acctCode || ""}</td>
-                    <td>${r.acctName || ""}</td>
-                    <td>${sectionLabel("balance", r.section)}</td>
+                    <td class="num-col" dir="ltr">${escHtml(toWesternDigits(String(r.scheduleNo ?? "")))}</td>
+                    <td class="num-col" dir="ltr">${escHtml(toWesternDigits(String(r.acctCode || "")))}</td>
+                    <td>${escHtml(r.acctName || "")}</td>
+                    <td>${escHtml(sectionLabel("balance", r.section))}</td>
                     <td class="amount-col" dir="ltr">${fmt(r.cy || 0)}</td>
                     <td class="amount-col" dir="ltr">${fmt(r.py || 0)}</td>
                   </tr>
@@ -4654,16 +4752,17 @@
               <tbody>
                 ${linkedIncome.map(r=>`
                   <tr>
-                    <td class="num-col" dir="ltr">${r.scheduleNo ?? ""}</td>
-                    <td class="num-col" dir="ltr">${r.acctCode || ""}</td>
-                    <td>${r.acctName || ""}</td>
-                    <td>${sectionLabel("income", r.section)}</td>
+                    <td class="num-col" dir="ltr">${escHtml(toWesternDigits(String(r.scheduleNo ?? "")))}</td>
+                    <td class="num-col" dir="ltr">${escHtml(toWesternDigits(String(r.acctCode || "")))}</td>
+                    <td>${escHtml(r.acctName || "")}</td>
+                    <td>${escHtml(sectionLabel("income", r.section))}</td>
                     <td class="amount-col" dir="ltr">${fmt(r.cy || 0)}</td>
                     <td class="amount-col" dir="ltr">${fmt(r.py || 0)}</td>
                   </tr>
                 `).join("") || `<tr><td colspan="6" class="hint">لا توجد كشوفات مرحّلة.</td></tr>`}
               </tbody>
             </table>
+        </div>
       `;
       wrap.appendChild(fsCard);
 
@@ -5473,7 +5572,8 @@
 
           renderTable();
         } else if(kind === "contracts"){
-          const saved = dataById[sch.id] || { type:"contracts", exchangeRate:"", revPyTotalIqd:"", rows: [] };
+          const saved = dataById[sch.id] || { type:"contracts", exchangeRate:"", revPyTotalIqd:"", revenueAcctCode:"", rows: [] };
+          if(saved.revenueAcctCode == null) saved.revenueAcctCode = "";
           dataById[sch.id] = saved;
           let editing = false;
           let selectedRow = -1;
@@ -5482,9 +5582,12 @@
             const rows = Array.isArray(saved.rows) ? saved.rows : (saved.rows = []);
             const rate = saved.exchangeRate != null ? String(saved.exchangeRate) : "";
             const revPyTotal = saved.revPyTotalIqd != null ? String(saved.revPyTotalIqd) : "";
+            const revAcct = saved.revenueAcctCode != null ? String(saved.revenueAcctCode) : "";
             const header = document.createElement("div");
             header.className = "row";
             header.style.justifyContent = "space-between";
+            header.style.flexWrap = "wrap";
+            header.style.gap = "10px";
             header.style.marginBottom = "10px";
             header.innerHTML = `
               <span class="pill"><b>سعر الصرف (USD→IQD)</b>
@@ -5492,6 +5595,9 @@
               </span>
               <span class="pill"><b>إيراد العقود للعام السابق (${PY}) (دينار)</b>
                 <input id="contracts-revpy" dir="ltr" ${editing ? "" : "disabled"} value="${revPyTotal || ""}" placeholder="مثال: 0" style="min-width:180px"/>
+              </span>
+              <span class="pill"><b>رمز الدليل للإيرادات (قائمة الدخل)</b>
+                <input id="contracts-rev-acct" dir="ltr" ${editing ? "" : "disabled"} value="${escHtml(revAcct)}" placeholder="مثال: 41-45" style="min-width:160px" title="يُدمج مع رموز دليل الكشوف المصنّفة «إيرادات» في عمود الدليل ببيان ب دون فصل الصفوف"/>
               </span>
               <span class="hint">يمكن إدخال الدولار أو الدينار مباشرة. نسبة الإنجاز تُحسب تلقائياً.</span>
             `;
@@ -5613,6 +5719,17 @@
                   const raw = String(revPyInp.value||"").trim();
                   saved.revPyTotalIqd = raw ? fmt(n(raw)) : "";
                   revPyInp.value = saved.revPyTotalIqd;
+                });
+              }
+
+              const revAcctInp = body.querySelector("#contracts-rev-acct");
+              if(revAcctInp){
+                revAcctInp.addEventListener("input", ()=>{
+                  saved.revenueAcctCode = revAcctInp.value;
+                });
+                revAcctInp.addEventListener("blur", ()=>{
+                  saved.revenueAcctCode = String(revAcctInp.value || "").trim();
+                  revAcctInp.value = saved.revenueAcctCode;
                 });
               }
 
@@ -5913,6 +6030,9 @@
       const printStyle = `
         @page { size: A4; margin: 12mm; }
         body{ background:#fff; }
+        @media print {
+          .no-print-fs{ display:none !important; }
+        }
         /* hide app UI + all toolbars/buttons/inputs in print tab */
         .overlay, .modal, nav, header{ display:none !important; }
         button, input, select, textarea{ display:none !important; }
