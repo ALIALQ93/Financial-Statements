@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Financial Statements – عرض تقديمي احترافي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ══════════════ VARIABLES ══════════════ */
+:root{
+  --navy:#1a3a5c; --blue:#1F4E79; --blue2:#2e76b6; --blue-ultra:#EBF3FB;
+  --gold:#e8c46a; --gold2:#f4d98d; --gold3:#c9a84c;
+  --bg:#eef1f4; --border:#b0c4d8; --text:#0d1f30;
+  --danger:#b00020;
+  --font:'Cairo','Noto Naskh Arabic',serif;
+  --shadow:0 18px 50px rgba(0,0,0,.18);
+  /* Slide theme */
+  --s-bg:#07111e; --s-card:rgba(255,255,255,.04); --s-border:rgba(255,255,255,.09);
+  --s-text:#e8eef4; --s-muted:rgba(232,238,244,.55);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--s-bg);color:var(--s-text);overflow:hidden;height:100vh;width:100vw;direction:rtl;}
+
+/* ══════════════ DECK ══════════════ */
+.deck{width:100vw;height:100vh;position:relative;}
+
+.slide{
+  position:absolute;inset:0;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:0;
+  opacity:0;pointer-events:none;
+  overflow:hidden;
+}
+/* السماح بالتمرير داخل أعمدة الشريحة حتى لا يُقتص المحتوى الطويل */
+.slide:not(.full) > .exp-panel,
+.slide:not(.full) > .ui-panel{min-height:0;}
+.slide.animated{
+  transition:opacity .5s ease,transform .5s ease;
+  transform:translateX(-30px);
+}
+.slide.active{opacity:1;pointer-events:all;transform:translateX(0) !important;}
+.slide.exit{opacity:0;transform:translateX(30px) !important;pointer-events:none;}
+
+/* Full-width slides */
+.slide.full{grid-template-columns:1fr;}
+
+/* ══ LEFT PANEL (explanation) ══ */
+.exp-panel{
+  display:flex;flex-direction:column;justify-content:flex-start;
+  padding:44px 40px 80px 36px;
+  background:linear-gradient(160deg,#0a1929 0%,#071018 100%);
+  border-left:1px solid rgba(255,255,255,.06);
+  position:relative;
+  overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.exp-panel::before{
+  content:'';position:absolute;
+  bottom:-120px;right:-80px;
+  width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,196,106,.07),transparent 70%);
+  pointer-events:none;
+}
+
+/* ══ RIGHT PANEL (UI mockup) ══ */
+.ui-panel{
+  display:flex;flex-direction:column;justify-content:flex-start;align-items:center;
+  padding:32px 28px 80px;
+  background:linear-gradient(160deg,#0d1f30 0%,#061018 100%);
+  position:relative;
+  overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.ui-panel::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(46,118,182,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(46,118,182,.04) 1px,transparent 1px);
+  background-size:40px 40px;pointer-events:none;
+}
+
+/* ══════════════ EXPLANATION ELEMENTS ══════════════ */
+.slide-tag{
+  display:inline-block;background:rgba(232,196,106,.12);
+  border:1px solid rgba(232,196,106,.3);color:var(--gold);
+  padding:4px 12px;border-radius:6px;font-size:9.5pt;font-weight:700;
+  margin-bottom:14px;letter-spacing:.4px;
+}
+.slide-title{font-size:21pt;font-weight:900;color:#fff;line-height:1.25;margin-bottom:6px;}
+.slide-title .a{color:var(--gold);}
+.slide-sub{font-size:10pt;color:var(--s-muted);margin-bottom:22px;line-height:1.6;}
+
+.points{display:flex;flex-direction:column;gap:11px;}
+.point{
+  display:flex;align-items:flex-start;gap:12px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+  border-radius:10px;padding:12px 14px;
+}
+.point .p-icon{
+  flex:0 0 auto;width:30px;height:30px;border-radius:8px;
+  background:rgba(232,196,106,.14);border:1px solid rgba(232,196,106,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;
+}
+.point .p-body .p-title{font-size:11pt;font-weight:900;color:#fff;margin-bottom:2px;}
+.point .p-body .p-desc{font-size:9.5pt;color:var(--s-muted);line-height:1.6;}
+
+/* ══════════════ APP MOCKUP STYLES (replica of real app) ══════════════ */
+.app-mock{
+  width:100%;max-width:480px;
+  background:#eef1f4;border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 24px 60px rgba(0,0,0,.55);
+  border:1px solid rgba(255,255,255,.1);
+  font-size:10px;direction:rtl;
+  transform:scale(.96);
+}
+
+/* Topbar */
+.m-topbar{
+  background:#1a3a5c;color:#fff;
+  padding:8px 12px;display:flex;align-items:center;gap:8px;
+  font-family:var(--font);font-size:10px;
+}
+.m-brand{font-weight:900;color:#e8c46a;margin:0 auto;font-size:11px;}
+.m-pill{
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);
+  padding:3px 8px;border-radius:999px;font-size:9px;color:#fff;
+}
+.m-logout{
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);
+  color:#fff;padding:3px 7px;border-radius:5px;font-size:9px;cursor:default;
+  font-family:var(--font);
+}
+
+/* Layout */
+.m-layout{display:flex;}
+
+/* Sidebar */
+.m-sidebar{
+  width:110px;flex:0 0 auto;
+  background:rgba(255,255,255,.55);
+  border-left:1px solid rgba(176,196,216,.75);
+  padding:8px 6px;backdrop-filter:blur(10px);
+}
+.m-nav-title{font-weight:900;color:#1a3a5c;font-size:9px;margin:4px 4px 8px;}
+.m-nav-btn{
+  width:100%;display:flex;align-items:center;gap:6px;
+  padding:6px 7px;border-radius:8px;
+  border:1px solid rgba(176,196,216,.9);background:#fff;
+  color:#1a3a5c;font-size:9px;font-weight:700;
+  font-family:var(--font);text-align:right;margin-bottom:5px;cursor:default;
+}
+.m-nav-btn.active{
+  background:linear-gradient(180deg,rgba(232,196,106,.55),rgba(232,196,106,.25));
+  border-color:rgba(232,196,106,.85);
+}
+
+/* Main content */
+.m-main{flex:1 1 auto;padding:10px;background:#eef1f4;min-height:240px;}
+.m-card{
+  background:#fff;border:1px solid #b0c4d8;border-radius:10px;
+  padding:10px 12px;margin:0 0 8px;
+  box-shadow:0 3px 10px rgba(0,0,0,.05);
+}
+.m-card h2{font-size:11px;color:#1a3a5c;font-weight:900;margin-bottom:8px;font-family:var(--font);}
+.m-label{font-size:8px;color:#444;font-weight:700;margin-bottom:3px;display:block;}
+.m-input{
+  width:100%;padding:5px 7px;border:1px solid #b0c4d8;border-radius:6px;
+  font-family:var(--font);font-size:9px;outline:none;color:#111;
+  background:#fff;
+}
+.m-input[dir="ltr"]{text-align:left;}
+.m-select{
+  width:100%;padding:5px 7px;border:1px solid #b0c4d8;border-radius:6px;
+  font-family:var(--font);font-size:9px;background:#fff;color:#111;
+}
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.m-btn-primary{
+  background:#e8c46a;color:#1a3a5c;border:none;
+  padding:5px 12px;border-radius:7px;font-weight:900;font-size:9px;
+  cursor:default;font-family:var(--font);
+}
+.m-btn{
+  background:#fff;color:#1a3a5c;border:1px solid #b0c4d8;
+  padding:5px 10px;border-radius:7px;font-weight:700;font-size:9px;
+  cursor:default;font-family:var(--font);
+}
+.m-pill-info{
+  display:inline-flex;gap:5px;align-items:center;
+  background:#EBF3FB;border:1px solid #b0c4d8;
+  padding:4px 8px;border-radius:999px;font-size:8.5px;color:#111;
+}
+.m-pill-info b{color:#1a3a5c;}
+.m-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
+.m-hint{font-size:8px;color:#555;line-height:1.5;margin:4px 0;}
+.m-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:8px;}
+
+/* Table */
+.m-table{width:100%;border-collapse:collapse;font-size:8px;direction:rtl;}
+.m-table th{background:#1F4E79;color:#fff;padding:5px 6px;text-align:right;border:1px solid #1a3a5c;font-weight:600;}
+.m-table td{border:1px solid #b0c4d8;padding:4px 6px;vertical-align:middle;color:#111;}
+.m-table tr:nth-child(even) td{background:#EBF3FB;}
+.m-table .row-total td{background:#fff!important;font-weight:700;border-top:2px solid #1F4E79;}
+.m-table .row-header td{background:#dce9f5!important;font-weight:700;font-size:8.5px;}
+.m-table .row-sub td{background:#EBF3FB!important;font-weight:700;text-decoration:underline;}
+.m-table .num{text-align:center;}
+.m-table .amt{text-align:center;font-size:8px;}
+
+/* Login card */
+.m-auth-header{
+  background:linear-gradient(135deg,#1a3a5c,#1F4E79,#2e76b6);
+  padding:14px;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.m-auth-logo{
+  width:28px;height:28px;border-radius:7px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  display:grid;place-items:center;color:#e8c46a;font-weight:900;font-size:11px;
+}
+.m-auth-title{color:#fff;font-weight:900;font-size:13px;font-family:var(--font);}
+.m-auth-form{padding:12px 14px;background:#fff;}
+.m-auth-form h2{font-size:12px;color:#1a3a5c;font-weight:900;margin-bottom:10px;font-family:var(--font);}
+.m-field{margin:8px 0;}
+
+/* Modal overlay */
+.m-overlay{
+  position:relative;background:#fff;border-radius:10px;overflow:hidden;
+  border:1px solid #b0c4d8;
+}
+.m-modal-hd{
+  background:#1a3a5c;color:#e8c46a;padding:8px 12px;
+  font-weight:900;font-size:10px;font-family:var(--font);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.m-modal-close{
+  width:20px;height:20px;border-radius:5px;border:1px solid rgba(255,255,255,.3);
+  background:rgba(255,255,255,.1);color:#fff;display:grid;place-items:center;
+  font-size:11px;cursor:default;
+}
+.m-modal-body{padding:10px 12px;}
+.m-modal-ft{
+  padding:8px 12px;background:#EBF3FB;border-top:1px solid #b0c4d8;
+  display:flex;gap:8px;justify-content:flex-end;
+}
+
+/* form-section label */
+.m-form-section{
+  grid-column:1/-1;padding:6px 10px;
+  border:1px solid rgba(176,196,216,.75);background:rgba(240,246,255,.65);
+  border-radius:8px;font-weight:900;color:#1a3a5c;font-size:8.5px;
+}
+
+/* Callout arrow */
+.callout{
+  position:relative;z-index:1;
+  background:rgba(232,196,106,.15);border:1px solid rgba(232,196,106,.4);
+  border-radius:8px;padding:8px 12px;margin-top:14px;
+  font-size:9.5pt;color:var(--gold);font-weight:700;line-height:1.6;
+  display:flex;align-items:flex-start;gap:8px;
+}
+.callout .cl-icon{font-size:14px;flex:0 0 auto;margin-top:1px;}
+
+/* Developer / DOM reference (login slide) */
+.dom-ref{
+  margin-top:14px;width:100%;max-width:320px;
+  padding:12px 14px;
+  background:rgba(232,196,106,.1);border:1px solid rgba(232,196,106,.45);
+  border-radius:9px;font-size:9pt;color:rgba(232,238,244,.88);
+  line-height:1.55;border-right:3px solid rgba(232,196,106,.55);
+  flex-shrink:0;
+}
+.dom-ref .dom-path{
+  margin-top:8px;padding:9px 11px;background:rgba(0,0,0,.45);
+  border-radius:6px;font-family:ui-monospace,Consolas,'Cascadia Mono',monospace;
+  font-size:8.5pt;color:#e8eef4;direction:ltr;text-align:left;
+  word-break:break-all;line-height:1.45;border:1px solid rgba(255,255,255,.08);
+}
+.dom-ref .dom-meta{font-size:8.5pt;color:rgba(232,238,244,.65);margin-top:10px;line-height:1.55;}
+
+/* ══════════════ NAV BAR ══════════════ */
+.nav-bar{
+  position:fixed;bottom:0;left:0;right:0;height:58px;
+  background:rgba(5,12,22,.95);border-top:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(20px);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;z-index:100;
+}
+.nav-btn{
+  width:38px;height:38px;border-radius:9px;
+  border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.75);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;transition:all .2s;
+}
+.nav-btn:hover:not(:disabled){background:rgba(232,196,106,.15);border-color:rgba(232,196,106,.35);color:var(--gold);}
+.nav-btn:disabled{opacity:.3;cursor:not-allowed;}
+.dots{display:flex;gap:5px;align-items:center;}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);transition:all .3s;cursor:pointer;}
+.dot.active{background:var(--gold);width:16px;border-radius:3px;}
+.slide-counter{font-size:10pt;font-weight:700;color:rgba(255,255,255,.45);direction:ltr;}
+.slide-title-lbl{font-size:9.5pt;color:rgba(255,255,255,.30);max-width:220px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+
+/* Progress */
+.progress-bar{position:fixed;top:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold3),var(--gold));transition:width .4s ease;z-index:200;border-radius:0 0 0 2px;}
+
+/* Cover slide */
+.cover-panel{
+  grid-column:1/-1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:48px 48px 80px;
+  background:linear-gradient(145deg,#09182a 0%,#05101a 100%);
+  position:relative;overflow:hidden;
+}
+.cover-panel::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 800px 500px at 30% 30%,rgba(232,196,106,.09),transparent 60%),
+  radial-gradient(ellipse 600px 400px at 75% 70%,rgba(31,78,121,.18),transparent 60%);
+  pointer-events:none;}
+.cover-panel::after{content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(232,196,106,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(232,196,106,.03) 1px,transparent 1px);
+  background-size:55px 55px;pointer-events:none;}
+.cover-logo{
+  position:relative;z-index:1;
+  width:76px;height:76px;border-radius:20px;
+  background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;font-weight:900;color:var(--navy);
+  box-shadow:0 0 0 1px rgba(232,196,106,.3),0 20px 50px rgba(232,196,106,.2);
+  margin-bottom:24px;animation:pulse 3s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 1px rgba(232,196,106,.3),0 20px 50px rgba(232,196,106,.2);}50%{box-shadow:0 0 0 1px rgba(232,196,106,.6),0 20px 70px rgba(232,196,106,.32);}}
+.cover-tag-pill{position:relative;z-index:1;display:inline-block;background:rgba(232,196,106,.12);border:1px solid rgba(232,196,106,.3);color:var(--gold);padding:5px 16px;border-radius:999px;font-size:10.5pt;font-weight:600;margin-bottom:18px;}
+.cover-title{position:relative;z-index:1;font-size:38pt;font-weight:900;color:#fff;line-height:1.2;margin-bottom:14px;}
+.cover-title span{color:var(--gold);}
+.cover-div{width:70px;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 18px;border-radius:2px;}
+.cover-sub{position:relative;z-index:1;font-size:12.5pt;color:rgba(255,255,255,.60);max-width:580px;line-height:1.75;}
+.cover-stats{position:relative;z-index:1;display:flex;gap:28px;justify-content:center;margin-top:32px;flex-wrap:wrap;}
+.cs-item{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.cs-num{font-size:24pt;font-weight:900;color:var(--gold);line-height:1;}
+.cs-label{font-size:9.5pt;color:rgba(255,255,255,.50);font-weight:600;}
+.cs-sep{width:1px;height:36px;background:rgba(255,255,255,.12);}
+
+/* Schedule toolbar mock */
+.m-sch-toolbar{
+  display:flex;flex-wrap:wrap;align-items:center;gap:5px;
+  padding:6px 8px;background:#EBF3FB;border:1px solid #b0c4d8;border-radius:6px;
+  font-size:8px;margin-bottom:6px;
+}
+.m-tb-btn{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:3px 7px;border-radius:4px;border:1px solid #b0c4d8;
+  background:#fff;font-family:var(--font);font-size:8px;font-weight:600;color:#1a3a5c;cursor:default;
+}
+.m-tb-btn.primary{background:#e8c46a;border-color:transparent;color:#1a3a5c;}
+
+/* Page mock (A4) */
+.m-page{
+  background:#fff;border:1px solid rgba(176,196,216,.85);
+  border-radius:3px;padding:10px 10px 8px;width:100%;
+  box-shadow:0 2px 12px rgba(0,0,0,.12);
+}
+.m-page-label{font-size:7px;color:#aaa;margin-bottom:4px;font-style:italic;}
+.m-doc-title{text-align:center;font-size:9px;font-weight:900;color:#1a3a5c;margin-bottom:2px;}
+.m-doc-sub{text-align:center;font-size:8px;text-decoration:underline;margin-bottom:4px;color:#111;}
+.m-stmt-code{font-size:7px;color:#777;text-align:left;margin-bottom:4px;}
+
+/* Sig row */
+.m-sig-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px;padding-top:6px;border-top:1px solid #b0c4d8;text-align:center;font-size:7.5px;}
+.m-sig-box .sig-title{font-weight:900;color:#1a3a5c;margin-bottom:2px;}
+.m-sig-box .sig-line{border-bottom:1px solid #333;width:70%;margin:4px auto 0;}
+
+/* tooltip-style annotation */
+.ann{
+  position:absolute;background:rgba(232,196,106,.95);color:#1a3a5c;
+  font-size:8pt;font-weight:900;padding:4px 9px;border-radius:6px;
+  white-space:nowrap;z-index:10;
+  box-shadow:0 4px 12px rgba(0,0,0,.3);
+}
+.ann::after{content:'';position:absolute;border:5px solid transparent;}
+
+/* section header full-width slide */
+.section-full{
+  grid-column:1/-1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:60px 60px 80px;
+  background:linear-gradient(145deg,#08192b 0%,#040d18 100%);
+  position:relative;overflow:hidden;
+}
+.section-full::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 700px 400px at 50% 50%,rgba(31,78,121,.2),transparent 70%);
+  pointer-events:none;}
+
+.kbd-hint{
+  position:fixed;bottom:68px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.45);padding:5px 12px;border-radius:7px;font-size:9pt;
+  pointer-events:none;animation:fade-hint 4.5s ease forwards;z-index:150;white-space:nowrap;
+}
+@keyframes fade-hint{0%{opacity:0;}15%{opacity:1;}80%{opacity:1;}100%{opacity:0;}}
+
+/* ══ MOBILE ══ */
+@media(max-width:820px){
+  .slide:not(.full){
+    grid-template-columns:1fr;
+    grid-template-rows:auto auto;
+    overflow-y:auto;
+  }
+  .exp-panel{
+    padding:24px 20px 16px;
+    justify-content:flex-start;
+    min-height:0;
+    border-left:none;
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .ui-panel{
+    padding:16px 16px 70px;
+    min-height:0;
+    justify-content:flex-start;
+  }
+  .app-mock{transform:scale(1);max-width:100%;}
+  .slide-title{font-size:15pt;}
+  .cover-title{font-size:22pt;}
+  .cover-stats{gap:16px;}
+  .cs-sep{display:none;}
+  .section-full{padding:40px 20px 70px;}
+  .points{gap:8px;}
+  .point{padding:10px 12px;}
+  .callout{font-size:9pt;}
+  .nav-bar{padding:0 16px;}
+  .slide-title-lbl{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+
+<div class="deck" id="deck">
+
+<!-- ══════════ SLIDE 1: COVER ══════════ -->
+<div class="slide full" data-title="الغلاف">
+  <div class="cover-panel">
+    <div class="cover-logo">$</div>
+    <div class="cover-tag-pill">نظام إدارة القوائم المالية</div>
+    <h1 class="cover-title">Financial <span>Statements</span></h1>
+    <div class="cover-div"></div>
+    <p class="cover-sub">دليل شامل للمحاسبين القانونيين ومراقبي الحسابات<br/>إعداد القوائم المالية وفق النظام المحاسبي العراقي باحترافية ودقة</p>
+    <div class="cover-stats">
+      <div class="cs-item"><span class="cs-num">٤</span><span class="cs-label">قوائم مالية</span></div>
+      <div class="cs-sep"></div>
+      <div class="cs-item"><span class="cs-num">٨+</span><span class="cs-label">كشوفات تفصيلية</span></div>
+      <div class="cs-sep"></div>
+      <div class="cs-item"><span class="cs-num">∞</span><span class="cs-label">شركات وسنوات</span></div>
+      <div class="cs-sep"></div>
+      <div class="cs-item"><span class="cs-num">١</span><span class="cs-label">ملف HTML</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SLIDE 2: LOGIN ══════════ -->
+<div class="slide" data-title="شاشة تسجيل الدخول">
+  <div class="exp-panel">
+    <div class="slide-tag">الأمان والوصول</div>
+    <h2 class="slide-title">شاشة <span class="a">تسجيل الدخول</span></h2>
+    <p class="slide-sub">أول ما يراه المستخدم — نظام مصادقة آمن بالبريد وكلمة المرور</p>
+    <div class="points">
+      <div class="point">
+        <div class="p-icon">🔐</div>
+        <div class="p-body">
+          <div class="p-title">Firebase Authentication</div>
+          <div class="p-desc">المصادقة عبر Google Firebase — التشفير ومعالجة الدخول تتم على السحابة بشكل كامل</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">👑</div>
+        <div class="p-body">
+          <div class="p-title">صلاحيتان فقط</div>
+          <div class="p-desc">مدير (Admin) — يصل لكل شيء بما فيه إدارة المستخدمين<br/>محاسب — يدخل البيانات ويعدّل الكشوفات</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">🔄</div>
+        <div class="p-body">
+          <div class="p-title">إعداد أولي مرة واحدة</div>
+          <div class="p-desc">أول دخول يُحدد المدير الرئيسي للنظام تلقائياً ثم يضيف بقية المستخدمين</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">☁️</div>
+        <div class="p-body">
+          <div class="p-title">مؤشر الاتصال</div>
+          <div class="p-desc">شريط الأعلى يُظهر حالة الاتصال بـ Firestore لحظياً — "متصل / غير متصل"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui-panel">
+    <div class="app-mock" style="max-width:320px;">
+      <div class="m-topbar">
+        <span class="m-brand">Financial Statements</span>
+      </div>
+      <div class="m-auth-header">
+        <div class="m-auth-logo">$</div>
+        <div class="m-auth-title">Financial Statements</div>
+      </div>
+      <div class="m-auth-form">
+        <h2>تسجيل الدخول</h2>
+        <div class="m-field">
+          <span class="m-label">البريد الإلكتروني</span>
+          <input class="m-input" dir="ltr" value="accountant@office.com" readonly/>
+        </div>
+        <div class="m-field">
+          <span class="m-label">كلمة المرور</span>
+          <input class="m-input" dir="ltr" type="password" value="••••••••" readonly/>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+          <button class="m-btn-primary">دخول</button>
+        </div>
+      </div>
+    </div>
+    <div class="dom-ref">
+      <strong style="color:var(--gold);font-weight:800;">مسار DOM في التطبيق</strong>
+      <div class="dom-path">div.layout &gt; main.main &gt; div.wrap &gt; div#view-login &gt; div.auth-card &gt; div.auth-form</div>
+      <div class="dom-meta">العنصر <code style="background:rgba(232,196,106,.2);padding:2px 7px;border-radius:4px;color:var(--gold);">.auth-form</code> يضم «تسجيل الدخول، البريد الإلكتروني، كلمة المرور، زر دخول». أبعاد تقريبية: ~518×294px (حسب النافذة).</div>
+    </div>
+    <div class="callout" style="max-width:320px;margin-top:14px;">
+      <span class="cl-icon">💡</span>
+      كل مستخدم يرى فقط ما تسمح به صلاحيته — قسم المستخدمين مخفي عن المحاسبين
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SLIDE 3: DASHBOARD ══════════ -->
+<div class="slide" data-title="لوحة التحكم">
+  <div class="exp-panel">
+    <div class="slide-tag">الصفحة الرئيسية</div>
+    <h2 class="slide-title">لوحة <span class="a">التحكم الرئيسية</span></h2>
+    <p class="slide-sub">أول ما يظهر بعد الدخول — ملخص سريع للوضع الحالي</p>
+    <div class="points">
+      <div class="point">
+        <div class="p-icon">🏠</div>
+        <div class="p-body">
+          <div class="p-title">الشريط الجانبي الثابت</div>
+          <div class="p-desc">التنقل بين الأقسام الخمسة: لوحة التحكم، الشركات، الدليل، الكشوفات، المستخدمين</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">📊</div>
+        <div class="p-body">
+          <div class="p-title">إحصائيات فورية</div>
+          <div class="p-desc">عدد الشركات المسجلة في المكتب + الشركة النشطة حالياً مع سنتها الحالية (CY) والسابقة (PY)</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">👤</div>
+        <div class="p-body">
+          <div class="p-title">بيانات الجلسة</div>
+          <div class="p-desc">اسم المستخدم المسجّل وصلاحيته تظهر دائماً في أعلى لوحة التحكم</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui-panel">
+    <div class="app-mock">
+      <div class="m-topbar">
+        <span class="m-pill">الاتصال: متصل</span>
+        <span class="m-brand">Financial Statements</span>
+        <button class="m-logout">خروج</button>
+      </div>
+      <div class="m-layout">
+        <div class="m-sidebar">
+          <div class="m-nav-title">الأقسام</div>
+          <div class="m-nav-btn active">🏠 لوحة التحكم</div>
+          <div class="m-nav-btn">🏢 الشركات</div>
+          <div class="m-nav-btn">📇 دليل المحاسبين</div>
+          <div class="m-nav-btn">🧾 الكشوفات</div>
+        </div>
+        <div class="m-main">
+          <div class="m-card">
+            <h2>لوحة التحكم</h2>
+            <div class="m-row">
+              <span class="m-pill-info"><b>المستخدم</b> ali@office.com</span>
+              <span class="m-pill-info"><b>الصلاحية</b> مدير</span>
+            </div>
+          </div>
+          <div class="m-card">
+            <h2>إحصائيات سريعة</h2>
+            <div class="m-grid">
+              <div class="m-card" style="margin:0;padding:8px">
+                <div style="font-size:8.5px;font-weight:900;color:#1a3a5c;margin-bottom:5px;">الشركات</div>
+                <span class="m-pill-info"><b>العدد</b> 5</span>
+              </div>
+              <div class="m-card" style="margin:0;padding:8px">
+                <div style="font-size:8.5px;font-weight:900;color:#1a3a5c;margin-bottom:5px;">السنة الحالية</div>
+                <span class="m-pill-info"><b>CY</b> 2024</span>
+                <span class="m-pill-info" style="margin-top:3px;display:inline-flex;"><b>PY</b> 2023</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:14px;">
+      <span class="cl-icon">🔗</span>
+      الشريط الجانبي ثابت في جميع الأقسام — التنقل فوري دون إعادة تحميل الصفحة
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SLIDE 4: COMPANIES ══════════ -->
+<div class="slide" data-title="إدارة الشركات">
+  <div class="exp-panel">
+    <div class="slide-tag">قسم الشركات</div>
+    <h2 class="slide-title">إدارة <span class="a">الشركات</span></h2>
+    <p class="slide-sub">تعريف كامل للشركة مرة واحدة — ثم تُستخدم في جميع السنوات</p>
+    <div class="points">
+      <div class="point">
+        <div class="p-icon">📝</div>
+        <div class="p-body">
+          <div class="p-title">نافذة إنشاء الشركة</div>
+          <div class="p-desc">اسم عربي وإنجليزي، نوع النشاط، نوع الشركة، الدولة والمحافظة، شهادة التأسيس، رأس المال، العنوان والفروع</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">🗂️</div>
+        <div class="p-body">
+          <div class="p-title">جدول الشركات</div>
+          <div class="p-desc">قائمة بكل الشركات مع آخر تحديث وأزرار عرض / تعديل لكل شركة</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">⚠️</div>
+        <div class="p-body">
+          <div class="p-title">هذا القسم للتعريف فقط</div>
+          <div class="p-desc">إدخال البيانات المالية واختيار السنة يتم حصرياً من قسم "الكشوفات" — لا تداخل بين القسمين</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui-panel">
+    <div class="app-mock">
+      <div class="m-topbar">
+        <span class="m-pill">متصل</span>
+        <span class="m-brand">Financial Statements</span>
+        <button class="m-logout">خروج</button>
+      </div>
+      <div class="m-layout">
+        <div class="m-sidebar">
+          <div class="m-nav-title">الأقسام</div>
+          <div class="m-nav-btn">🏠 لوحة التحكم</div>
+          <div class="m-nav-btn active">🏢 الشركات</div>
+          <div class="m-nav-btn">📇 دليل</div>
+          <div class="m-nav-btn">🧾 الكشوفات</div>
+        </div>
+        <div class="m-main">
+          <div class="m-overlay">
+            <div class="m-modal-hd">
+              <span>إنشاء شركة</span>
+              <div class="m-modal-close">×</div>
+            </div>
+            <div class="m-modal-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                <div class="m-form-section">البيانات الأساسية</div>
+                <div>
+                  <span class="m-label">اسم الشركة القانوني</span>
+                  <input class="m-input" value="شركة روزميري للحلول البرمجية" readonly/>
+                </div>
+                <div>
+                  <span class="m-label">اسم الشركة (إنكليزي)</span>
+                  <input class="m-input" dir="ltr" value="Rosemary Software Solutions" readonly/>
+                </div>
+                <div>
+                  <span class="m-label">النشاط</span>
+                  <select class="m-select"><option>حلول برمجية</option></select>
+                </div>
+                <div>
+                  <span class="m-label">نوع الشركة</span>
+                  <select class="m-select"><option>محدودة المسؤولية</option></select>
+                </div>
+                <div>
+                  <span class="m-label">الدولة</span>
+                  <select class="m-select"><option>العراق</option></select>
+                </div>
+                <div>
+                  <span class="m-label">المحافظة</span>
+                  <select class="m-select"><option>بغداد</option></select>
+                </div>
+                <div class="m-form-section">التسجيل والاتصال</div>
+                <div>
+                  <span class="m-label">رقم التسجيل</span>
+                  <input class="m-input" dir="ltr" value="45821" readonly/>
+                </div>
+                <div>
+                  <span class="m-label">رأس المال (دينار)</span>
+                  <input class="m-input" dir="ltr" value="50,000,000" readonly/>
+                </div>
+              </div>
+            </div>
+            <div class="m-modal-ft">
+              <button class="m-btn">إلغاء</button>
+              <button class="m-btn-primary">إنشاء</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:12px;">
+      <span class="cl-icon">💡</span>
+      بعد الإنشاء مباشرةً انتقل لقسم "الكشوفات" لفتح السنة المالية وإدخال البيانات
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SLIDE 5: DIRECTORY ══════════ -->
+<div class="slide" data-title="دليل المحاسبين والمراقبين">
+  <div class="exp-panel">
+    <div class="slide-tag">الدليل المهني</div>
+    <h2 class="slide-title">دليل <span class="a">المحاسبين والمراقبين</span></h2>
+    <p class="slide-sub">قاعدة بيانات المهنيين في المكتب — سجّل مرة واستخدم للأبد</p>
+    <div class="points">
+      <div class="point">
+        <div class="p-icon">📇</div>
+        <div class="p-body">
+          <div class="p-title">سجل مرجعي دائم</div>
+          <div class="p-desc">كل محاسب ومراقب يُسجّل مرة واحدة بالاسم والصفة القانونية (عربي وإنجليزي) والعنوان والهاتف</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">⚡</div>
+        <div class="p-body">
+          <div class="p-title">تعبئة تلقائية في مرجعيات السنة</div>
+          <div class="p-desc">عند فتح سنة جديدة اختر المحاسب أو المراقب من القائمة المنسدلة — يُعبّأ اسمه وبياناته تلقائياً</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">🔄</div>
+        <div class="p-body">
+          <div class="p-title">مرونة لكل سنة</div>
+          <div class="p-desc">الربط النهائي محفوظ في بيانات كل سنة بشكل مستقل — يمكن تغيير المراقب من سنة لأخرى دون أثر على الأخرى</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui-panel">
+    <div class="app-mock">
+      <div class="m-topbar">
+        <span class="m-pill">متصل</span><span class="m-brand">Financial Statements</span><button class="m-logout">خروج</button>
+      </div>
+      <div class="m-layout">
+        <div class="m-sidebar">
+          <div class="m-nav-btn">🏠 لوحة التحكم</div>
+          <div class="m-nav-btn">🏢 الشركات</div>
+          <div class="m-nav-btn active">📇 دليل المحاسبين</div>
+          <div class="m-nav-btn">🧾 الكشوفات</div>
+        </div>
+        <div class="m-main">
+          <div class="m-card">
+            <h2>دليل المحاسبين ومراقبي الحسابات</h2>
+            <div class="m-hint">يُستخدم للتعبئة السريعة في «مرجعيات السنة»</div>
+            <div class="m-actions"><button class="m-btn-primary">➕ إضافة مسجّل للدليل</button></div>
+          </div>
+          <div style="overflow-x:auto;margin-top:6px;">
+            <table class="m-table">
+              <thead><tr>
+                <th>النوع</th><th>الاسم الكامل</th><th>الصفة القانونية</th><th>الهاتف</th><th>إجراءات</th>
+              </tr></thead>
+              <tbody>
+                <tr>
+                  <td>محاسب</td><td>أحمد علي</td><td>محاسب قانوني معتمد</td><td>0770-1234567</td>
+                  <td><button class="m-btn" style="font-size:7px;padding:2px 5px;">تعديل</button></td>
+                </tr>
+                <tr>
+                  <td>مراقب</td><td>سامر حسن</td><td>مراقب حسابات</td><td>0780-9876543</td>
+                  <td><button class="m-btn" style="font-size:7px;padding:2px 5px;">تعديل</button></td>
+                </tr>
+                <tr>
+                  <td>محاسب</td><td>ليلى محمود</td><td>محاسب قانوني</td><td>0751-5554433</td>
+                  <td><button class="m-btn" style="font-size:7px;padding:2px 5px;">تعديل</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:12px;">
+      <span class="cl-icon">💡</span>
+      الصفة القانونية الإنجليزية تُستخدم في التقارير الرسمية الصادرة بالإنجليزية
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SLIDE 6: YEAR META ══════════ -->
+<div class="slide" data-title="مرجعيات السنة المالية">
+  <div class="exp-panel">
+    <div class="slide-tag">قسم الكشوفات</div>
+    <h2 class="slide-title">مرجعيات <span class="a">السنة المالية</span></h2>
+    <p class="slide-sub">الإعدادات التي تتحكم في كل القوائم والحسابات</p>
+    <div class="points">
+      <div class="point">
+        <div class="p-icon">📅</div>
+        <div class="p-body">
+          <div class="p-title">بيانات التوقيت</div>
+          <div class="p-desc">السنة المالية (CY)، تاريخ نهاية السنة، رقم التقرير وتاريخه — تُستخدم في عناوين القوائم</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">⚙️</div>
+        <div class="p-body">
+          <div class="p-title">الإعدادات المحاسبية</div>
+          <div class="p-desc">نسبة ضريبة الدخل % + نسبة الاحتياطي القانوني % — تُحسب تلقائياً في بيان ب</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">🔘</div>
+        <div class="p-body">
+          <div class="p-title">مفاتيح تفعيل القوائم</div>
+          <div class="p-desc">عقود / موجودات ثابتة / مخزون — تفعيل كل منها يُنشئ الكشف المقابل ويُدمجه في القوائم تلقائياً</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">👥</div>
+        <div class="p-body">
+          <div class="p-title">الأطراف المهنية</div>
+          <div class="p-desc">المدير المفوض + المحاسب (من الدليل أو يدوياً) + مراقب الحسابات — تظهر في خانات التوقيع</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui-panel">
+    <div class="app-mock">
+      <div class="m-topbar"><span class="m-pill">متصل</span><span class="m-brand">Financial Statements</span></div>
+      <div class="m-layout">
+        <div class="m-sidebar">
+          <div class="m-nav-btn">🏢 الشركات</div>
+          <div class="m-nav-btn active">🧾 الكشوفات</div>
+        </div>
+        <div class="m-main">
+          <div class="m-card">
+            <div class="m-row">
+              <span class="m-pill-info"><b>الشركة</b> <input class="m-input" style="width:100px;border:none;padding:0;" value="شركة روزميري للحلول البرمجية" readonly/></span>
+              <span class="m-pill-info"><b>CY</b> <input class="m-input" dir="ltr" style="width:50px;border:none;padding:0;" value="2024" readonly/></span>
+              <button class="m-btn-primary">فتح</button>
+              <button class="m-btn">➕ سنة جديدة</button>
+            </div>
+          </div>
+          <div class="m-card" style="padding:8px 10px;">
+            <h2>مرجعيات السنة</h2>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+              <div><span class="m-label">السنة المالية (CY)</span><input class="m-input" dir="ltr" value="2024" readonly/></div>
+              <div><span class="m-label">تاريخ نهاية السنة</span><input class="m-input" dir="ltr" value="2024-12-31" readonly/></div>
+              <div><span class="m-label">المدير المفوض</span><input class="m-input" value="محمد كريم" readonly/></div>
+              <div><span class="m-label">اختيار محاسب من الدليل</span><select class="m-select"><option>أحمد علي</option></select></div>
+              <div><span class="m-label">نسبة ضريبة الدخل %</span><input class="m-input" dir="ltr" value="15" readonly/></div>
+              <div><span class="m-label">نسبة الاحتياطي القانوني %</span><input class="m-input" dir="ltr" value="5" readonly/></div>
+              <div><span class="m-label">هل لدى الشركة عقود؟</span><select class="m-select"><option>نعم</option></select></div>
+              <div><span class="m-label">هل يوجد موجودات ثابتة؟</span><select class="m-select"><option>نعم</option></select></div>
+            </div>
+            <div class="m-actions"><button class="m-btn-primary">حفظ مرجعيات السنة</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:12px;">
+      <span class="cl-icon">⚠️</span>
+      تفعيل "عقود" ينشئ جدول العقود — تفعيل "موجودات ثابتة" ينشئ كشف (١) للإهلاك تلقائياً
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SLIDE 7: بيان أ ══════════ -->
+<div class="slide" data-title="بيان أ – قائمة المركز المالي">
+  <div class="exp-panel">
+    <div class="slide-tag">القوائم المالية</div>
+    <h2 class="slide-title"><span class="a">بيان أ</span> — قائمة المركز المالي</h2>
+    <p class="slide-sub">الميزانية العمومية — الموجودات ومصادر التمويل</p>
+    <div class="points">
+      <div class="point">
+        <div class="p-icon">📋</div>
+        <div class="p-body">
+          <div class="p-title">هيكل الميزانية</div>
+          <div class="p-desc">موجودات ثابتة + موجودات متداولة = مصادر تمويل طويلة الأجل + قصيرة الأجل</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">🔄</div>
+        <div class="p-body">
+          <div class="p-title">ترحيل تلقائي</div>
+          <div class="p-desc">الموجودات الثابتة من كشف (١) — المخزون من بيان د — حقوق الملكية من بيان ج</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">⚖️</div>
+        <div class="p-body">
+          <div class="p-title">تنبيه التوازن اللحظي</div>
+          <div class="p-desc">إذا مجموع الموجودات ≠ مجموع مصادر التمويل — يظهر تنبيه أحمر مع مقدار الفرق فوراً</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">📅</div>
+        <div class="p-body">
+          <div class="p-title">عمودان CY و PY</div>
+          <div class="p-desc">السنة الحالية والسابقة جنباً إلى جنب في كل صف للمقارنة المباشرة</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui-panel">
+    <div class="app-mock" style="font-size:8.5px;">
+      <div class="m-topbar"><span class="m-brand">Financial Statements</span></div>
+      <div style="padding:8px 10px;background:#eef1f4;">
+        <div class="m-page">
+          <div class="m-page-label">بيان أ – قائمة المركز المالي</div>
+          <div class="m-doc-title">شركة روزميري للحلول البرمجية</div>
+          <div class="m-doc-sub">قائمة المركز المالي كما في 31 / 12 / 2024</div>
+          <div class="m-stmt-code">بيان -أ-</div>
+          <table class="m-table">
+            <thead><tr>
+              <th class="num" style="width:8%">كشف</th>
+              <th class="num" style="width:9%">دليل</th>
+              <th style="width:45%">اسم الحساب</th>
+              <th class="amt" style="width:19%">2024 دينار</th>
+              <th class="amt" style="width:19%">2023 دينار</th>
+            </tr></thead>
+            <tbody>
+              <tr class="row-header"><td colspan="5">الموجودات</td></tr>
+              <tr class="row-sub"><td colspan="5">الموجودات الثابتة</td></tr>
+              <tr><td class="num">1</td><td class="num">11</td><td>الموجودات الثابتة (بالقيمة الدفترية)</td><td class="amt">85,000,000</td><td class="amt">72,000,000</td></tr>
+              <tr class="row-total"><td></td><td></td><td>مجموع الموجودات الثابتة</td><td class="amt">85,000,000</td><td class="amt">72,000,000</td></tr>
+              <tr class="row-sub"><td colspan="5">الموجودات المتداولة</td></tr>
+              <tr><td class="num">2</td><td class="num">16</td><td>المدينون</td><td class="amt">12,500,000</td><td class="amt">9,800,000</td></tr>
+              <tr><td class="num">3</td><td class="num">18</td><td>النقود</td><td class="amt">8,200,000</td><td class="amt">6,100,000</td></tr>
+              <tr class="row-total"><td></td><td></td><td>مجموع الموجودات</td><td class="amt" style="font-weight:900">105,700,000</td><td class="amt" style="font-weight:900">87,900,000</td></tr>
+              <tr class="row-header"><td colspan="5">مصادر التمويل طويلة الأجل</td></tr>
+              <tr><td class="num">بيان ج</td><td class="num">21</td><td>رأس المال</td><td class="amt">50,000,000</td><td class="amt">50,000,000</td></tr>
+              <tr><td class="num">بيان ج</td><td class="num">22</td><td>الاحتياطيات</td><td class="amt">35,200,000</td><td class="amt">22,100,000</td></tr>
+              <tr class="row-total"><td></td><td></td><td><b>مجموع مصادر التمويل</b></td><td class="amt" style="font-weight:900">105,700,000</td><td class="amt" style="font-weight:900">87,900,000</td></tr>
+            </tbody>
+          </table>
+          <div class="m-sig-row">
+            <div class="m-sig-box"><div class="sig-title">المحاسب</div><div>أحمد علي</div><div class="sig-line"></div></div>
+            <div></div>
+            <div class="m-sig-box"><div class="sig-title">المدير المفوض</div><div>محمد كريم</div><div class="sig-line"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SLIDE 8: بيان ب ══════════ -->
+<div class="slide" data-title="بيان ب – كشف العمليات الجارية">
+  <div class="exp-panel">
+    <div class="slide-tag">القوائم المالية</div>
+    <h2 class="slide-title"><span class="a">بيان ب</span> — كشف العمليات الجارية</h2>
+    <p class="slide-sub">قائمة الدخل — الإيرادات والمصروفات والفائض</p>
+    <div class="points">
+      <div class="point">
+        <div class="p-icon">💰</div>
+        <div class="p-body">
+          <div class="p-title">إيراد النشاط التشغيلي</div>
+          <div class="p-desc">يُجمع تلقائياً من كشف العقود + الكشوفات المصنّفة "إيرادات" — رقم الدليل يُبنى تلقائياً</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">📉</div>
+        <div class="p-body">
+          <div class="p-title">صفوف المصروفات</div>
+          <div class="p-desc">كل كشف مصروفات عمودي مُصنّف "قائمة دخل" يُضاف صفاً مستقلاً تلقائياً + الإهلاك + المواد الأولية</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">🧮</div>
+        <div class="p-body">
+          <div class="p-title">حسابات تلقائية</div>
+          <div class="p-desc">ضريبة الدخل % + الاحتياطي القانوني % + صافي الربح — كلها محسوبة ومُرحَّلة تلقائياً</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui-panel">
+    <div class="app-mock" style="font-size:8.5px;">
+      <div class="m-topbar"><span class="m-brand">Financial Statements</span></div>
+      <div style="padding:8px 10px;background:#eef1f4;">
+        <div class="m-page">
+          <div class="m-page-label">بيان ب – كشف العمليات الجارية</div>
+          <div class="m-doc-title">شركة روزميري للحلول البرمجية</div>
+          <div class="m-doc-sub">كشف العمليات الجارية للسنة المالية المنتهية في 31 / 12 / 2024</div>
+          <div class="m-stmt-code">بيان -ب-</div>
+          <table class="m-table">
+            <thead><tr>
+              <th class="num" style="width:8%">كشف</th><th class="num" style="width:9%">دليل</th>
+              <th style="width:45%">اسم الحساب</th>
+              <th class="amt" style="width:19%">2024 دينار</th>
+              <th class="amt" style="width:19%">2023 دينار</th>
+            </tr></thead>
+            <tbody>
+              <tr class="row-sub"><td colspan="5">الايرادات</td></tr>
+              <tr><td class="num">8</td><td class="num" dir="ltr">41-45</td><td>ايراد النشاط التشغيلي</td><td class="amt">180,000,000</td><td class="amt">150,000,000</td></tr>
+              <tr class="row-sub"><td colspan="5">تنزل المصروفات الجارية:</td></tr>
+              <tr><td class="num">2</td><td class="num">31</td><td>الرواتب والأجور</td><td class="amt">45,000,000</td><td class="amt">38,000,000</td></tr>
+              <tr><td class="num">3</td><td class="num">32</td><td>المصاريف الإدارية والعمومية</td><td class="amt">22,000,000</td><td class="amt">18,500,000</td></tr>
+              <tr><td class="num">1</td><td class="num">37</td><td>الاندثارات والاطفاءات</td><td class="amt">8,500,000</td><td class="amt">7,200,000</td></tr>
+              <tr class="row-total"><td colspan="3">مجموع المصروفات الجارية</td><td class="amt">75,500,000</td><td class="amt">63,700,000</td></tr>
+              <tr class="row-total"><td colspan="3">فائض العمليات الجارية</td><td class="amt">104,500,000</td><td class="amt">86,300,000</td></tr>
+              <tr><td colspan="3">تخصيصات ضريبة الدخل 15%</td><td class="amt">(15,675,000)</td><td class="amt">(12,945,000)</td></tr>
+              <tr class="row-total"><td colspan="3"><b>صافي الربح بعد الضريبة</b></td><td class="amt" style="font-weight:900">88,825,000</td><td class="amt" style="font-weight:900">73,355,000</td></tr>
+              <tr><td colspan="3">احتياطي قانوني 5%</td><td class="amt">4,441,250</td><td class="amt">3,667,750</td></tr>
+              <tr><td colspan="3">الفائض المتراكم</td><td class="amt">84,383,750</td><td class="amt">69,687,250</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SLIDE 9: بيان ج + د ══════════ -->
+<div class="slide" data-title="بيان ج و بيان د">
+  <div class="exp-panel">
+    <div class="slide-tag">القوائم المالية</div>
+    <h2 class="slide-title"><span class="a">بيان ج</span> و <span class="a">بيان د</span></h2>
+    <p class="slide-sub">تغيرات حقوق الملكية + حركة المخزون</p>
+    <div class="points">
+      <div class="point">
+        <div class="p-icon">ج</div>
+        <div class="p-body">
+          <div class="p-title">بيان ج — تغيرات حقوق الملكية</div>
+          <div class="p-desc">الرصيد الافتتاحي والتنزيلات يدوي — الاحتياطي القانوني والفائض يُرحّلان تلقائياً من بيان ب — مستقل لكل سنة</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">د</div>
+        <div class="p-body">
+          <div class="p-title">بيان د — كشف حركة المخزون</div>
+          <div class="p-desc">افتتاحي + مشتريات − مستخدم = ختامي — يُرحّل: الختامي للميزانية (15) والمستخدم لقائمة الدخل (321)</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">🔗</div>
+        <div class="p-body">
+          <div class="p-title">ترابط البيانات الأربعة</div>
+          <div class="p-desc">بيان ب ← بيان ج ← بيان أ — بيان د ← بيان أ + ب — كل تغيير ينعكس في سلسلة القوائم فوراً</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:16px;">
+      <span class="cl-icon">📌</span>
+      بيان ج وبيان د مستقلان — لا يعتمدان على معلومات الشركة بل يُدخل فيهما مباشرة ثم يُرحّلان للبيانات الأخرى
+    </div>
+  </div>
+  <div class="ui-panel">
+    <div style="width:100%;max-width:460px;display:flex;flex-direction:column;gap:14px;">
+      <!-- بيان ج -->
+      <div class="app-mock" style="font-size:8.5px;transform:scale(1);">
+        <div style="padding:8px 10px;background:#eef1f4;">
+          <div class="m-page">
+            <div class="m-page-label">بيان ج – قائمة تغيرات حقوق الملكية</div>
+            <div style="font-size:7.5px;text-align:center;font-weight:900;color:#1a3a5c;margin-bottom:3px;">قائمة التغيرات في حقوق الملكية</div>
+            <table class="m-table" style="font-size:7.5px;">
+              <thead><tr><th>البيان</th><th class="amt">رأس المال</th><th class="amt">الاحتياطي</th><th class="amt">الفائض</th><th class="amt">المجموع</th></tr></thead>
+              <tbody>
+                <tr><td>رصيد أول المدة</td><td class="amt">50,000,000</td><td class="amt">17,658,750</td><td class="amt">4,441,250</td><td class="amt">72,100,000</td></tr>
+                <tr><td>الاحتياطي القانوني 5%</td><td class="amt">—</td><td class="amt">4,441,250</td><td class="amt">(4,441,250)</td><td class="amt">—</td></tr>
+                <tr><td>صافي ربح السنة</td><td class="amt">—</td><td class="amt">—</td><td class="amt">84,383,750</td><td class="amt">84,383,750</td></tr>
+                <tr class="row-total"><td>رصيد آخر المدة</td><td class="amt">50,000,000</td><td class="amt">22,100,000</td><td class="amt">84,383,750</td><td class="amt">156,483,750</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- بيان د -->
+      <div class="app-mock" style="font-size:8.5px;">
+        <div style="padding:8px 10px;background:#eef1f4;">
+          <div class="m-page">
+            <div class="m-page-label">بيان د – كشف حركة المخزون</div>
+            <table class="m-table" style="font-size:7.5px;">
+              <thead><tr><th>البيان</th><th class="amt">2024</th><th class="amt">2023</th></tr></thead>
+              <tbody>
+                <tr><td>رصيد المخزون الافتتاحي</td><td class="amt">5,000,000</td><td class="amt">4,200,000</td></tr>
+                <tr><td>الإضافات (مشتريات)</td><td class="amt">12,000,000</td><td class="amt">9,500,000</td></tr>
+                <tr><td>المسحوبات (مستخدمة)</td><td class="amt">(10,800,000)</td><td class="amt">(8,700,000)</td></tr>
+                <tr class="row-total"><td>رصيد المخزون الختامي → بيان أ (15)</td><td class="amt">6,200,000</td><td class="amt">5,000,000</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SLIDE 10: الكشوفات التفصيلية ══════════ -->
+<div class="slide" data-title="الكشوفات التفصيلية">
+  <div class="exp-panel">
+    <div class="slide-tag">الكشوفات</div>
+    <h2 class="slide-title">الكشوفات <span class="a">التفصيلية</span></h2>
+    <p class="slide-sub">إيضاحات ومرفقات القوائم المالية — أرقام تُبنى منها القوائم</p>
+    <div class="points">
+      <div class="point">
+        <div class="p-icon">🏗️</div>
+        <div class="p-body">
+          <div class="p-title">كشف (١) — الموجودات الثابتة</div>
+          <div class="p-desc">جدول الإهلاك: التكلفة + الإضافات − الإهلاك = صافي القيمة الدفترية — يُرحّل لبيان أ وبيان ب</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">📋</div>
+        <div class="p-body">
+          <div class="p-title">كشف العقود</div>
+          <div class="p-desc">اسم العقد + الإيرادات + المصروفات لكل عقد — الإجمالي يُدمج في بيان ب تلقائياً</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">➕</div>
+        <div class="p-body">
+          <div class="p-title">كشوفات مخصصة (٢–٨+)</div>
+          <div class="p-desc">أضف كشفاً بأي اسم وصنّفه: الميزانية ← موجودات / مطلوبات — أو قائمة الدخل ← إيرادات / مصروفات</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">⚙️</div>
+        <div class="p-body">
+          <div class="p-title">أدوات الكشف</div>
+          <div class="p-desc">تعديل الخلايا مباشرة في الجدول + حفظ + ⚙️ إعداد لتغيير الاسم والتصنيف والترتيب</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui-panel">
+    <div class="app-mock">
+      <div class="m-topbar"><span class="m-brand">Financial Statements</span></div>
+      <div style="padding:8px 10px;background:#eef1f4;">
+        <div class="m-card" style="margin-bottom:6px;">
+          <div class="m-sch-toolbar">
+            <span style="font-weight:700;color:#1a3a5c;font-size:8.5px;">كشف (١) – الموجودات الثابتة</span>
+            <div style="margin-right:auto;display:flex;gap:4px;">
+              <button class="m-tb-btn primary">💾 حفظ</button>
+              <button class="m-tb-btn">⚙️ إعداد</button>
+              <button class="m-tb-btn">🗑 حذف</button>
+            </div>
+          </div>
+          <table class="m-table">
+            <thead><tr>
+              <th>الموجود</th><th class="num">رمز دليل الإهلاك</th>
+              <th class="amt">التكلفة</th><th class="amt">الإهلاك المتراكم</th><th class="amt">الصافي</th>
+            </tr></thead>
+            <tbody>
+              <tr><td>سيارات</td><td class="num">37-11</td><td class="amt">30,000,000</td><td class="amt">8,000,000</td><td class="amt">22,000,000</td></tr>
+              <tr><td>أجهزة وحاسبات</td><td class="num">37-12</td><td class="amt">12,000,000</td><td class="amt">4,500,000</td><td class="amt">7,500,000</td></tr>
+              <tr><td>معدات</td><td class="num">37-13</td><td class="amt">85,000,000</td><td class="amt">30,000,000</td><td class="amt">55,000,000</td></tr>
+              <tr class="row-total"><td colspan="2">المجموع</td><td class="amt">127,000,000</td><td class="amt">42,500,000</td><td class="amt">84,500,000</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="m-sch-toolbar" style="background:rgba(232,196,106,.18);border-color:#e8c46a;">
+          <span style="font-weight:700;color:#1a3a5c;font-size:8.5px;">➕ إضافة كشف جديد</span>
+          <button class="m-tb-btn primary" style="margin-right:auto;">إضافة كشف</button>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:12px;">
+      <span class="cl-icon">🔗</span>
+      مجموع الصافي (84,500,000) يُرحّل تلقائياً لصف "الموجودات الثابتة" في بيان أ
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SLIDE 11: تقرير المدير المفوض ══════════ -->
+<div class="slide" data-title="تقرير المدير المفوض">
+  <div class="exp-panel">
+    <div class="slide-tag">التقارير الرسمية</div>
+    <h2 class="slide-title">تقرير <span class="a">المدير المفوض</span></h2>
+    <p class="slide-sub">وثيقة قانونية جاهزة للتوقيع والطباعة</p>
+    <div class="points">
+      <div class="point">
+        <div class="p-icon">📄</div>
+        <div class="p-body">
+          <div class="p-title">تعبئة تلقائية</div>
+          <div class="p-desc">بيانات الشركة (شهادة التأسيس، رأس المال، المحافظة) تُدمج في نص التقرير تلقائياً عبر قوالب {{متغير}}</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">✏️</div>
+        <div class="p-body">
+          <div class="p-title">تحرير الفقرات</div>
+          <div class="p-desc">كل مجموعة فقرات لها زر حفظ مستقل — يمكن تعديل أي نص مع الاحتفاظ بالقوالب الافتراضية</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">👥</div>
+        <div class="p-body">
+          <div class="p-title">جدول المساهمين + المصارف</div>
+          <div class="p-desc">إدخال المساهمين وحصصهم + الحسابات البنكية — مخصص لكل شركة وسنة على حدة</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="p-icon">🖨️</div>
+        <div class="p-body">
+          <div class="p-title">طباعة / PDF</div>
+          <div class="p-desc">زر "طباعة/PDF" أو "فتح للطباعة A4" — أدوات التحكم تختفي تلقائياً عند الطباعة</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui-panel">
+    <div class="app-mock" style="font-size:8.5px;">
+      <div class="m-topbar"><span class="m-brand">Financial Statements</span></div>
+      <div style="padding:8px 10px;background:#eef1f4;">
+        <div class="m-card" style="margin-bottom:6px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="font-size:9px;font-weight:900;color:#1a3a5c;">تقرير المدير المفوض</div>
+            <div style="display:flex;gap:4px;">
+              <button class="m-tb-btn">🖨️ طباعة / PDF</button>
+              <button class="m-tb-btn">🗂️ فتح A4</button>
+            </div>
+          </div>
+        </div>
+        <div class="m-page">
+          <div class="m-page-label">تقرير المدير المفوض – ١</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1.5px solid #1F4E79;padding-bottom:5px;margin-bottom:6px;">
+            <div style="display:flex;gap:5px;align-items:center;">
+              <div style="width:28px;height:28px;border-radius:5px;background:linear-gradient(135deg,#0a5c8a,#1a8cc0);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:7px;text-align:center;">FS</div>
+              <div><div style="font-size:8px;font-weight:900;color:#1a3a5c;">شركة روزميري للحلول البرمجية</div><div style="font-size:7px;color:#777;">Rosemary Software Solutions</div></div>
+            </div>
+            <div style="text-align:left;font-size:7px;color:#777;"><div>رقم التقرير: 2024/15</div><div>التاريخ: 2025-03-01</div></div>
+          </div>
+          <div style="font-size:8.5px;font-weight:900;color:#1a3a5c;margin-bottom:4px;">نبذة عن الشركة</div>
+          <div style="font-size:8px;line-height:1.7;color:#222;">
+            ١. تأسست الشركة بموجب شهادة التأسيس المرقمة <b>45821</b> بتاريخ <b>01/01/2015</b> الصادرة من دائرة تسجيل الشركات، ويقع مقرها الرئيسي في <b>بغداد</b>، ويبلغ رأس المال المدفوع حسب بيان ج (<b>50,000,000</b>) دينار.
+          </div>
+          <div style="font-size:8px;line-height:1.7;color:#222;margin-top:5px;">
+            ٢. اتبعت الشركة تعليمات النظام المحاسبي للشركات في إعداد وتنظيم الميزانية العامة وحساباتها الختامية.
+          </div>
+          <div style="margin-top:8px;">
+            <div style="font-size:8px;font-weight:900;color:#1a3a5c;margin-bottom:3px;">جدول المساهمين</div>
+            <table class="m-table" style="font-size:7.5px;">
+              <thead><tr><th>اسم المساهم</th><th class="amt">الحصة (دينار)</th><th class="amt">النسبة %</th></tr></thead>
+              <tbody>
+                <tr><td>أحمد كريم علي</td><td class="amt">25,000,000</td><td class="amt">50%</td></tr>
+                <tr><td>سارة محمود حسن</td><td class="amt">25,000,000</td><td class="amt">50%</td></tr>
+                <tr class="row-total"><td>المجموع</td><td class="amt">50,000,000</td><td class="amt">100%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SLIDE 12: WORKFLOW ══════════ -->
+<div class="slide full" data-title="سير العمل الكامل">
+  <div class="section-full">
+    <div style="position:relative;z-index:1;width:100%;max-width:980px;">
+      <div class="slide-tag">الاستخدام العملي</div>
+      <h2 class="cover-title" style="font-size:28pt;margin-bottom:10px;">سير العمل <span>الكامل</span></h2>
+      <p style="font-size:11pt;color:rgba(255,255,255,.55);margin-bottom:36px;">من الصفر حتى القوائم الجاهزة للطباعة — ٧ خطوات</p>
+      <!-- Steps -->
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0;align-items:start;">
+        <!-- Step 1 -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#1F4E79,#1a3a5c);border:2px solid rgba(232,196,106,.4);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 20px rgba(232,196,106,.1);">🏢</div>
+          <div style="font-size:9.5pt;font-weight:900;color:rgba(255,255,255,.8);text-align:center;line-height:1.4;">إنشاء<br/>الشركة</div>
+          <div style="font-size:8.5pt;color:rgba(255,255,255,.40);text-align:center;line-height:1.5;">الاسم، النشاط،<br/>رأس المال</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;padding-top:18px;color:rgba(232,196,106,.4);font-size:20px;">←</div>
+        <!-- Step 2 -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#1F4E79,#1a3a5c);border:2px solid rgba(232,196,106,.4);display:flex;align-items:center;justify-content:center;font-size:22px;">📅</div>
+          <div style="font-size:9.5pt;font-weight:900;color:rgba(255,255,255,.8);text-align:center;line-height:1.4;">فتح سنة<br/>مالية</div>
+          <div style="font-size:8.5pt;color:rgba(255,255,255,.40);text-align:center;line-height:1.5;">CY جديدة أو<br/>فتح موجودة</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;padding-top:18px;color:rgba(232,196,106,.4);font-size:20px;">←</div>
+        <!-- Step 3 -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#1F4E79,#1a3a5c);border:2px solid rgba(232,196,106,.4);display:flex;align-items:center;justify-content:center;font-size:22px;">⚙️</div>
+          <div style="font-size:9.5pt;font-weight:900;color:rgba(255,255,255,.8);text-align:center;line-height:1.4;">مرجعيات<br/>السنة</div>
+          <div style="font-size:8.5pt;color:rgba(255,255,255,.40);text-align:center;line-height:1.5;">ضريبة، احتياطي،<br/>تفعيل القوائم</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;padding-top:18px;color:rgba(232,196,106,.4);font-size:20px;">←</div>
+        <!-- Step 4 -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#1F4E79,#1a3a5c);border:2px solid rgba(232,196,106,.4);display:flex;align-items:center;justify-content:center;font-size:22px;">📊</div>
+          <div style="font-size:9.5pt;font-weight:900;color:rgba(255,255,255,.8);text-align:center;line-height:1.4;">إدخال<br/>الكشوفات</div>
+          <div style="font-size:8.5pt;color:rgba(255,255,255,.40);text-align:center;line-height:1.5;">موجودات ثابتة،<br/>عقود، مصروفات</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:28px;max-width:580px;margin-right:auto;margin-left:auto;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#1F4E79,#1a3a5c);border:2px solid rgba(232,196,106,.4);display:flex;align-items:center;justify-content:center;font-size:22px;">🔄</div>
+          <div style="font-size:9.5pt;font-weight:900;color:rgba(255,255,255,.8);text-align:center;">ترحيل تلقائي</div>
+          <div style="font-size:8.5pt;color:rgba(255,255,255,.40);text-align:center;line-height:1.5;">الأرقام تتدفق<br/>بين القوائم</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#1F4E79,#1a3a5c);border:2px solid rgba(232,196,106,.4);display:flex;align-items:center;justify-content:center;font-size:22px;">✅</div>
+          <div style="font-size:9.5pt;font-weight:900;color:rgba(255,255,255,.8);text-align:center;">مراجعة التوازن</div>
+          <div style="font-size:8.5pt;color:rgba(255,255,255,.40);text-align:center;line-height:1.5;">تنبيه لحظي<br/>للفروقات</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:flex;align-items:center;justify-content:center;font-size:22px;">🖨️</div>
+          <div style="font-size:9.5pt;font-weight:900;color:var(--gold);text-align:center;">طباعة القوائم</div>
+          <div style="font-size:8.5pt;color:rgba(255,255,255,.40);text-align:center;line-height:1.5;">A4 جاهز<br/>للتوقيع</div>
+        </div>
+      </div>
+      <!-- Stats row -->
+      <div style="display:flex;gap:20px;justify-content:center;margin-top:32px;flex-wrap:wrap;">
+        <div style="background:rgba(232,196,106,.08);border:1px solid rgba(232,196,106,.2);border-radius:12px;padding:14px 22px;text-align:center;">
+          <div style="font-size:22pt;font-weight:900;color:var(--gold);">٠</div>
+          <div style="font-size:9pt;color:rgba(255,255,255,.50);">تثبيت مطلوب</div>
+        </div>
+        <div style="background:rgba(232,196,106,.08);border:1px solid rgba(232,196,106,.2);border-radius:12px;padding:14px 22px;text-align:center;">
+          <div style="font-size:22pt;font-weight:900;color:var(--gold);">٠</div>
+          <div style="font-size:9pt;color:rgba(255,255,255,.50);">إدخال مزدوج</div>
+        </div>
+        <div style="background:rgba(232,196,106,.08);border:1px solid rgba(232,196,106,.2);border-radius:12px;padding:14px 22px;text-align:center;">
+          <div style="font-size:22pt;font-weight:900;color:var(--gold);">100%</div>
+          <div style="font-size:9pt;color:rgba(255,255,255,.50);">حفظ سحابي تلقائي</div>
+        </div>
+        <div style="background:rgba(232,196,106,.08);border:1px solid rgba(232,196,106,.2);border-radius:12px;padding:14px 22px;text-align:center;">
+          <div style="font-size:22pt;font-weight:900;color:var(--gold);">A4</div>
+          <div style="font-size:9pt;color:rgba(255,255,255,.50);">طباعة مباشرة</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SLIDE 13: CLOSING ══════════ -->
+<div class="slide full" data-title="الخاتمة">
+  <div class="cover-panel">
+    <div class="cover-logo" style="width:90px;height:90px;font-size:34px;">$</div>
+    <div class="cover-tag-pill">جاهز للاستخدام الفوري</div>
+    <h1 class="cover-title" style="font-size:30pt;">نظام <span>Financial Statements</span><br/>بين يديك الآن</h1>
+    <div class="cover-div"></div>
+    <p class="cover-sub">ملف HTML واحد — يعمل في أي متصفح — بيانات سحابية آمنة<br/>للمحاسبين القانونيين الذين يقدّرون الدقة والاحترافية</p>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:28px;flex-wrap:wrap;position:relative;z-index:1;">
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px 16px;font-size:10pt;font-weight:700;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#ffa500;display:inline-block;"></span>Firebase Firestore</div>
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px 16px;font-size:10pt;font-weight:700;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#4CAF50;display:inline-block;"></span>HTML5 / CSS3 / JS</div>
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px 16px;font-size:10pt;font-weight:700;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#2196F3;display:inline-block;"></span>Arabic RTL</div>
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px 16px;font-size:10pt;font-weight:700;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#E91E63;display:inline-block;"></span>Print Ready A4</div>
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px 16px;font-size:10pt;font-weight:700;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#9C27B0;display:inline-block;"></span>Cloud Sync</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<!-- NAV -->
+<div class="nav-bar">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button class="nav-btn" id="btn-prev">→</button>
+    <button class="nav-btn" id="btn-next">←</button>
+  </div>
+  <div class="dots" id="dots"></div>
+  <div style="display:flex;align-items:center;gap:14px;">
+    <span class="slide-title-lbl" id="title-lbl"></span>
+    <span class="slide-counter" id="counter">1 / 13</span>
+  </div>
+</div>
+
+<div class="kbd-hint">استخدم أسهم لوحة المفاتيح للتنقل</div>
+
+<script>
+const slides = [...document.querySelectorAll('.slide')];
+const dotsEl = document.getElementById('dots');
+const counterEl = document.getElementById('counter');
+const titleEl = document.getElementById('title-lbl');
+const progressEl = document.getElementById('progress');
+const btnPrev = document.getElementById('btn-prev');
+const btnNext = document.getElementById('btn-next');
+let cur = 0;
+const total = slides.length;
+
+slides.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.onclick = () => goTo(i);
+  dotsEl.appendChild(d);
+});
+
+// Show first slide immediately with no transition
+slides[0].classList.add('active');
+update();
+
+// Enable transitions after first paint
+requestAnimationFrame(() => requestAnimationFrame(() => {
+  slides.forEach(s => s.classList.add('animated'));
+}));
+
+function update() {
+  [...dotsEl.children].forEach((d, i) => d.classList.toggle('active', i === cur));
+  counterEl.textContent = `${cur + 1} / ${total}`;
+  titleEl.textContent = slides[cur].dataset.title || '';
+  progressEl.style.width = `${((cur + 1) / total) * 100}%`;
+  btnPrev.disabled = cur === 0;
+  btnNext.disabled = cur === total - 1;
+}
+
+function goTo(n) {
+  if (n < 0 || n >= total || n === cur) return;
+  const prev = cur;
+  slides[prev].classList.add('exit');
+  slides[prev].classList.remove('active');
+  cur = n;
+  slides[cur].style.transform = n > prev ? 'translateX(30px)' : 'translateX(-30px)';
+  slides[cur].style.opacity = '0';
+  slides[cur].classList.add('active');
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    slides[cur].style.transform = '';
+    slides[cur].style.opacity = '';
+  }));
+  setTimeout(() => slides[prev].classList.remove('exit'), 520);
+  update();
+}
+
+btnNext.onclick = () => goTo(cur + 1);
+btnPrev.onclick = () => goTo(cur - 1);
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') goTo(cur + 1);
+  if (e.key === 'ArrowRight' || e.key === 'ArrowUp') goTo(cur - 1);
+});
+let tx = 0;
+document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const d = e.changedTouches[0].clientX - tx;
+  if (Math.abs(d) > 50) goTo(d < 0 ? cur + 1 : cur - 1);
+});
+update();
+</script>
+</body>
+</html>

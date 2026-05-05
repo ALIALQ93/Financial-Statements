@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Financial Statements – لوحة التحكم</title>
-  <script type="text/javascript" nonce="7e5e41e13e914b7980cb6d4c29c" src="//local.adguard.org?ts=1777976666854&amp;type=content-script&amp;dmn=onedrive.live.com&amp;url=https%3A%2F%2Fonedrive.live.com%2Fpersonal%2F833d97c028c7d8a3%2F_layouts%2F15%2Fdownload.aspx%3FUniqueId%3D63142f74%252Db7d2%252D4df2%252D805a%252D56afd5fd5f6e&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=0"></script><script type="text/javascript" nonce="7e5e41e13e914b7980cb6d4c29c" src="//local.adguard.org?ts=1777976666854&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet"/>
   <style>
     :root{
       --navy:#1a3a5c; --blue:#1F4E79; --blue-ultra:#EBF3FB;
@@ -489,6 +489,30 @@
     }
     .alert.show{display:block}
 
+    .auth-presentation-link{
+      margin:14px 0 0;
+      padding-top:14px;
+      border-top:1px solid rgba(176,196,216,.65);
+      text-align:center;
+      font-size:10.5pt;
+      line-height:1.5;
+    }
+    .auth-presentation-link a{
+      color:var(--blue);
+      font-weight:800;
+      text-decoration:none;
+      border-bottom:1px dashed rgba(31,78,121,.45);
+    }
+    .auth-presentation-link a:hover{
+      color:var(--navy);
+      border-bottom-color:var(--navy);
+    }
+    .auth-presentation-link a:focus-visible{
+      outline:2px solid rgba(232,196,106,.75);
+      outline-offset:3px;
+      border-radius:4px;
+    }
+
     /* Hide technical pills on login */
     body.mode-login .topbar .pill,
     body.mode-login .topbar .sep,
@@ -559,6 +583,9 @@
             <button class="btn auth primary" id="btn-login">دخول</button>
           </div>
           <div class="alert" id="login-msg" role="alert"></div>
+          <div class="auth-presentation-link">
+            <a href="presentation.html" target="_blank" rel="noopener noreferrer">عرض تقديمي يشرح البرنامج</a>
+          </div>
         </div>
       </div>
     </div>
