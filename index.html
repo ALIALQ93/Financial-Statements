@@ -525,6 +525,8 @@
   <div class="topbar">
     <span class="pill"><b>الاتصال</b><span id="ui-conn">غير متصل</span></span>
     <span class="sep"></span>
+    <span class="pill hidden" id="pill-active-office-wrap"><b>المكتب</b><span id="pill-active-office">—</span></span>
+    <span class="sep hidden" id="sep-active-office"></span>
     <button class="btn" id="btn-logout" disabled>خروج</button>
     <span class="brand">Financial Statements</span>
   </div>
@@ -552,6 +554,14 @@
         <button class="nav-btn hidden" id="nav-users" data-section="users">
           <span class="ic">👤</span>
           المستخدمين
+        </button>
+        <button class="nav-btn hidden" id="nav-movements" data-section="movements">
+          <span class="ic">📋</span>
+          مسجل الحركات
+        </button>
+        <button class="nav-btn hidden" id="nav-platform" data-section="platform">
+          <span class="ic">🏛️</span>
+          مكاتب المنصّة
         </button>
         <!-- تم إلغاء قسم التقارير: تقرير المدير المفوض جزء من الكشوفات -->
       </div>
@@ -606,8 +616,9 @@
 
     <!-- Dashboard container -->
     <div class="card hidden" id="view-dashboard">
-      <h2>لوحة التحكم</h2>
-      <div class="row" style="margin-bottom:10px">
+      <h2 style="margin-bottom:6px">لوحة التحكم</h2>
+      <p class="hint" style="margin:0 0 12px">نظرة عامة على المكتب؛ استخدم الشريط الجانبي أو الاختصارات أدناه للانتقال.</p>
+      <div class="row" style="margin-bottom:10px;flex-wrap:wrap;gap:8px">
         <span class="pill"><b>المستخدم</b><span id="dash-user" dir="ltr"></span></span>
         <span class="pill"><b>الصلاحية</b><span id="dash-role"></span></span>
       </div>
@@ -616,20 +627,68 @@
         <h2 style="font-size:13pt">إحصائيات سريعة</h2>
         <div class="grid">
           <div class="card" style="margin:0">
-            <h2 style="font-size:12.5pt">الشركات</h2>
+            <h3 style="font-size:12.5pt;margin:0 0 8px;font-weight:800;color:var(--navy)">الشركات</h3>
             <div class="row">
               <span class="pill"><b>العدد</b><span id="stat-companies">-</span></span>
             </div>
-            <div class="hint" style="margin-top:8px">يمكنك إدارة الشركات من قسم “الشركات”.</div>
+            <div class="hint" style="margin-top:8px">إنشاء وتعديل الشركات من قسم «الشركات».</div>
           </div>
           <div class="card" style="margin:0">
-            <h2 style="font-size:12.5pt">الشركة/السنة الحالية</h2>
+            <h3 style="font-size:12.5pt;margin:0 0 8px;font-weight:800;color:var(--navy)">الشركة والسنة النشطة</h3>
             <div class="row">
               <span class="pill"><b>الشركة</b><span id="stat-active-company">-</span></span>
               <span class="pill"><b>CY</b><span id="stat-active-cy" dir="ltr">-</span></span>
               <span class="pill"><b>PY</b><span id="stat-active-py" dir="ltr">-</span></span>
             </div>
-            <div class="hint" style="margin-top:8px">اختيار السنة يتم من قسم “الشركات”.</div>
+            <div class="hint" style="margin-top:8px">اختيار شركة وسنة لإدخال القوائم والكشوفات يتم من قسم «الكشوفات» ثم «فتح».</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px;background:rgba(255,255,255,.65)">
+          <h3 style="font-size:12.5pt;margin:0 0 10px;font-weight:800;color:var(--navy)">انتقال سريع</h3>
+          <div class="row" style="gap:8px;flex-wrap:wrap">
+            <button type="button" class="linkbtn" id="dash-go-companies">الشركات</button>
+            <button type="button" class="linkbtn" id="dash-go-schedules">الكشوفات</button>
+            <button type="button" class="linkbtn" id="dash-go-directory">الدليل</button>
+            <button type="button" class="linkbtn hidden" id="dash-go-users">المستخدمين</button>
+            <button type="button" class="linkbtn hidden" id="dash-go-movements">مسجل الحركات</button>
+            <button type="button" class="linkbtn hidden" id="dash-go-platform">مكاتب المنصّة</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card hidden" id="section-platform">
+        <h2 style="font-size:13pt">مكاتب المنصّة (مدير عام)</h2>
+        <div class="hint">إنشاء مكاتب جديدة والتبديل بينها. يظهر هذا القسم لمن لديه صلاحية «مدير المنصّة» (مستند في مجموعة <span dir="ltr">platform_admins</span>).</div>
+        <div class="card" style="margin-top:12px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px">
+          <div style="font-weight:900;color:var(--navy);margin-bottom:8px">مكتب جديد</div>
+          <div class="row" style="gap:10px;flex-wrap:wrap;align-items:flex-end">
+            <div style="flex:1;min-width:200px">
+              <label>اسم المكتب</label>
+              <input id="platform-new-office-name" placeholder="مثال: مكتب بغداد" />
+            </div>
+            <button type="button" class="linkbtn" id="btn-platform-create-office">➕ إنشاء مكتب</button>
+          </div>
+          <div class="msg err" id="platform-msg" style="margin-top:8px"></div>
+          <div class="msg ok" id="platform-ok" style="margin-top:4px"></div>
+        </div>
+        <div class="card" style="margin-top:12px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px">
+          <div style="font-weight:900;color:var(--navy);margin-bottom:8px">المكاتب المسجّلة</div>
+          <div style="overflow:auto">
+            <table class="fin-table" style="width:100%">
+              <thead>
+                <tr>
+                  <th style="width:22%">المعرّف</th>
+                  <th style="width:28%">الاسم</th>
+                  <th style="width:22%">تاريخ الإنشاء</th>
+                  <th style="width:28%">إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="platform-offices-tbody"></tbody>
+            </table>
+          </div>
+          <div class="actions" style="margin-top:10px">
+            <button type="button" class="linkbtn" id="btn-platform-refresh">تحديث القائمة</button>
           </div>
         </div>
       </div>
@@ -691,8 +750,84 @@
 
       <div class="card hidden" id="section-users">
         <h2 style="font-size:13pt">المستخدمين</h2>
-        <div class="hint">هذا القسم للمدير فقط. الخطوة التالية: إضافة/تعطيل المستخدمين عبر UID وتحديد الصلاحيات.</div>
-        <div class="msg err" id="users-msg"></div>
+        <div class="hint">هذا القسم يظهر للمدير (Admin) فقط. إنشاء <b>حساب تسجيل الدخول</b> يتم من Firebase Authentication (تسجيل مستخدم بالبريد أو من وحدة تحكم Firebase)، ثم تُسجَّل <b>العضوية</b> هنا باستخدام نفس <b>UID</b> ليُسمح بالدخول إلى المكتب.</div>
+        <div class="hint" style="margin-top:8px">النسخ السريع للـ UID: Firebase Console → Authentication → Users → عمود User UID.</div>
+
+        <div class="card" style="margin-top:12px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px">
+          <div style="font-weight:900;color:var(--navy);margin-bottom:8px">إضافة أو تحديث عضوية</div>
+          <div class="grid" style="gap:10px">
+            <div>
+              <label>معرف المستخدم UID</label>
+              <input id="users-uid" dir="ltr" placeholder="مثال: AbCdEfGh..." autocomplete="off" />
+            </div>
+            <div>
+              <label>البريد (للعرض فقط)</label>
+              <input id="users-email" dir="ltr" placeholder="user@example.com" autocomplete="off" />
+            </div>
+            <div>
+              <label>الصلاحية</label>
+              <select id="users-role">
+                <option value="staff">محاسب / موظف (staff)</option>
+                <option value="admin">مدير (admin)</option>
+              </select>
+            </div>
+            <div>
+              <label>الحالة</label>
+              <select id="users-active">
+                <option value="yes">مفعّل</option>
+                <option value="no">معطّل</option>
+              </select>
+            </div>
+          </div>
+          <div class="actions" style="margin-top:12px">
+            <button class="linkbtn" id="btn-users-save" type="button">حفظ العضوية</button>
+            <button class="linkbtn" id="btn-users-refresh" type="button">تحديث القائمة</button>
+          </div>
+          <div class="msg err" id="users-msg" style="margin-top:8px"></div>
+          <div class="msg ok" id="users-ok" style="margin-top:4px"></div>
+        </div>
+
+        <div class="card" style="margin-top:12px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px">
+          <div style="font-weight:900;color:var(--navy);margin-bottom:8px">المستخدمون المسجّلون في المكتب</div>
+          <div style="overflow:auto">
+            <table class="fin-table" style="width:100%">
+              <thead>
+                <tr>
+                  <th style="width:28%">UID</th>
+                  <th style="width:26%">البريد</th>
+                  <th style="width:14%">الصلاحية</th>
+                  <th style="width:12%">الحالة</th>
+                  <th style="width:20%">إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody">
+                <tr><td colspan="5" class="hint">اختر «المستخدمين» من القائمة لتحميل البيانات.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card hidden" id="section-movements">
+        <h2 style="font-size:13pt">مسجل الحركات</h2>
+        <div class="hint">سجل زمني لأهم الإجراءات في المكتب (حفظ مرجعيات السنة، الكشوفات، العضويات، إلخ). يظهر هذا القسم لمدير النظام فقط.</div>
+        <div class="actions" style="margin-top:12px">
+          <button type="button" class="linkbtn" id="btn-movements-refresh">تحديث السجل</button>
+        </div>
+        <div class="msg err" id="movements-msg" style="margin-top:8px"></div>
+        <div style="overflow:auto;margin-top:12px">
+          <table class="fin-table" style="width:100%">
+            <thead>
+              <tr>
+                <th style="width:22%">الوقت</th>
+                <th style="width:18%">المستخدم</th>
+                <th style="width:18%">الإجراء</th>
+                <th>التفاصيل</th>
+              </tr>
+            </thead>
+            <tbody id="movements-tbody"></tbody>
+          </table>
+        </div>
       </div>
 
       <div class="card hidden" id="section-schedules">
@@ -1252,10 +1387,12 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     // ===== Project constants (as agreed) =====
-    const OFFICE_ID = "office_1";
+    const DEFAULT_OFFICE_ID = "office_1";
+    const LS_OFFICE_KEY = "fs_active_office_v1";
+    // عند تغيير هذا البريد حدّث أيضاً دالة seedEmailMatches في firestore.rules ثم انشر القواعد.
     const SEED_EMAIL = "ali.alqadre93@gmail.com";
 
     // Firebase config (provided by you)
@@ -1469,8 +1606,211 @@
       selectedCompanyId: null,
       selectedCompanyName: null,
       selectedYearId: null,
-      officeDirectory: null
+      officeDirectory: null,
+      /** Loaded year doc for fiscalYear−1; used for قائمة التدفقات النقدية column PY */
+      priorYearDocForCashFlow: null,
+      /** معرّف المكتب النشط — يُحدَّد من localStorage أو افتراضي */
+      activeOfficeId: null,
+      /** مدير المنصّة: مستند platform_admins/{uid} */
+      isPlatformSuperAdmin: false
     };
+
+    function officeId(){
+      return state.activeOfficeId || DEFAULT_OFFICE_ID;
+    }
+
+    function loadActiveOfficeFromStorage(){
+      try{
+        const v = localStorage.getItem(LS_OFFICE_KEY);
+        state.activeOfficeId = (v && String(v).trim()) ? String(v).trim() : null;
+      }catch(_){
+        state.activeOfficeId = null;
+      }
+    }
+
+    function setActiveOfficeId(id){
+      const clean = String(id || "").trim() || DEFAULT_OFFICE_ID;
+      state.activeOfficeId = clean;
+      try{ localStorage.setItem(LS_OFFICE_KEY, clean); }catch(_){}
+    }
+
+    async function loadPlatformSuperAdminFlag(user){
+      const ref = doc(db, "platform_admins", user.uid);
+      const s = await getDoc(ref);
+      state.isPlatformSuperAdmin = s.exists() && s.data()?.active !== false;
+    }
+
+    /** مستند إعدادات المنصّة — مسار صالح: مجموعة platform + مستند settings */
+    async function ensurePlatformSettingsDoc(user){
+      if(!user) return;
+      const ref = doc(db, "platform", "settings");
+      const s = await getDoc(ref);
+      if(s.exists()) return;
+      const isSeed = (user.email || "").toLowerCase() === SEED_EMAIL.toLowerCase();
+      if(!isSeed && !state.isPlatformSuperAdmin) return;
+      await setDoc(ref, {
+        schemaVersion: "1.0",
+        titleAr: "منصّة القوائم المالية",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    }
+
+    async function maybePromoteSeedToPlatformAdmin(user){
+      if((user.email || "").toLowerCase() !== SEED_EMAIL.toLowerCase()) return;
+      await ensurePlatformSettingsDoc(user);
+      const ref = doc(db, "platform_admins", user.uid);
+      const s = await getDoc(ref);
+      if(s.exists()) return;
+      await setDoc(ref, {
+        email: user.email || "",
+        active: true,
+        createdAt: serverTimestamp(),
+        source: "seed_email_auto"
+      });
+      state.isPlatformSuperAdmin = true;
+    }
+
+    /** مستند وصف المكتب — مطلوب لظهور المكتب في قائمة المنصّة */
+    async function ensureDefaultOfficeRegistryDoc(){
+      const ref = doc(db, "offices", DEFAULT_OFFICE_ID);
+      const s = await getDoc(ref);
+      if(s.exists()) return;
+      if(!state.isPlatformSuperAdmin) return;
+      await setDoc(ref, {
+        name: "المكتب الافتراضي",
+        createdAt: serverTimestamp(),
+        migrated: true,
+        note: "auto_registry"
+      }, { merge: true });
+    }
+
+    async function ensurePlatformAdminMembership(user){
+      if(!state.isPlatformSuperAdmin) return;
+      const ref = memberRef(user.uid);
+      const s = await getDoc(ref);
+      if(s.exists()) return;
+      await setDoc(ref, {
+        email: user.email || "",
+        role: "admin",
+        active: true,
+        createdAt: serverTimestamp(),
+        source: "platform_admin"
+      });
+    }
+
+    async function updateTopbarOfficeName(){
+      const wrap = $("pill-active-office-wrap");
+      const sep = $("sep-active-office");
+      const span = $("pill-active-office");
+      if(!span) return;
+      const oid = officeId();
+      try{
+        const d = await getDoc(doc(db, "offices", oid));
+        const name = d.exists() ? (d.data()?.name || oid) : oid;
+        span.textContent = `${name} (${oid})`;
+        wrap?.classList.remove("hidden");
+        sep?.classList.remove("hidden");
+      }catch(_){
+        span.textContent = oid;
+        wrap?.classList.remove("hidden");
+        sep?.classList.remove("hidden");
+      }
+    }
+
+    async function switchToOffice(oid){
+      const user = auth.currentUser;
+      if(!user) return;
+      setText("platform-msg", "");
+      try{
+        setActiveOfficeId(oid);
+        if(state.isPlatformSuperAdmin){
+          await ensurePlatformAdminMembership(user);
+        }
+        await ensureMembership(user);
+        window.location.reload();
+      }catch(e){
+        setText("platform-msg", e?.message || String(e));
+      }
+    }
+
+    async function loadPlatformOfficesSection(){
+      const tbody = $("platform-offices-tbody");
+      if(!tbody) return;
+      setText("platform-msg", "");
+      tbody.innerHTML = "";
+      const loadingRow = document.createElement("tr");
+      const loadingCell = document.createElement("td");
+      loadingCell.colSpan = 4;
+      loadingCell.className = "hint";
+      loadingCell.textContent = "جاري التحميل…";
+      loadingRow.appendChild(loadingCell);
+      tbody.appendChild(loadingRow);
+      try{
+        const snap = await getDocs(collection(db, "offices"));
+        const rows = [];
+        snap.forEach((d)=> rows.push({ id: d.id, ...d.data() }));
+        rows.sort((a,b)=> String(a.id).localeCompare(String(b.id)));
+        tbody.innerHTML = "";
+        const cur = officeId();
+        if(!rows.length){
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          td.colSpan = 4;
+          td.className = "hint";
+          td.textContent = "لا توجد مكاتب بعد. أنشئ مكتباً من النموذج أعلاه.";
+          tr.appendChild(td);
+          tbody.appendChild(tr);
+          return;
+        }
+        for(const r of rows){
+          const tr = document.createElement("tr");
+          const isCur = r.id === cur;
+          if(isCur) tr.style.background = "var(--blue-ultra)";
+          const created = r.createdAt?.toDate?.()
+            ? r.createdAt.toDate().toLocaleString("ar-IQ", { hour12:false })
+            : "—";
+          const td0 = document.createElement("td");
+          td0.dir = "ltr";
+          td0.textContent = r.id;
+          const td1 = document.createElement("td");
+          td1.textContent = r.name || "—";
+          const td2 = document.createElement("td");
+          td2.dir = "ltr";
+          td2.textContent = created;
+          const td3 = document.createElement("td");
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "linkbtn";
+          btn.textContent = isCur ? "المكتب الحالي" : "العمل بهذا المكتب";
+          btn.disabled = isCur;
+          if(!isCur) btn.addEventListener("click", ()=> void switchToOffice(r.id));
+          td3.appendChild(btn);
+          tr.appendChild(td0);
+          tr.appendChild(td1);
+          tr.appendChild(td2);
+          tr.appendChild(td3);
+          tbody.appendChild(tr);
+        }
+      }catch(e){
+        tbody.innerHTML = "";
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 4;
+        td.className = "hint";
+        td.textContent = "تعذر تحميل المكاتب.";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        setText("platform-msg", e?.message || String(e));
+      }
+    }
+
+    function roleLabelAr(role){
+      const r = String(role || "").toLowerCase();
+      if(r === "admin") return "مدير النظام";
+      if(r === "staff") return "موظف / محاسب";
+      return role || "—";
+    }
 
     function updateStats(){
       setText("stat-active-company", state.activeCompanyName || "-");
@@ -1480,7 +1820,7 @@
     }
 
     function setSection(sec){
-      const ids = ["dashboard","companies","directory","schedules","users"];
+      const ids = ["dashboard","companies","directory","schedules","users","movements","platform"];
       for(const k of ids){
         const secEl = $("section-"+k);
         const navEl = $("nav-"+k);
@@ -1489,12 +1829,141 @@
       }
     }
 
-    ["nav-dashboard","nav-companies","nav-directory","nav-schedules","nav-users"].forEach((id)=>{
+    async function appendActivityLog(action, detail){
+      const user = auth.currentUser;
+      if(!user) return;
+      try{
+        await addDoc(activityLogCol(), {
+          createdAt: serverTimestamp(),
+          actorUid: user.uid,
+          actorEmail: user.email || "",
+          action: String(action || "").slice(0, 160),
+          detail: String(detail || "").slice(0, 4000)
+        });
+      }catch(err){
+        const c = err?.code || "";
+        if(c === "permission-denied"){
+          console.warn("[activityLog]", err?.message || err);
+        }
+      }
+    }
+
+    function fmtActivityTime(ts){
+      try{
+        const d = ts?.toDate?.();
+        return d ? d.toLocaleString("ar-IQ", { hour12:false }) : "—";
+      }catch(_){ return "—"; }
+    }
+
+    async function loadMovementsSection(){
+      const tbody = $("movements-tbody");
+      if(!tbody) return;
+      setText("movements-msg", "");
+      tbody.innerHTML = "";
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 4;
+      td.className = "hint";
+      td.textContent = "جاري التحميل…";
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      try{
+        const q = query(activityLogCol(), orderBy("createdAt", "desc"), limit(400));
+        const snap = await getDocs(q);
+        const rows = [];
+        snap.forEach((d)=> rows.push({ id: d.id, ...d.data() }));
+        tbody.innerHTML = "";
+        if(!rows.length){
+          const tr0 = document.createElement("tr");
+          const td0 = document.createElement("td");
+          td0.colSpan = 4;
+          td0.className = "hint";
+          td0.textContent = "لا توجد حركات مسجّلة بعد. ستُضاف تلقائياً عند حفظ مرجعيات السنة أو العضويات وغيرها.";
+          tr0.appendChild(td0);
+          tbody.appendChild(tr0);
+          return;
+        }
+        for(const r of rows){
+          const trr = document.createElement("tr");
+          const esc = (s)=> String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+          trr.innerHTML = `
+            <td dir="ltr">${esc(fmtActivityTime(r.createdAt))}</td>
+            <td dir="ltr">${esc(r.actorEmail || r.actorUid || "")}</td>
+            <td>${esc(r.action || "")}</td>
+            <td style="white-space:pre-wrap;word-break:break-word">${esc(r.detail || "")}</td>
+          `;
+          tbody.appendChild(trr);
+        }
+      }catch(e){
+        tbody.innerHTML = "";
+        const trE = document.createElement("tr");
+        const tdE = document.createElement("td");
+        tdE.colSpan = 4;
+        tdE.className = "hint";
+        tdE.textContent = "تعذر تحميل السجل.";
+        trE.appendChild(tdE);
+        tbody.appendChild(trE);
+        const code = e?.code || "";
+        const hint = code === "permission-denied"
+          ? " — تأكد أن قواعد Firestore المنشورة تتضمن «activityLog» وأن حسابك مدير (role=admin) أو بريد seed، ثم نفّذ: firebase deploy --only firestore:rules"
+          : "";
+        setText("movements-msg", (e?.message || String(e)) + hint);
+      }
+    }
+
+    function goToSection(sec){
+      setSection(sec);
+      if(sec === "directory") void loadDirectorySection();
+      if(sec === "users") void loadUsersSection();
+      if(sec === "movements") void loadMovementsSection();
+      if(sec === "platform") void loadPlatformOfficesSection();
+    }
+
+    ["nav-dashboard","nav-companies","nav-directory","nav-schedules","nav-users","nav-movements","nav-platform"].forEach((id)=>{
       $(id).addEventListener("click", ()=>{
         const sec = $(id).getAttribute("data-section");
-        setSection(sec);
-        if(sec === "directory") void loadDirectorySection();
+        goToSection(sec);
       });
+    });
+
+    $("dash-go-companies")?.addEventListener("click", ()=> goToSection("companies"));
+    $("dash-go-schedules")?.addEventListener("click", ()=> goToSection("schedules"));
+    $("dash-go-directory")?.addEventListener("click", ()=> goToSection("directory"));
+    $("dash-go-users")?.addEventListener("click", ()=> goToSection("users"));
+    $("dash-go-movements")?.addEventListener("click", ()=> goToSection("movements"));
+    $("dash-go-platform")?.addEventListener("click", ()=> goToSection("platform"));
+    $("btn-movements-refresh")?.addEventListener("click", ()=> void loadMovementsSection());
+    $("btn-platform-refresh")?.addEventListener("click", ()=> void loadPlatformOfficesSection());
+    $("btn-platform-create-office")?.addEventListener("click", async ()=>{
+      try{
+        setText("platform-msg","");
+        setText("platform-ok","");
+        const user = auth.currentUser;
+        if(!user) throw new Error("غير مسجل.");
+        if(!state.isPlatformSuperAdmin) throw new Error("ليس لديك صلاحية مدير المنصّة.");
+        const name = ($("platform-new-office-name")?.value||"").trim();
+        if(!name) throw new Error("أدخل اسم المكتب.");
+        const id = `office_${Date.now()}`;
+        await setDoc(doc(db, "offices", id), {
+          name,
+          createdAt: serverTimestamp(),
+          createdBy: user.uid,
+          createdByEmail: user.email || ""
+        });
+        await setDoc(doc(db, "offices", id, "users", user.uid), {
+          email: user.email || "",
+          role: "admin",
+          active: true,
+          createdAt: serverTimestamp(),
+          source: "platform_new_office"
+        });
+        $("platform-new-office-name").value = "";
+        setText("platform-ok", `تم إنشاء المكتب ${id}. يمكنك التبديل إليه من الجدول.`);
+        await appendActivityLog("إنشاء مكتب", `${id} — ${name}`);
+        await loadPlatformOfficesSection();
+      }catch(e){
+        setText("platform-msg", e?.message || String(e));
+      }
     });
 
     // ===== Country / Province + Branches helpers =====
@@ -1750,13 +2219,35 @@
     // اتصال قاعدة البيانات (يعتمد على نجاح قراءات Firestore)
     setText("ui-conn", "غير متصل");
 
-    function bootRef() { return doc(db, "offices", OFFICE_ID, "settings", "bootstrap"); }
-    function memberRef(uid) { return doc(db, "offices", OFFICE_ID, "users", uid); }
-    function companiesCol() { return collection(db, "offices", OFFICE_ID, "companies"); }
-    function companyRef(id) { return doc(db, "offices", OFFICE_ID, "companies", id); }
-    function yearRef(companyId, yearId) { return doc(db, "offices", OFFICE_ID, "companies", companyId, "years", yearId); }
-    function yearsCol(companyId) { return collection(db, "offices", OFFICE_ID, "companies", companyId, "years"); }
-    function directoryRef() { return doc(db, "offices", OFFICE_ID, "settings", "directory"); }
+    function bootRef() { return doc(db, "offices", officeId(), "settings", "bootstrap"); }
+    function memberRef(uid) { return doc(db, "offices", officeId(), "users", uid); }
+    function companiesCol() { return collection(db, "offices", officeId(), "companies"); }
+    function companyRef(id) { return doc(db, "offices", officeId(), "companies", id); }
+    function yearRef(companyId, yearId) { return doc(db, "offices", officeId(), "companies", companyId, "years", yearId); }
+    async function refreshPriorYearDocForCashFlow(){
+      state.priorYearDocForCashFlow = null;
+      const companyId = state.selectedCompanyId;
+      const yearId = state.selectedYearId;
+      if(!companyId || !yearId) return null;
+      const yn = parseInt(String(yearId), 10);
+      if(!Number.isFinite(yn)) return null;
+      try{
+        const ps = await getDoc(yearRef(companyId, String(yn - 1)));
+        state.priorYearDocForCashFlow = ps.exists() ? (ps.data() || {}) : null;
+      }catch(_){
+        state.priorYearDocForCashFlow = null;
+      }
+      return state.priorYearDocForCashFlow;
+    }
+    async function renderYearPagesFresh(yearDoc){
+      await refreshPriorYearDocForCashFlow();
+      renderInPages(yearDoc);
+    }
+    function yearsCol(companyId) { return collection(db, "offices", officeId(), "companies", companyId, "years"); }
+    function directoryRef() { return doc(db, "offices", officeId(), "settings", "directory"); }
+    function usersCol() { return collection(db, "offices", officeId(), "users"); }
+    /** سجل نشاط المكتب — قراءة للمدير فقط حسب firestore.rules */
+    function activityLogCol() { return collection(db, "offices", officeId(), "activityLog"); }
 
     function invalidateOfficeDirectory(){ state.officeDirectory = null; }
 
@@ -3878,7 +4369,116 @@
         active: true,
         createdAt: serverTimestamp()
       });
+      await maybePromoteSeedToPlatformAdmin(user);
     }
+
+    async function loadUsersSection(){
+      const tbody = $("users-tbody");
+      if(!tbody) return;
+      setText("users-msg", "");
+      setText("users-ok", "");
+      tbody.innerHTML = "";
+      const loadingRow = document.createElement("tr");
+      const loadingCell = document.createElement("td");
+      loadingCell.colSpan = 5;
+      loadingCell.className = "hint";
+      loadingCell.textContent = "جاري التحميل…";
+      loadingRow.appendChild(loadingCell);
+      tbody.appendChild(loadingRow);
+      try{
+        const snap = await getDocs(usersCol());
+        const items = [];
+        snap.forEach((d) => items.push({ id: d.id, ...d.data() }));
+        items.sort((a,b)=> String(a.email||a.id||"").localeCompare(String(b.email||b.id||""), "ar"));
+        tbody.innerHTML = "";
+        const curUid = auth.currentUser?.uid || "";
+        if(!items.length){
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          td.colSpan = 5;
+          td.className = "hint";
+          td.textContent = "لا يوجد مستخدمون بعد. أنشئ مستخدماً في Firebase Authentication ثم أضف عضويته هنا بالـ UID.";
+          tr.appendChild(td);
+          tbody.appendChild(tr);
+          return;
+        }
+        for(const u of items){
+          const tr = document.createElement("tr");
+          if(u.id === curUid) tr.style.background = "var(--blue-ultra)";
+          const tdUid = document.createElement("td");
+          tdUid.dir = "ltr";
+          tdUid.style.fontSize = "11px";
+          tdUid.style.wordBreak = "break-all";
+          tdUid.textContent = u.id;
+          const tdEmail = document.createElement("td");
+          tdEmail.dir = "ltr";
+          tdEmail.textContent = u.email || "—";
+          const tdRole = document.createElement("td");
+          tdRole.textContent = String(u.role||"").toLowerCase() === "admin" ? "مدير" : "موظف";
+          const tdAct = document.createElement("td");
+          tdAct.textContent = u.active === false ? "معطّل" : "مفعّل";
+          const tdBtn = document.createElement("td");
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "linkbtn";
+          btn.textContent = "تعديل في النموذج";
+          btn.addEventListener("click", ()=>{
+            $("users-uid").value = u.id;
+            $("users-email").value = u.email ? String(u.email) : "";
+            $("users-role").value = String(u.role||"staff").toLowerCase() === "admin" ? "admin" : "staff";
+            $("users-active").value = u.active === false ? "no" : "yes";
+            $("users-uid").scrollIntoView({ behavior:"smooth", block:"center" });
+          });
+          tdBtn.appendChild(btn);
+          tr.appendChild(tdUid);
+          tr.appendChild(tdEmail);
+          tr.appendChild(tdRole);
+          tr.appendChild(tdAct);
+          tr.appendChild(tdBtn);
+          tbody.appendChild(tr);
+        }
+      }catch(e){
+        tbody.innerHTML = "";
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 5;
+        td.className = "hint";
+        td.textContent = "تعذر تحميل المستخدمين.";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        setText("users-msg", e?.message || String(e));
+      }
+    }
+
+    $("btn-users-save")?.addEventListener("click", async ()=>{
+      try{
+        setText("users-msg","");
+        setText("users-ok","");
+        const uid = ($("users-uid")?.value||"").trim();
+        if(!uid) throw new Error("أدخل UID صالحاً من Firebase Authentication.");
+        const email = ($("users-email")?.value||"").trim();
+        const role = ($("users-role")?.value||"staff").trim();
+        const active = ($("users-active")?.value||"yes") === "yes";
+        const ref = memberRef(uid);
+        const prev = await getDoc(ref);
+        const payload = {
+          email: email || null,
+          role,
+          active,
+          updatedAt: serverTimestamp()
+        };
+        if(!prev.exists()){
+          payload.createdAt = serverTimestamp();
+        }
+        await setDoc(ref, payload, { merge: true });
+        await appendActivityLog("عضوية مستخدم", `UID: ${uid} — الدور: ${role} — ${active ? "مفعّل" : "معطّل"}${email ? ` — ${email}` : ""}`);
+        setText("users-ok", "تم حفظ العضوية.");
+        await loadUsersSection();
+      }catch(e){
+        setText("users-msg", e?.message || String(e));
+      }
+    });
+    $("btn-users-refresh")?.addEventListener("click", ()=> void loadUsersSection());
 
     async function refreshCompanies() {
       const sel = $("sel-company");
@@ -4113,7 +4713,7 @@
         state.activeYearId = yearId;
         updateStats();
 
-        renderInPages(data);
+        await renderYearPagesFresh(data);
         show("in-md-report-card");
         await loadDirectorReportIntoSchedules(companyId, data);
       }catch(e){
@@ -4127,6 +4727,131 @@
         $("btn-save-year").disabled = true;
         state.selectedYearId = null;
       }
+    }
+
+    function verticalSumsByScheduleNoForDoc(yearDoc, n){
+      const ds = yearDoc?.dynamicSchedules || {};
+      const reg = enforceReservedScheduleNos(Array.isArray(ds.registry) ? ds.registry : []);
+      const dataById = ds.dataById || {};
+      const sumVertical = (schId)=>{
+        const rows = (dataById?.[schId]?.rows) || [];
+        return rows.reduce((acc,r)=>({ cy: acc.cy + n(r?.cy), py: acc.py + n(r?.py) }), { cy:0, py:0 });
+      };
+      const sumsByNo = {};
+      for(const sch of reg.filter(s=>s.active !== false)){
+        if(sch.type === "vertical"){
+          sumsByNo[Number(sch.scheduleNo||0)] = sumVertical(sch.id);
+        }
+      }
+      return sumsByNo;
+    }
+
+    /** Mirrors قائمة الدخل logic in renderInPages for an arbitrary year document (ضريبة/ربح للعام والعام السابق للمقارنة داخل ذلك الملف). */
+    function incomeStatementTaxPatFromYearDoc(yearDoc, yearLabelForMeta, n){
+      const ds = yearDoc?.dynamicSchedules || {};
+      const reg = enforceReservedScheduleNos(Array.isArray(ds.registry) ? ds.registry : []);
+      const dataById = ds.dataById || {};
+      const sumVertical = (schId)=>{
+        const rows = (dataById?.[schId]?.rows) || [];
+        return rows.reduce((acc,r)=>({ cy: acc.cy + n(r?.cy), py: acc.py + n(r?.py) }), { cy:0, py:0 });
+      };
+      const effectiveVerticalTarget = (sch)=>{
+        const t = String(sch?.target || "").trim();
+        if(t === "balance" || t === "income") return t;
+        const id = String(sch?.id || "");
+        if(id === "sch-2" || id === "sch-3" || id === "sch-4") return "balance";
+        if(sch?.type === "vertical") return "income";
+        return "income";
+      };
+      const effectiveVerticalSection = (sch, target)=>{
+        const s = String(sch?.section || "").trim();
+        if(s) return s;
+        if(target !== "balance") return "expense";
+        const id = String(sch?.id || "");
+        if(id === "sch-2" || id === "sch-3") return "assets-current";
+        if(id === "sch-4") return "st";
+        return "assets-current";
+      };
+      const activeVerticals = reg.filter(s=>s && s.active !== false && s.type === "vertical");
+      const vertSumList = (list)=> list.reduce((acc,sch)=>{
+        const t = sumVertical(sch.id);
+        return { cy: acc.cy + t.cy, py: acc.py + t.py };
+      }, { cy:0, py:0 });
+      const incomeExpenseSchedules = activeVerticals.filter(sch=>{
+        const tgt = effectiveVerticalTarget(sch);
+        const sec = effectiveVerticalSection(sch, tgt);
+        return tgt === "income" && sec === "expense";
+      }).sort((a,b)=>Number(a.scheduleNo||0) - Number(b.scheduleNo||0));
+      const incomeRevenueSchedules = activeVerticals.filter(sch=>{
+        const tgt = effectiveVerticalTarget(sch);
+        const sec = effectiveVerticalSection(sch, tgt);
+        return tgt === "income" && sec === "revenue";
+      }).sort((a,b)=>Number(a.scheduleNo||0) - Number(b.scheduleNo||0));
+      const expenseVertTotals = vertSumList(incomeExpenseSchedules);
+      const revenueVertTotals = vertSumList(incomeRevenueSchedules);
+      const meta = { ...defaultYearMeta(yearLabelForMeta), ...(yearDoc?.meta||{}) };
+      const hasFA = String(meta.companyHasFixedAssets || "no") === "yes";
+      const hasContracts = String(meta.companyHasContracts || "yes") === "yes";
+      const hasInv = String(meta.companyHasInventory || "no") === "yes";
+      const contracts = dataById?.["sch-8"] || {};
+      const exRate = Number.isFinite(n(contracts.exchangeRate)) && n(contracts.exchangeRate) > 0 ? n(contracts.exchangeRate) : 0;
+      const conRows = Array.isArray(contracts.rows) ? contracts.rows : [];
+      const contractRowComputed = (r)=>{
+        const rate = exRate || n(r?.exchangeRate) || 0;
+        const contractUsd = n(r?.contractUsd);
+        const contractIqd = n(r?.contractIqd) || (rate ? contractUsd * rate : 0);
+        const revUsd = n(r?.revUsd);
+        const revIqd = n(r?.revIqd) || (rate ? revUsd * rate : 0);
+        const prevCumIqd = n(r?.prevCumIqd);
+        const expensesIqd = n(r?.expensesIqd);
+        const completion = contractIqd > 0 ? ((prevCumIqd + revIqd) / contractIqd) : 0;
+        return { rate, contractIqd, revIqd, completion, expensesIqd, prevCumIqd };
+      };
+      const revenueFromContractsCY = (hasContracts ? conRows.reduce((s,r)=>s + contractRowComputed(r).revIqd, 0) : 0);
+      const revenueCY = revenueFromContractsCY + (revenueVertTotals.cy || 0);
+      const revenuePY = (hasContracts ? (n(contracts.revPyTotalIqd) || 0) : 0) + (revenueVertTotals.py || 0);
+      const invBox = hasInv ? (dataById?.["_invBox"] || {}) : {};
+      const openInv = n(invBox.openInv);
+      const purchases = n(invBox.purchases);
+      const closeInv = n(invBox.closeInv);
+      const usedMaterialsCY = hasInv ? ((openInv + purchases) - closeInv) : 0;
+      const usedMaterialsPY = hasInv ? n(invBox.prevUsedMaterials) : 0;
+      const faDepsFromDoc = ()=>{
+        const fa = dataById?.["sch-1"] || {};
+        const cols = Array.isArray(fa.columns) ? fa.columns : [];
+        let depCY = 0, depPY = 0;
+        for(const c of cols){
+          const openCostPY = n(c.openCostPY);
+          const addCY = n(c.addCY);
+          const dispCY = n(c.dispCY);
+          const rate = n(c.ratePct) / 100;
+          const closeCostCY = openCostPY + addCY - dispCY;
+          depCY += (closeCostCY * rate);
+          depPY += (openCostPY * rate);
+        }
+        return { depCY, depPY };
+      };
+      const faDep = hasFA ? faDepsFromDoc() : { depCY:0, depPY:0 };
+      const expCY = (expenseVertTotals.cy || 0) + (hasFA ? (faDep.depCY||0) : 0) + (hasInv ? usedMaterialsCY : 0);
+      const expPY = (expenseVertTotals.py || 0) + (hasFA ? (faDep.depPY||0) : 0) + (hasInv ? usedMaterialsPY : 0);
+      const pbtCY = revenueCY - expCY;
+      const pbtPY = revenuePY - expPY;
+      const taxRate = n(meta.incomeTaxRatePct) / 100;
+      const taxCY = pbtCY > 0 ? (pbtCY * taxRate) : 0;
+      const taxPY = pbtPY > 0 ? (pbtPY * taxRate) : 0;
+      const patCY = pbtCY - taxCY;
+      const patPY = pbtPY - taxPY;
+      return { taxCY, taxPY, patCY, patPY };
+    }
+
+    function fixedAssetsCapExAddCYFromYearDoc(yearDoc, yearLabelForMeta, n){
+      const meta = { ...defaultYearMeta(yearLabelForMeta), ...(yearDoc?.meta||{}) };
+      if(String(meta.companyHasFixedAssets||"no") !== "yes") return 0;
+      const fa = (yearDoc?.dynamicSchedules?.dataById||{})["sch-1"] || {};
+      const cols = Array.isArray(fa.columns) ? fa.columns : [];
+      let addCYTotal = 0;
+      for(const c of cols) addCYTotal += n(c.addCY);
+      return addCYTotal;
     }
 
     function renderInPages(yearDoc){
@@ -4170,6 +4895,7 @@
         const fa = dataById?.["sch-1"] || {};
         const cols = Array.isArray(fa.columns) ? fa.columns : [];
         let depCY = 0, depPY = 0, accCY = 0, accPY = 0, nbvCY = 0, nbvPY = 0;
+        let addCYTotal = 0, dispCYTotal = 0;
         for(const c of cols){
           const openCostPY = n(c.openCostPY);
           const addCY = n(c.addCY);
@@ -4187,8 +4913,10 @@
           accCY += closeAccCY;
           nbvPY += (openCostPY - openAccPY);
           nbvCY += (closeCostCY - closeAccCY);
+          addCYTotal += addCY;
+          dispCYTotal += dispCY;
         }
-        return { depCY, depPY, accCY, accPY, nbvCY, nbvPY };
+        return { depCY, depPY, accCY, accPY, nbvCY, nbvPY, addCYTotal, dispCYTotal };
       };
 
       // ===== Auto statements (CY/PY) =====
@@ -4218,7 +4946,7 @@
       const meta = getMeta();
       const hasFA = String(meta.companyHasFixedAssets || "no") === "yes";
       const hasContracts = String(meta.companyHasContracts || "yes") === "yes";
-      const faTotals = hasFA ? computeFixedAssets() : { depCY:0, depPY:0, accCY:0, accPY:0, nbvCY:0, nbvPY:0 };
+      const faTotals = hasFA ? computeFixedAssets() : { depCY:0, depPY:0, accCY:0, accPY:0, nbvCY:0, nbvPY:0, addCYTotal:0, dispCYTotal:0 };
       const CY = String(meta.fiscalYear || state.selectedYearId || "").trim();
       const CYn = parseInt(CY, 10);
       const PY = Number.isFinite(CYn) ? String(CYn - 1) : "PY";
@@ -4439,6 +5167,57 @@
         if(!num) return "-";
         return num > 0 ? `(${fmt(num)})` : fmt(Math.abs(num));
       };
+      // ===== Cash Flow Statement (Indirect) — built from Balance + Income =====
+      const d = (cy, py)=> (Number(cy||0) - Number(py||0));
+      const dInvCY = d(bs.assets.inventory.cy, bs.assets.inventory.py);
+      const dRecCY = d(bs.assets.receivables.cy, bs.assets.receivables.py);
+      const dCredCY = d(bs.liabilities.creditors.cy, bs.liabilities.creditors.py);
+      const dProvCY = d(bs.liabilities.shortTermProvisions.cy, bs.liabilities.shortTermProvisions.py);
+      const wcEffectCY = (-dInvCY) + (-dRecCY) + (dCredCY) + (dProvCY);
+      const cfoCY = (patCY || 0) + (hasFA ? (faTotals.depCY || 0) : 0) + wcEffectCY;
+      const capexCY = hasFA ? (faTotals.addCYTotal || 0) : 0;
+      // Note: disposals proceeds are not captured in FA schedule; treat as 0 unless modeled later.
+      const cfiCY = -capexCY;
+      // Equity statement "deductions" are treated as cash distributions/withdrawals for now.
+      const eqDedsCashCY = (n(eqDed.capital) || 0) + (n(eqDed.reserve) || 0) + (n(eqDed.surplus) || 0);
+      const cffCY = -eqDedsCashCY;
+      const netCashChangeCY = cfoCY + cfiCY + cffCY;
+      const cashDiffCY = d(bs.assets.cash.cy, bs.assets.cash.py);
+      const cfsDiffCY = cashDiffCY - netCashChangeCY;
+      const priorDoc = state.priorYearDocForCashFlow;
+      let cfoPY = null;
+      let cfiPY = null;
+      let cffPY = null;
+      let netCashChangePY = null;
+      let cashDiffPY = null;
+      let cfsDiffPY = null;
+      let cashOpeningPYcol = "—";
+      let dInvPY = 0, dRecPY = 0, dCredPY = 0, dProvPY = 0;
+      let capexPY = 0;
+      let eqDedsCashPYNum = 0;
+      if(priorDoc){
+        const sumsPrior = verticalSumsByScheduleNoForDoc(priorDoc, n);
+        const priorTaxPat = incomeStatementTaxPatFromYearDoc(priorDoc, PY, n);
+        const taxPPY = priorTaxPat.taxPY;
+        const invPriorOpen = hasInv ? n(((priorDoc.dynamicSchedules||{}).dataById||{})["_invBox"]?.openInv) : 0;
+        dInvPY = hasInv ? d(bs.assets.inventory.py, invPriorOpen) : 0;
+        dRecPY = d(bs.assets.receivables.py, sumsPrior[2]?.py||0);
+        dCredPY = d(bs.liabilities.creditors.py, sumsPrior[4]?.py||0);
+        dProvPY = d(bs.liabilities.shortTermProvisions.py, taxPPY);
+        const wcEffectPY = (-dInvPY) + (-dRecPY) + (dCredPY) + (dProvPY);
+        cfoPY = (patPY || 0) + (hasFA ? (faTotals.depPY || 0) : 0) + wcEffectPY;
+        capexPY = fixedAssetsCapExAddCYFromYearDoc(priorDoc, PY, n);
+        cfiPY = -capexPY;
+        const eqPrior = ((priorDoc.dynamicSchedules||{}).dataById||{})["_equityStmt"] || {};
+        const eqDedPrior = eqPrior.deductions || {};
+        eqDedsCashPYNum = (n(eqDedPrior.capital)||0) + (n(eqDedPrior.reserve)||0) + (n(eqDedPrior.surplus)||0);
+        cffPY = -eqDedsCashPYNum;
+        netCashChangePY = cfoPY + cfiPY + cffPY;
+        cashDiffPY = d(bs.assets.cash.py, sumsPrior[3]?.py||0);
+        cfsDiffPY = cashDiffPY - netCashChangePY;
+        cashOpeningPYcol = fmt(sumsPrior[3]?.py||0);
+      }
+      const cfsPYCell = (txt)=> priorDoc ? txt : "—";
       const contractsSchNo = (reg.find(s=>s?.active!==false && (s?.id==="sch-8" || s?.type==="contracts"))?.scheduleNo) || 8;
 
       const escHtml = (s)=> String(s ?? "")
@@ -4593,6 +5372,121 @@
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div class="page" data-fs-order="3">
+            <div class="page-label">بيان هـ – قائمة التدفقات النقدية (غير مباشرة)</div>
+            <div class="doc-subtitle">${state.selectedCompanyName || ""}</div>
+            <div class="doc-sub2 doc-underline" style="margin:6px 0">${meta.fyEndDate ? `للسنة المالية المنتهية في ${formatFyEndArabic(meta.fyEndDate)}` : ""}</div>
+            <div class="stmt-code">بيان -هـ-</div>
+            ${Math.abs(cfsDiffCY) >= 0.99 ? `
+              <div class="msg err" style="margin-top:10px">
+                تنبيه تدفقات نقدية (${CY}): صافي التغير في النقد المحسوب (<b dir="ltr">${fmt(netCashChangeCY)}</b>)
+                لا يطابق فرق النقد في الميزانية (<b dir="ltr">${fmt(cashDiffCY)}</b>). الفرق: <b dir="ltr">${fmt(cfsDiffCY)}</b>
+              </div>
+            ` : ``}
+            ${priorDoc && cfsDiffPY != null && Math.abs(cfsDiffPY) >= 0.99 ? `
+              <div class="msg err" style="margin-top:10px">
+                تنبيه تدفقات نقدية (${PY}): صافي التغير المحسوب (<b dir="ltr">${fmt(netCashChangePY)}</b>)
+                لا يطابق فرق النقد (<b dir="ltr">${fmt(cashDiffPY)}</b>). الفرق: <b dir="ltr">${fmt(cfsDiffPY)}</b>
+              </div>
+            ` : ``}
+            ${!priorDoc ? `
+              <div class="hint" style="margin-top:10px">
+                عمود ${PY}: لإظهار حساب التدفقات النقدية للعام السابق بالكامل (حركة رأس المال العامل والتحقق من النقد)، احفظ وثيقة سنة <b>${PY}</b> في النظام لنفس الشركة.
+              </div>
+            ` : ``}
+            <table class="fin-table" id="table-cfs-live">
+              <thead><tr>
+                <th style="width:52%">البيان</th>
+                <th style="width:24%">${CY} دينار</th>
+                <th style="width:24%">${PY} دينار</th>
+              </tr></thead>
+              <tbody>
+                <tr class="row-header"><td colspan="3" contenteditable="false">التدفقات النقدية من الأنشطة التشغيلية</td></tr>
+                <tr>
+                  <td contenteditable="false">صافي الربح بعد الضريبة</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${fmt(patCY)}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${fmt(patPY)}</td>
+                </tr>
+                ${hasFA ? `
+                <tr>
+                  <td contenteditable="false">يضاف: الاندثارات والاطفاءات</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${fmt(faTotals.depCY||0)}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${fmt(faTotals.depPY||0)}</td>
+                </tr>
+                ` : ``}
+                <tr class="row-subheader"><td colspan="3" contenteditable="false">تغيرات رأس المال العامل</td></tr>
+                <tr>
+                  <td contenteditable="false">نقص/زيادة المخزون</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${fmtNeg(dInvCY)}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${cfsPYCell(hasInv ? fmtNeg(dInvPY) : fmtNeg(0))}</td>
+                </tr>
+                <tr>
+                  <td contenteditable="false">نقص/زيادة المدينون</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${fmtNeg(dRecCY)}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${cfsPYCell(fmtNeg(dRecPY))}</td>
+                </tr>
+                <tr>
+                  <td contenteditable="false">نقص/زيادة الدائنون</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${fmt(dCredCY)}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${cfsPYCell(fmt(dCredPY))}</td>
+                </tr>
+                <tr>
+                  <td contenteditable="false">نقص/زيادة التخصيصات قصيرة الأجل</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${fmt(dProvCY)}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${cfsPYCell(fmt(dProvPY))}</td>
+                </tr>
+                <tr class="row-total">
+                  <td contenteditable="false" style="font-weight:700">صافي النقد من الأنشطة التشغيلية</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${fmt(cfoCY)}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${cfsPYCell(fmt(cfoPY))}</td>
+                </tr>
+
+                <tr class="row-header"><td colspan="3" contenteditable="false">التدفقات النقدية من الأنشطة الاستثمارية</td></tr>
+                <tr>
+                  <td contenteditable="false">شراء موجودات ثابتة</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${fmtNeg(capexCY)}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${cfsPYCell(fmtNeg(capexPY))}</td>
+                </tr>
+                <tr class="row-total">
+                  <td contenteditable="false" style="font-weight:700">صافي النقد من الأنشطة الاستثمارية</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${fmt(cfiCY)}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${cfsPYCell(fmt(cfiPY))}</td>
+                </tr>
+
+                <tr class="row-header"><td colspan="3" contenteditable="false">التدفقات النقدية من الأنشطة التمويلية</td></tr>
+                <tr>
+                  <td contenteditable="false">تنزيلات/توزيعات من حقوق الملكية (بيان ج)</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${fmtNeg(eqDedsCashCY)}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${cfsPYCell(fmtNeg(eqDedsCashPYNum))}</td>
+                </tr>
+                <tr class="row-total">
+                  <td contenteditable="false" style="font-weight:700">صافي النقد من الأنشطة التمويلية</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${fmt(cffCY)}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${cfsPYCell(fmt(cffPY))}</td>
+                </tr>
+
+                <tr class="row-total">
+                  <td contenteditable="false" style="font-weight:900;background:var(--blue-pale)">صافي التغير في النقد خلال السنة</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:900">${fmt(netCashChangeCY)}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:900">${cfsPYCell(fmt(netCashChangePY))}</td>
+                </tr>
+                <tr>
+                  <td contenteditable="false">النقد في بداية السنة</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${fmt(bs.assets.cash.py)}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${cashOpeningPYcol}</td>
+                </tr>
+                <tr class="row-total">
+                  <td contenteditable="false" style="font-weight:700">النقد في نهاية السنة</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${fmt(bs.assets.cash.cy)}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${fmt(bs.assets.cash.py)}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="hint" style="margin-top:8px">
+              ملاحظة: هذا البيان يُبنى تلقائياً من (بيان أ) و(بيان ب) وبيانات الموجودات الثابتة (كشف ١) وحقوق الملكية (بيان ج). عمود ${PY} للتدفقات يُحسب من نفس القواعد خلال سنة ${PY} باستخدام وثيقة سنة ${PY} كمصدر لمواقف افتتاحية (ما قبل ${PY}) مع مقارنة أعمدة الميزانية الحالية. إن كان لديك بيع موجودات ثابتة أو قروض/فوائد، قد يلزم إضافة حقول مخصصة لتظهر بدقة ضمن الاستثمار/التمويل.
             </div>
           </div>
 
@@ -4908,7 +5802,7 @@
             editing = false;
             saveBtn.disabled = true;
             setMsg("تم حفظ كشف حركة المخزون.", "");
-            renderInPages(snap.data()||{});
+            await renderYearPagesFresh(snap.data()||{});
           }catch(e){
             setMsg("", e?.message || String(e));
           }
@@ -5013,9 +5907,9 @@
                 <th>التفاصيل</th>
                 ${colLabels.map(c=>`
                   <th style="width:14%">
-                    <div style="font-weight:700">${mdV01SafeText(c.name || "")}</div>
-                    <div style="font-size:9pt;opacity:.9">رمز الحساب: <span dir="ltr">${mdV01SafeText(c.code || "")}</span></div>
-                    <div style="font-size:9pt;opacity:.9">دينار</div>
+                    <div style="font-size:9pt;opacity:.9">اسم الحساب: <span style="font-weight:700">${mdV01SafeText(c.name || "")}</span></div>
+                    <div style="font-size:9pt;opacity:.9;margin-top:2px">رمز الحساب: <span dir="ltr">${mdV01SafeText(c.code || "")}</span></div>
+                    <div style="font-size:9pt;opacity:.9;margin-top:2px">دينار</div>
                   </th>
                 `).join("")}
                 <th style="width:14%">المجموع دينار</th>
@@ -5096,7 +5990,7 @@
             editing = false;
             saveBtn.disabled = true;
             setMsg("تم حفظ بيان ج.", "");
-            renderInPages(snap.data()||{});
+            await renderYearPagesFresh(snap.data()||{});
           }catch(e){
             setMsg("", e?.message || String(e));
           }
@@ -5380,7 +6274,7 @@
               editing = false;
               saveBtn.disabled = true;
               setMsg("تم حفظ كشف الموجودات الثابتة.", "");
-              renderInPages(snap.data()||{});
+              await renderYearPagesFresh(snap.data()||{});
             }catch(e){
               setMsg("", e?.message || String(e));
             }
@@ -5394,7 +6288,7 @@
               updatedAt: serverTimestamp()
             }, { merge:true });
             const snap = await getDoc(yearRef(state.selectedCompanyId, state.selectedYearId));
-            renderInPages(snap.data()||{});
+            await renderYearPagesFresh(snap.data()||{});
           });
 
           renderFA();
@@ -5581,7 +6475,7 @@
               editing = false;
               saveBtn.disabled = true;
               setMsg("تم حفظ الكشف.", "");
-              renderInPages(snap.data()||{});
+              await renderYearPagesFresh(snap.data()||{});
             }catch(e){
               setMsg("", e?.message || String(e));
             }
@@ -5594,7 +6488,7 @@
               updatedAt: serverTimestamp()
             }, { merge:true });
             const snap = await getDoc(yearRef(state.selectedCompanyId, state.selectedYearId));
-            renderInPages(snap.data()||{});
+            await renderYearPagesFresh(snap.data()||{});
           });
 
           renderTable();
@@ -5853,7 +6747,7 @@
               editing = false;
               saveBtn.disabled = true;
               setMsg("تم حفظ كشف العقود.", "");
-              renderInPages(snap.data()||{});
+              await renderYearPagesFresh(snap.data()||{});
             }catch(e){
               setMsg("", e?.message || String(e));
             }
@@ -5867,7 +6761,7 @@
               updatedAt: serverTimestamp()
             }, { merge:true });
             const snap = await getDoc(yearRef(state.selectedCompanyId, state.selectedYearId));
-            renderInPages(snap.data()||{});
+            await renderYearPagesFresh(snap.data()||{});
           });
 
           renderContracts();
@@ -5915,8 +6809,14 @@
         const user = auth.currentUser;
         if (!user) throw new Error("غير مسجل");
         await seedBootstrap(user);
-        setText("bootstrap-msg", "تمت التهيئة بنجاح. سيتم فتح لوحة التحكم.");
-        // UI will continue via auth state handler
+        await loadPlatformSuperAdminFlag(user);
+        await ensurePlatformSettingsDoc(user);
+        loadActiveOfficeFromStorage();
+        await ensureDefaultOfficeRegistryDoc();
+        await ensurePlatformAdminMembership(user);
+        const mem = await ensureMembership(user);
+        await openDashboardForUser(user, mem);
+        setText("bootstrap-msg", "تمت التهيئة بنجاح.");
       } catch (e) {
         setText("bootstrap-msg", e?.message || String(e));
       }
@@ -6323,7 +7223,7 @@
         await setDoc(yref, { dynamicSchedules: { ...ds, registry: reg, dataById }, updatedAt: serverTimestamp() }, { merge:true });
         closeOverlay("ov-schedule");
         const snap2 = await getDoc(yref);
-        renderInPages(snap2.data()||{});
+        await renderYearPagesFresh(snap2.data()||{});
       }catch(e){
         setText("sch-msg", e?.message || String(e));
       }
@@ -6559,6 +7459,7 @@
           meta: { ...defaultYearMeta(state.selectedYearId), ...m },
           updatedAt: serverTimestamp()
         }, { merge: true });
+        await appendActivityLog("حفظ مرجعيات السنة", `شركة: ${state.selectedCompanyId || ""} — CY: ${state.selectedYearId || ""}`);
         setText("year-ok","تم حفظ مرجعيات السنة.");
       }catch(e){
         setText("year-msg", e?.message || String(e));
@@ -6569,6 +7470,40 @@
 
     // (تم إلغاء القوالب حالياً)
 
+    async function openDashboardForUser(user, mem){
+      hide("view-login");
+      hide("view-bootstrap");
+      show("view-dashboard");
+      setText("dash-user", `${user.email}`);
+      setText("dash-role", roleLabelAr(mem.role));
+      setText("ui-conn", "متصل");
+      setMode("app");
+      await updateTopbarOfficeName();
+      try{
+        bindCountryProvince("co");
+        bindBranchesUI("co");
+        bindCountryProvince("newco");
+        bindBranchesUI("newco");
+      }catch(_e){}
+      setSection("dashboard");
+      updateStats();
+      const isAdmin = String(mem.role || "").toLowerCase() === "admin";
+      $("nav-users").classList.toggle("hidden", !isAdmin);
+      $("nav-movements").classList.toggle("hidden", !isAdmin);
+      $("dash-go-users")?.classList.toggle("hidden", !isAdmin);
+      $("dash-go-movements")?.classList.toggle("hidden", !isAdmin);
+      $("nav-platform").classList.toggle("hidden", !state.isPlatformSuperAdmin);
+      $("dash-go-platform")?.classList.toggle("hidden", !state.isPlatformSuperAdmin);
+      state.selectedCompanyId = null;
+      state.selectedCompanyName = null;
+      state.selectedYearId = null;
+      fillCompanyForm(defaultCompanyProfile());
+      fillYearForm(defaultYearMeta(""));
+      setCompanyFormEnabled(false);
+      setYearFormEnabled(false);
+      await refreshCompanies();
+    }
+
     // ===== Auth state =====
     onAuthStateChanged(auth, async (user) => {
       setAlert("login-msg", "");
@@ -6578,6 +7513,9 @@
         setMode("login");
         setText("ui-conn", "غير متصل");
         $("btn-logout").disabled = true;
+        $("pill-active-office-wrap")?.classList.add("hidden");
+        $("sep-active-office")?.classList.add("hidden");
+        state.isPlatformSuperAdmin = false;
         // ensure modal dynamic fields are ready when opened
         try{
           bindCountryProvince("newco");
@@ -6610,37 +7548,14 @@
           return;
         }
 
+        await maybePromoteSeedToPlatformAdmin(user);
+        await loadPlatformSuperAdminFlag(user);
+        await ensurePlatformSettingsDoc(user);
+        loadActiveOfficeFromStorage();
+        await ensureDefaultOfficeRegistryDoc();
+        await ensurePlatformAdminMembership(user);
         const mem = await ensureMembership(user);
-        hide("view-login");
-        hide("view-bootstrap");
-        show("view-dashboard");
-        setText("dash-user", `${user.email}`);
-        setText("dash-role", mem.role || "staff");
-        setText("ui-conn", "متصل");
-        setMode("app");
-
-        // bind dynamic company fields
-        try{
-          bindCountryProvince("co");
-          bindBranchesUI("co");
-          bindCountryProvince("newco");
-          bindBranchesUI("newco");
-        }catch(_e){}
-
-        setSection("dashboard");
-        updateStats();
-        // show users tab only for admin
-        const isAdmin = String(mem.role || "").toLowerCase() === "admin";
-        $("nav-users").classList.toggle("hidden", !isAdmin);
-        // reset selection state
-        state.selectedCompanyId = null;
-        state.selectedCompanyName = null;
-        state.selectedYearId = null;
-        fillCompanyForm(defaultCompanyProfile());
-        fillYearForm(defaultYearMeta(""));
-        setCompanyFormEnabled(false);
-        setYearFormEnabled(false);
-        await refreshCompanies();
+        await openDashboardForUser(user, mem);
       } catch (e) {
         setText("ui-conn", "خطأ اتصال/صلاحيات");
         setMode("login");
