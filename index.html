@@ -580,6 +580,13 @@
         <div class="auth-form">
           <h2>تسجيل الدخول</h2>
 
+          <div id="file-origin-warning" class="hidden" style="margin-bottom:12px;padding:10px 12px;border-radius:10px;border:1px solid var(--danger);background:rgba(176,0,32,.08);font-size:12px;line-height:1.45;color:var(--text)">
+            <strong>تنبيه:</strong> الصفحة تُفتح عبر <span dir="ltr">file://</span>، وهذا يقيّد المتصفح وقد يمنع Firebase أو يُظهر تحذيرات أمان عند فتح روابط أخرى. شغّل خادماً محلياً من مجلد المشروع ثم افتح التطبيق عبر <span dir="ltr">http://localhost</span>، مثلاً في PowerShell:
+            <code dir="ltr" style="display:block;margin-top:6px;font-size:11px;word-break:break-all">npx --yes serve . -l 5500</code>
+            ثم افتح في المتصفح:
+            <code dir="ltr" style="display:block;margin-top:4px;font-size:11px;word-break:break-all">http://localhost:5500/FinancialStatementsApp.html</code>
+          </div>
+
           <div class="field">
             <label>البريد الإلكتروني</label>
             <input id="login-email" dir="ltr" autocomplete="username" placeholder="name@example.com" />
@@ -594,7 +601,8 @@
           </div>
           <div class="alert" id="login-msg" role="alert"></div>
           <div class="auth-presentation-link">
-            <a href="presentation.html" target="_blank" rel="noopener noreferrer">عرض تقديمي يشرح البرنامج</a>
+            <a id="link-presentation" href="presentation.html" rel="noopener noreferrer">عرض تقديمي يشرح البرنامج</a>
+            <span id="presentation-file-hint" class="hidden hint" style="display:block;margin-top:6px">يفضّل فتح العرض بعد تشغيل الخادم المحلي (انظر التنبيه أعلاه) لتجنب قيود المتصفح على <span dir="ltr">file://</span>.</span>
           </div>
         </div>
       </div>
@@ -604,8 +612,9 @@
     <div class="card hidden" id="view-bootstrap">
       <h2>الإعداد الأولي (مرة واحدة)</h2>
       <div class="hint">
-        سيتم تعيين المدير للحساب الحالي فقط إذا كان الإيميل:
-        <span dir="ltr" style="font-weight:800">ali.alqadre93@gmail.com</span>
+        يُكمَل الإعداد الأولي لهذا المكتب بحساب <b>seed</b>
+        (<span dir="ltr" style="font-weight:800">ali.alqadre93@gmail.com</span>)
+        أو بمدير منصّة لديه صلاحية إنشاء المكتب. يُعيَّن المستخدم الحالي مديراً لهذا المكتب عند التأكيد.
       </div>
       <div class="msg" id="bootstrap-user"></div>
       <div class="actions">
@@ -750,7 +759,7 @@
 
       <div class="card hidden" id="section-users">
         <h2 style="font-size:13pt">المستخدمين</h2>
-        <div class="hint">هذا القسم يظهر للمدير (Admin) فقط. إنشاء <b>حساب تسجيل الدخول</b> يتم من Firebase Authentication (تسجيل مستخدم بالبريد أو من وحدة تحكم Firebase)، ثم تُسجَّل <b>العضوية</b> هنا باستخدام نفس <b>UID</b> ليُسمح بالدخول إلى المكتب.</div>
+        <div class="hint">هذا القسم يظهر للمدير (Admin) فقط. إنشاء <b>حساب تسجيل الدخول</b> يتم من Firebase Authentication (تسجيل مستخدم بالبريد أو من وحدة تحكم Firebase)، ثم تُسجَّل <b>العضوية</b> هنا باستخدام نفس <b>UID</b> ليُسمح بالدخول إلى المكتب. الصلاحية <b>تجريبي (trial)</b> تمنح عميلاً عدداً محدداً من الأيام يبدأ احتسابها من <b>أول تسجيل دخول ناجح</b> لهذا المكتب؛ عند انتهاء المدة يُمنع الدخول.</div>
         <div class="hint" style="margin-top:8px">النسخ السريع للـ UID: Firebase Console → Authentication → Users → عمود User UID.</div>
 
         <div class="card" style="margin-top:12px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px">
@@ -769,7 +778,13 @@
               <select id="users-role">
                 <option value="staff">محاسب / موظف (staff)</option>
                 <option value="admin">مدير (admin)</option>
+                <option value="trial">تجريبي — عميل (trial)</option>
               </select>
+            </div>
+            <div id="users-trial-days-wrap" class="hidden" style="grid-column:1/-1">
+              <label>أيام الفترة التجريبية (تبدأ من أول دخول لهذا المكتب)</label>
+              <input id="users-trial-days" type="number" min="1" max="3650" step="1" dir="ltr" placeholder="مثال: 14" />
+              <div class="hint" style="margin-top:6px">يجب أن يكون إعداد المكتب الأولي قد اكتمل مسبقاً (مستند الإعداد) قبل أن يستطيع العميل التجريبي الدخول.</div>
             </div>
             <div>
               <label>الحالة</label>
@@ -793,15 +808,16 @@
             <table class="fin-table" style="width:100%">
               <thead>
                 <tr>
-                  <th style="width:28%">UID</th>
-                  <th style="width:26%">البريد</th>
-                  <th style="width:14%">الصلاحية</th>
-                  <th style="width:12%">الحالة</th>
-                  <th style="width:20%">إجراءات</th>
+                  <th style="width:24%">UID</th>
+                  <th style="width:22%">البريد</th>
+                  <th style="width:12%">الصلاحية</th>
+                  <th style="width:18%">التجربة</th>
+                  <th style="width:10%">الحالة</th>
+                  <th style="width:14%">إجراءات</th>
                 </tr>
               </thead>
               <tbody id="users-tbody">
-                <tr><td colspan="5" class="hint">اختر «المستخدمين» من القائمة لتحميل البيانات.</td></tr>
+                <tr><td colspan="6" class="hint">اختر «المستخدمين» من القائمة لتحميل البيانات.</td></tr>
               </tbody>
             </table>
           </div>
@@ -1387,11 +1403,12 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, collectionGroup, addDoc, serverTimestamp, query, where, orderBy, limit, getDocs, Timestamp, deleteField } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     // ===== Project constants (as agreed) =====
     const DEFAULT_OFFICE_ID = "office_1";
     const LS_OFFICE_KEY = "fs_active_office_v1";
+    const officeKeyForUid = (uid) => `${LS_OFFICE_KEY}:${String(uid || "").trim()}`;
     // عند تغيير هذا البريد حدّث أيضاً دالة seedEmailMatches في firestore.rules ثم انشر القواعد.
     const SEED_EMAIL = "ali.alqadre93@gmail.com";
 
@@ -1412,6 +1429,16 @@
 
     // ===== UI helpers =====
     const $ = (id) => document.getElementById(id);
+
+    if(globalThis.location?.protocol === "file:"){
+      $("file-origin-warning")?.classList.remove("hidden");
+      $("presentation-file-hint")?.classList.remove("hidden");
+      const lp = $("link-presentation");
+      if(lp){
+        lp.removeAttribute("target");
+        lp.title = "يفضّل تشغيل التطبيق عبر خادم محلي (http://localhost) وليس عبر فتح الملف مباشرة.";
+      }
+    }
     const show = (id) => $(id).classList.remove("hidden");
     const hide = (id) => $(id).classList.add("hidden");
     const setText = (id, txt) => {
@@ -1619,25 +1646,110 @@
       return state.activeOfficeId || DEFAULT_OFFICE_ID;
     }
 
-    function loadActiveOfficeFromStorage(){
+    function loadActiveOfficeFromStorage(uid){
       try{
-        const v = localStorage.getItem(LS_OFFICE_KEY);
+        const key = uid ? officeKeyForUid(uid) : LS_OFFICE_KEY;
+        let v = localStorage.getItem(key);
+        // ترحيل من المفتاح القديم العام إلى مفتاح المستخدم عند أول تسجيل دخول
+        if(uid && (!v || !String(v).trim())){
+          const legacy = localStorage.getItem(LS_OFFICE_KEY);
+          if(legacy && String(legacy).trim()){
+            localStorage.setItem(key, String(legacy).trim());
+            v = String(legacy).trim();
+          }
+        }
         state.activeOfficeId = (v && String(v).trim()) ? String(v).trim() : null;
       }catch(_){
         state.activeOfficeId = null;
       }
     }
 
-    function setActiveOfficeId(id){
+    function setActiveOfficeId(id, uid){
       const clean = String(id || "").trim() || DEFAULT_OFFICE_ID;
       state.activeOfficeId = clean;
-      try{ localStorage.setItem(LS_OFFICE_KEY, clean); }catch(_){}
+      try{
+        const key = uid ? officeKeyForUid(uid) : LS_OFFICE_KEY;
+        localStorage.setItem(key, clean);
+      }catch(_){}
     }
 
     async function loadPlatformSuperAdminFlag(user){
       const ref = doc(db, "platform_admins", user.uid);
       const s = await getDoc(ref);
       state.isPlatformSuperAdmin = s.exists() && s.data()?.active !== false;
+    }
+
+    /**
+     * يحدد المكتب النشط من عضويات Firestore (مسار: offices → مكتب → users → uid) بدل الاعتماد على office_1 فقط.
+     * مدير المنصّة بدون عضويات يُبقى المكتب من التخزين المحلي أو الافتراضي.
+     */
+    async function resolveActiveOfficeFromMemberships(user){
+      // مدير المنصّة يختار المكتب من واجهة المنصّة/التخزين المحلي؛ لا نحتاج استعلام عضويات هنا
+      if(state.isPlatformSuperAdmin) return;
+      const uid = user.uid;
+      const emailRaw = (user.email || "").trim();
+      const officeIdSet = new Set();
+      const pushSnap = (snap) => {
+        snap.forEach((d) => {
+          const officeDoc = d.ref.parent?.parent;
+          if(officeDoc?.id){
+            officeIdSet.add(officeDoc.id);
+          }
+        });
+      };
+      try{
+        const byAuth = query(collectionGroup(db, "users"), where("authUid", "==", uid));
+        pushSnap(await getDocs(byAuth));
+        if(officeIdSet.size === 0 && emailRaw){
+          const seen = new Set();
+          for(const em of [emailRaw, emailRaw.toLowerCase()]){
+            if(seen.has(em)) continue;
+            seen.add(em);
+            const byEmail = query(collectionGroup(db, "users"), where("email", "==", em));
+            pushSnap(await getDocs(byEmail));
+          }
+        }
+      }catch(err){
+        const code = err?.code || "";
+        console.warn("[office-resolve]", code, err?.message || err);
+        if(code === "permission-denied"){
+          throw err;
+        }
+        return;
+      }
+
+      const officeIds = [...officeIdSet];
+
+      if(!officeIds.length){
+        const isSeed = (user.email || "").toLowerCase() === SEED_EMAIL.toLowerCase();
+        if(isSeed){
+          return;
+        }
+        throw new Error(
+          "لا توجد عضوية لهذا الحساب في أي مكتب. أضف UID المستخدم في Firestore تحت المسار offices/{معرف_المكتب}/users/{نفس_UID ثابت من Authentication}."
+        );
+      }
+
+      officeIds.sort((a, b) => String(a).localeCompare(String(b), "ar"));
+
+      const stored = state.activeOfficeId;
+      if(stored && officeIds.includes(stored)){
+        return;
+      }
+
+      if(officeIds.length === 1){
+        setActiveOfficeId(officeIds[0], uid);
+        return;
+      }
+
+      if(stored && !officeIds.includes(stored)){
+        setActiveOfficeId(officeIds[0], uid);
+        return;
+      }
+
+      if(!stored){
+        setActiveOfficeId(officeIds[0], uid);
+      }
     }
 
     /** مستند إعدادات المنصّة — مسار صالح: مجموعة platform + مستند settings */
@@ -1671,14 +1783,15 @@
       state.isPlatformSuperAdmin = true;
     }
 
-    /** مستند وصف المكتب — مطلوب لظهور المكتب في قائمة المنصّة */
+    /** مستند وصف المكتب للمكتب النشط — يُنشئه مدير المنصّة فقط؛ لا يقرأ غير المصرّح مستندات مكاتب أخرى */
     async function ensureDefaultOfficeRegistryDoc(){
-      const ref = doc(db, "offices", DEFAULT_OFFICE_ID);
+      if(!state.isPlatformSuperAdmin) return;
+      const oid = officeId();
+      const ref = doc(db, "offices", oid);
       const s = await getDoc(ref);
       if(s.exists()) return;
-      if(!state.isPlatformSuperAdmin) return;
       await setDoc(ref, {
-        name: "المكتب الافتراضي",
+        name: oid === DEFAULT_OFFICE_ID ? "المكتب الافتراضي" : `مكتب ${oid}`,
         createdAt: serverTimestamp(),
         migrated: true,
         note: "auto_registry"
@@ -1692,6 +1805,7 @@
       if(s.exists()) return;
       await setDoc(ref, {
         email: user.email || "",
+        authUid: user.uid,
         role: "admin",
         active: true,
         createdAt: serverTimestamp(),
@@ -1723,7 +1837,7 @@
       if(!user) return;
       setText("platform-msg", "");
       try{
-        setActiveOfficeId(oid);
+        setActiveOfficeId(oid, user.uid);
         if(state.isPlatformSuperAdmin){
           await ensurePlatformAdminMembership(user);
         }
@@ -1809,7 +1923,35 @@
       const r = String(role || "").toLowerCase();
       if(r === "admin") return "مدير النظام";
       if(r === "staff") return "موظف / محاسب";
+      if(r === "trial") return "تجريبي (فترة محدودة)";
       return role || "—";
+    }
+
+    function usersRoleColLabel(role){
+      const r = String(role || "").toLowerCase();
+      if(r === "admin") return "مدير";
+      if(r === "trial") return "تجريبي";
+      return "موظف";
+    }
+
+    function usersTrialSummary(u){
+      const r = String(u.role || "").toLowerCase();
+      if(r !== "trial") return "—";
+      const days = Number(u.trialDays);
+      const exp = u.trialExpiresAt?.toDate?.();
+      const started = u.trialStartedAt?.toDate?.();
+      if(!exp || !started){
+        return (Number.isFinite(days) ? `${days} يومًا` : "—") + " — لم يبدأ بعد";
+      }
+      const endMs = exp.getTime();
+      if(endMs <= Date.now()) return "انتهت الفترة";
+      const left = Math.max(0, Math.ceil((endMs - Date.now()) / 86400000));
+      return `${left} يومًا · حتى ${exp.toLocaleDateString("ar-IQ")}`;
+    }
+
+    function syncUsersTrialFieldsVisibility(){
+      const r = ($("users-role")?.value || "staff").trim();
+      $("users-trial-days-wrap")?.classList.toggle("hidden", r !== "trial");
     }
 
     function updateStats(){
@@ -1952,6 +2094,7 @@
         });
         await setDoc(doc(db, "offices", id, "users", user.uid), {
           email: user.email || "",
+          authUid: user.uid,
           role: "admin",
           active: true,
           createdAt: serverTimestamp(),
@@ -4342,34 +4485,78 @@
       return snap.exists() ? snap.data() : null;
     }
 
+    /** تلميح إضافي عند منع الدخول قبل الإعداد — للعميل التجريبي لا يمكنه تنفيذ الإعداد بنفسه */
+    async function membershipRoleBootstrapHint(uid){
+      try{
+        const s = await getDoc(memberRef(uid));
+        if(!s.exists()) return "";
+        const r = String(s.data()?.role || "").toLowerCase();
+        if(r === "trial"){
+          return " حسابك «تجريبي»: تنفيذ الإعداد الأولي لا يتم إلا من حساب seed أو مدير المنصّة لهذا المكتب؛ بعد ذلك يمكنك الدخول طبيعياً.";
+        }
+        return "";
+      }catch(_){
+        return "";
+      }
+    }
+
     async function ensureMembership(user) {
-      const snap = await getDoc(memberRef(user.uid));
+      const ref = memberRef(user.uid);
+      let snap = await getDoc(ref);
       if (!snap.exists()) throw new Error("لا توجد عضوية لهذا المستخدم داخل المكتب.");
-      const m = snap.data() || {};
+      let m = snap.data() || {};
       if (m.active === false) throw new Error("المستخدم غير مفعل.");
+
+      const role = String(m.role || "").toLowerCase();
+      if (role === "trial") {
+        const days = Number(m.trialDays);
+        if (!Number.isFinite(days) || days < 1 || days > 3650) {
+          throw new Error("عضوية تجريبية غير صالحة: عدد الأيام غير محدد أو خارج المدى (1–3650).");
+        }
+        const nowMs = Date.now();
+        if (!m.trialStartedAt) {
+          const started = Timestamp.fromMillis(nowMs);
+          const expires = Timestamp.fromMillis(nowMs + Math.round(days * 86400000));
+          await updateDoc(ref, {
+            trialStartedAt: started,
+            trialExpiresAt: expires,
+            updatedAt: serverTimestamp()
+          });
+          m = { ...m, trialStartedAt: started, trialExpiresAt: expires };
+        } else {
+          const exp = m.trialExpiresAt;
+          const expMs = exp?.toMillis?.() ?? (exp?.seconds != null ? exp.seconds * 1000 : null);
+          if (expMs != null && expMs <= nowMs) {
+            throw new Error("انتهت الفترة التجريبية لهذا المكتب. لا يمكنك الدخول.");
+          }
+        }
+      }
+
       return m;
     }
 
     async function seedBootstrap(user) {
       const existing = await getBootstrap();
       if (existing) return;
-      if ((user.email || "").toLowerCase() !== SEED_EMAIL.toLowerCase()) {
-        throw new Error("ليس حساب seed.");
+      const isSeed = (user.email || "").toLowerCase() === SEED_EMAIL.toLowerCase();
+      if(!isSeed && !state.isPlatformSuperAdmin){
+        throw new Error("يُسمح بتهيئة الإعداد الأولي لحساب seed أو لمدير المنصّة.");
       }
-      // Create bootstrap (once) + admin membership
       await setDoc(bootRef(), {
-        seedAdminEmail: SEED_EMAIL,
+        seedAdminEmail: isSeed ? SEED_EMAIL : (user.email || ""),
         adminUid: user.uid,
-        adminEmail: user.email,
-        bootstrappedAt: serverTimestamp()
+        adminEmail: user.email || "",
+        bootstrappedAt: serverTimestamp(),
+        ...(isSeed ? {} : { source: "platform_super_admin" })
       });
       await setDoc(memberRef(user.uid), {
-        email: user.email,
+        email: user.email || "",
+        authUid: user.uid,
         role: "admin",
         active: true,
         createdAt: serverTimestamp()
-      });
-      await maybePromoteSeedToPlatformAdmin(user);
+      }, { merge: true });
+      if(isSeed) await maybePromoteSeedToPlatformAdmin(user);
     }
 
     async function loadUsersSection(){
@@ -4380,7 +4567,7 @@
       tbody.innerHTML = "";
       const loadingRow = document.createElement("tr");
       const loadingCell = document.createElement("td");
-      loadingCell.colSpan = 5;
+      loadingCell.colSpan = 6;
       loadingCell.className = "hint";
       loadingCell.textContent = "جاري التحميل…";
       loadingRow.appendChild(loadingCell);
@@ -4395,11 +4582,12 @@
         if(!items.length){
           const tr = document.createElement("tr");
           const td = document.createElement("td");
-          td.colSpan = 5;
+          td.colSpan = 6;
           td.className = "hint";
           td.textContent = "لا يوجد مستخدمون بعد. أنشئ مستخدماً في Firebase Authentication ثم أضف عضويته هنا بالـ UID.";
           tr.appendChild(td);
           tbody.appendChild(tr);
+          syncUsersTrialFieldsVisibility();
           return;
         }
         for(const u of items){
@@ -4414,7 +4602,11 @@
           tdEmail.dir = "ltr";
           tdEmail.textContent = u.email || "—";
           const tdRole = document.createElement("td");
-          tdRole.textContent = String(u.role||"").toLowerCase() === "admin" ? "مدير" : "موظف";
+          tdRole.textContent = usersRoleColLabel(u.role);
+          const tdTrial = document.createElement("td");
+          tdTrial.className = "hint";
+          tdTrial.style.fontSize = "12px";
+          tdTrial.textContent = usersTrialSummary(u);
           const tdAct = document.createElement("td");
           tdAct.textContent = u.active === false ? "معطّل" : "مفعّل";
           const tdBtn = document.createElement("td");
@@ -4425,23 +4617,31 @@
           btn.addEventListener("click", ()=>{
             $("users-uid").value = u.id;
             $("users-email").value = u.email ? String(u.email) : "";
-            $("users-role").value = String(u.role||"staff").toLowerCase() === "admin" ? "admin" : "staff";
+            const rr = String(u.role||"staff").toLowerCase();
+            if(rr === "admin") $("users-role").value = "admin";
+            else if(rr === "trial") $("users-role").value = "trial";
+            else $("users-role").value = "staff";
             $("users-active").value = u.active === false ? "no" : "yes";
+            const td = Number(u.trialDays);
+            $("users-trial-days").value = Number.isFinite(td) && td > 0 ? String(td) : "";
+            syncUsersTrialFieldsVisibility();
             $("users-uid").scrollIntoView({ behavior:"smooth", block:"center" });
           });
           tdBtn.appendChild(btn);
           tr.appendChild(tdUid);
           tr.appendChild(tdEmail);
           tr.appendChild(tdRole);
+          tr.appendChild(tdTrial);
           tr.appendChild(tdAct);
           tr.appendChild(tdBtn);
           tbody.appendChild(tr);
         }
+        syncUsersTrialFieldsVisibility();
       }catch(e){
         tbody.innerHTML = "";
         const tr = document.createElement("tr");
         const td = document.createElement("td");
-        td.colSpan = 5;
+        td.colSpan = 6;
         td.className = "hint";
         td.textContent = "تعذر تحميل المستخدمين.";
         tr.appendChild(td);
@@ -4459,19 +4659,41 @@
         const email = ($("users-email")?.value||"").trim();
         const role = ($("users-role")?.value||"staff").trim();
         const active = ($("users-active")?.value||"yes") === "yes";
+        const trialRaw = ($("users-trial-days")?.value||"").trim();
+        const trialDays = Math.round(Number(trialRaw));
         const ref = memberRef(uid);
         const prev = await getDoc(ref);
         const payload = {
           email: email || null,
+          authUid: uid,
           role,
           active,
           updatedAt: serverTimestamp()
         };
+        if(role === "trial"){
+          if(!Number.isFinite(trialDays) || trialDays < 1 || trialDays > 3650){
+            throw new Error("للصلاحية التجريبية أدخل عدد أيام بين 1 و 3650.");
+          }
+          payload.trialDays = trialDays;
+          const pData = prev.exists() ? (prev.data() || {}) : {};
+          if(pData.trialStartedAt && String(pData.role || "").toLowerCase() === "trial"){
+            const st = pData.trialStartedAt;
+            const stMs = st?.toMillis?.() ?? (st?.seconds != null ? st.seconds * 1000 : null);
+            if(stMs != null){
+              payload.trialExpiresAt = Timestamp.fromMillis(stMs + Math.round(trialDays * 86400000));
+            }
+          }
+        } else {
+          payload.trialDays = deleteField();
+          payload.trialStartedAt = deleteField();
+          payload.trialExpiresAt = deleteField();
+        }
         if(!prev.exists()){
           payload.createdAt = serverTimestamp();
         }
         await setDoc(ref, payload, { merge: true });
-        await appendActivityLog("عضوية مستخدم", `UID: ${uid} — الدور: ${role} — ${active ? "مفعّل" : "معطّل"}${email ? ` — ${email}` : ""}`);
+        const trialNote = role === "trial" ? ` — تجربة ${trialDays} يومًا` : "";
+        await appendActivityLog("عضوية مستخدم", `UID: ${uid} — الدور: ${role} — ${active ? "مفعّل" : "معطّل"}${trialNote}${email ? ` — ${email}` : ""}`);
         setText("users-ok", "تم حفظ العضوية.");
         await loadUsersSection();
       }catch(e){
@@ -4479,6 +4701,7 @@
       }
     });
     $("btn-users-refresh")?.addEventListener("click", ()=> void loadUsersSection());
+    $("users-role")?.addEventListener("change", ()=> syncUsersTrialFieldsVisibility());
 
     async function refreshCompanies() {
       const sel = $("sel-company");
@@ -6808,10 +7031,12 @@
         setText("bootstrap-msg", "");
         const user = auth.currentUser;
         if (!user) throw new Error("غير مسجل");
+        loadActiveOfficeFromStorage(user.uid);
+        await loadPlatformSuperAdminFlag(user);
+        await resolveActiveOfficeFromMemberships(user);
         await seedBootstrap(user);
         await loadPlatformSuperAdminFlag(user);
         await ensurePlatformSettingsDoc(user);
-        loadActiveOfficeFromStorage();
         await ensureDefaultOfficeRegistryDoc();
         await ensurePlatformAdminMembership(user);
         const mem = await ensureMembership(user);
@@ -7515,6 +7740,7 @@
         $("btn-logout").disabled = true;
         $("pill-active-office-wrap")?.classList.add("hidden");
         $("sep-active-office")?.classList.add("hidden");
+        state.activeOfficeId = null;
         state.isPlatformSuperAdmin = false;
         // ensure modal dynamic fields are ready when opened
         try{
@@ -7533,16 +7759,27 @@
 
       try {
         await user.getIdToken();
+        loadActiveOfficeFromStorage(user.uid);
+        await loadPlatformSuperAdminFlag(user);
+        await resolveActiveOfficeFromMemberships(user);
         const boot = await getBootstrap();
         if (!boot) {
-          // require seed email to bootstrap
-          if ((user.email || "").toLowerCase() !== SEED_EMAIL.toLowerCase()) {
-            throw new Error("لم يتم الإعداد الأولي بعد. سجّل بحساب seed.");
+          const canBootstrap =
+            (user.email || "").toLowerCase() === SEED_EMAIL.toLowerCase()
+            || state.isPlatformSuperAdmin;
+          if(!canBootstrap){
+            const tail =
+              "لم يتم الإعداد الأولي لهذا المكتب بعد. هذا الإعداد يُنفَّذ مرة واحدة بحساب seed أو مدير المنصّة؛ ثم يمكن لجميع المستخدمين (بمنهم التجريبيون) الدخول."
+              + " إن كان الإعداد قد أُنجز على مكتب آخر غيّر المكتب النشط أو امسح التخزين المحلي للمفتاح fs_active_office_v1 أو المفتاح الخاص بالمستخدم (المكتب الحالي: "
+              + officeId()
+              + ").";
+            const hint = await membershipRoleBootstrapHint(user.uid);
+            throw new Error(tail + hint);
           }
           hide("view-login");
           show("view-bootstrap");
           hide("view-dashboard");
-          setText("bootstrap-user", `المستخدم الحالي: ${user.email} / ${user.uid}`);
+          setText("bootstrap-user", `المستخدم الحالي: ${user.email} / ${user.uid} — المكتب: ${officeId()}`);
           setText("ui-conn", "متصل");
           setMode("app");
           return;
@@ -7551,7 +7788,6 @@
         await maybePromoteSeedToPlatformAdmin(user);
         await loadPlatformSuperAdminFlag(user);
         await ensurePlatformSettingsDoc(user);
-        loadActiveOfficeFromStorage();
         await ensureDefaultOfficeRegistryDoc();
         await ensurePlatformAdminMembership(user);
         const mem = await ensureMembership(user);
