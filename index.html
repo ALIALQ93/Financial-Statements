@@ -279,6 +279,7 @@
     .pages > .page[data-fs-order="2"]{order:2;}
     .pages > .page[data-fs-order="3"]{order:3;}
     .pages > .page[data-fs-order="4"]{order:4;}
+    .pages > .page[data-fs-order="5"]{order:5;}
     .page{
       width:min(210mm, 100%);
       background:#fff;
@@ -299,6 +300,15 @@
       gap:18mm;
       align-items:stretch;
       width:100%;
+    }
+    .fs-tb-sigs{
+      margin-top:12mm;
+      padding-top:6mm;
+      border-top:1px solid rgba(176,196,216,.95);
+    }
+    .fs-tb-sigs .sig-row{
+      max-width:520px;
+      margin-inline:auto;
     }
     @media print {
       .no-print-fs{ display:none !important; }
@@ -5301,6 +5311,234 @@
       }
       return null;
     }
+    /** مجموع ختامي CY لكشف كامل من وثيقة السنة السابقة */
+    function trialBalancePriorScheduleClosing(priorDoc, schId, n){
+      if(!priorDoc) return null;
+      const rows = ((priorDoc.dynamicSchedules || {}).dataById || {})[schId]?.rows || [];
+      if(!rows.length) return null;
+      return rows.reduce((s,r)=> s + n(r?.cy), 0);
+    }
+    function finalizeTrialBalanceLines(lines, priorDoc){
+      const displayRows = lines.map((ln)=>{
+        const op = trialBalanceSignedToDrCr(ln.opening, ln.nature);
+        const mv = trialBalanceSignedToDrCr(ln.movement, ln.nature);
+        const cl = trialBalanceSignedToDrCr(ln.isBalance ? ln.closing : 0, ln.nature);
+        return {
+          scheduleNo: ln.scheduleNo,
+          acctCode: ln.acctCode,
+          acctName: ln.acctName,
+          isBalance: ln.isBalance,
+          opDebit: op.debit, opCredit: op.credit,
+          mvDebit: mv.debit, mvCredit: mv.credit,
+          clDebit: cl.debit, clCredit: cl.credit
+        };
+      });
+      displayRows.sort((a,b)=>{
+        const sa = toWesternDigits(String(a.scheduleNo ?? "9999"));
+        const sb = toWesternDigits(String(b.scheduleNo ?? "9999"));
+        const na = Number(sa.replace(/[^\d]/g,"")) || 99999;
+        const nb = Number(sb.replace(/[^\d]/g,"")) || 99999;
+        if(na !== nb) return na - nb;
+        const ca = Number(toWesternDigits(a.acctCode || "9999").replace(/[^\d.]/g,"")) || 99999;
+        const cb = Number(toWesternDigits(b.acctCode || "9999").replace(/[^\d.]/g,"")) || 99999;
+        if(ca !== cb) return ca - cb;
+        return String(a.acctName).localeCompare(String(b.acctName), "ar");
+      });
+      const sum = (key)=> displayRows.reduce((s,r)=> s + Number(r[key] || 0), 0);
+      const totals = {
+        opDebit: sum("opDebit"), opCredit: sum("opCredit"),
+        mvDebit: sum("mvDebit"), mvCredit: sum("mvCredit"),
+        clDebit: sum("clDebit"), clCredit: sum("clCredit")
+      };
+      return { rows: displayRows, totals, closingDiff: totals.clDebit - totals.clCredit, usedPriorDoc: !!priorDoc };
+    }
+    /**
+     * ميزان مراجعة تجميعي — صف واحد لكل كشف (إجمالي البنود الفرعية).
+     */
+    function buildTrialBalanceBySchedule(params){
+      const n = params.n;
+      const reg = params.reg || [];
+      const dataById = params.dataById || {};
+      const priorDoc = params.priorDoc || null;
+      const lines = [];
+      const pushLine = (line)=>{
+        const code = String(line.acctCode || "").trim();
+        const name = String(line.acctName || "").trim();
+        if(!code && !name) return;
+        if(Math.abs(line.opening) < 1e-9 && Math.abs(line.movement) < 1e-9 && Math.abs(line.closing) < 1e-9) return;
+        lines.push({
+          scheduleNo: line.scheduleNo == null ? "" : String(line.scheduleNo),
+          acctCode: code,
+          acctName: name,
+          nature: line.nature,
+          isBalance: !!line.isBalance,
+          opening: Number(line.opening || 0),
+          movement: Number(line.movement || 0),
+          closing: Number(line.closing || 0)
+        });
+      };
+      const sumSchRows = (schId)=>{
+        const rows = dataById[schId]?.rows || [];
+        return rows.reduce((acc,r)=>({ cy: acc.cy + n(r?.cy), py: acc.py + n(r?.py) }), { cy:0, py:0 });
+      };
+
+      for(const sch of reg.filter((s)=> s && s.active !== false && s.type === "vertical")){
+        const target = effectiveVerticalTarget(sch);
+        const section = effectiveVerticalSection(sch, target);
+        const nature = trialBalanceAccountNature(target, section);
+        const isBalance = target === "balance";
+        const schedNo = sch.scheduleNo;
+        const tot = sumSchRows(sch.id);
+        const code = trialBalanceDefaultCode({ scheduleNo: schedNo, acctCode: sch.acctCode || "" });
+        const name = String(sch.acctName || sch.baseTitle || sch.title || "").trim() || `كشف (${schedNo})`;
+        let openingBal = 0;
+        if(isBalance){
+          const fromPrior = trialBalancePriorScheduleClosing(priorDoc, sch.id, n);
+          openingBal = fromPrior != null ? fromPrior : tot.py;
+        }
+        const closingBal = tot.cy;
+        const movement = isBalance ? (closingBal - openingBal) : closingBal;
+        pushLine({
+          scheduleNo: schedNo,
+          acctCode: code,
+          acctName: name,
+          nature,
+          isBalance,
+          opening: isBalance ? openingBal : 0,
+          movement,
+          closing: isBalance ? closingBal : 0
+        });
+      }
+
+      if(params.hasFA){
+        pushLine({
+          scheduleNo: 1,
+          acctCode: "11",
+          acctName: "الموجودات الثابتة (بالقيمة الدفترية)",
+          nature: "debit",
+          isBalance: true,
+          opening: params.faTotals?.nbvPY || 0,
+          movement: (params.faTotals?.nbvCY || 0) - (params.faTotals?.nbvPY || 0),
+          closing: params.faTotals?.nbvCY || 0
+        });
+        pushLine({
+          scheduleNo: 1,
+          acctCode: "37",
+          acctName: "الاندثارات والاطفاءات",
+          nature: "debit",
+          isBalance: false,
+          opening: 0,
+          movement: params.faTotals?.depCY || 0,
+          closing: 0
+        });
+      }
+
+      if(params.hasInv){
+        const inv = params.invBox || {};
+        const openInv = n(inv.openInv);
+        const closeInv = n(inv.closeInv);
+        const used = (openInv + n(inv.purchases)) - closeInv;
+        pushLine({
+          scheduleNo: "بيان د",
+          acctCode: "15",
+          acctName: "المخزون",
+          nature: "debit",
+          isBalance: true,
+          opening: openInv,
+          movement: closeInv - openInv,
+          closing: closeInv
+        });
+        pushLine({
+          scheduleNo: "بيان د",
+          acctCode: "321",
+          acctName: "الخامات و المواد الاولية",
+          nature: "debit",
+          isBalance: false,
+          opening: 0,
+          movement: used,
+          closing: 0
+        });
+      }
+
+      const eqOpen = params.eqOpen || {};
+      const eqClosing = params.eqClosing || {};
+      const openCap = n(eqOpen.capital);
+      const closeCap = n(eqClosing.capital);
+      const openRes = n(eqOpen.reserve) + n(eqOpen.surplus) - n(eqOpen.deficit);
+      const closeRes = n(eqClosing.reserve) + n(eqClosing.surplus) - n(eqClosing.deficit);
+      pushLine({
+        scheduleNo: "بيان ج",
+        acctCode: "21",
+        acctName: "راس المال",
+        nature: "credit",
+        isBalance: true,
+        opening: openCap,
+        movement: closeCap - openCap,
+        closing: closeCap
+      });
+      pushLine({
+        scheduleNo: "بيان ج",
+        acctCode: "22",
+        acctName: "الاحتياطيات",
+        nature: "credit",
+        isBalance: true,
+        opening: openRes,
+        movement: closeRes - openRes,
+        closing: closeRes
+      });
+
+      const taxOpen = params.taxOpening != null ? Number(params.taxOpening) : n(params.taxPY);
+      const taxClose = n(params.taxCY);
+      pushLine({
+        scheduleNo: "بيان ب",
+        acctCode: "23",
+        acctName: "تخصيصات قصيرة الاجل",
+        nature: "credit",
+        isBalance: true,
+        opening: taxOpen,
+        movement: taxClose - taxOpen,
+        closing: taxClose
+      });
+
+      if(params.hasContracts){
+        const contracts = params.contracts || {};
+        const revCode = toWesternDigits(String(contracts.revenueAcctCode || "").trim()) || "41-45";
+        const conRows = Array.isArray(contracts.rows) ? contracts.rows : [];
+        const exRate = Number.isFinite(n(contracts.exchangeRate)) && n(contracts.exchangeRate) > 0 ? n(contracts.exchangeRate) : 0;
+        let revTotal = 0, expTotal = 0;
+        for(const r of conRows){
+          const rate = exRate || n(r?.exchangeRate) || 0;
+          revTotal += n(r?.revIqd) || (rate ? n(r?.revUsd) * rate : 0);
+          expTotal += n(r?.expensesIqd);
+        }
+        if(revTotal){
+          pushLine({
+            scheduleNo: params.contractsSchNo,
+            acctCode: revCode,
+            acctName: "ايراد النشاط التشغيلي (عقود)",
+            nature: "credit",
+            isBalance: false,
+            opening: 0,
+            movement: revTotal,
+            closing: 0
+          });
+        }
+        if(expTotal){
+          pushLine({
+            scheduleNo: params.contractsSchNo,
+            acctCode: "41",
+            acctName: "مصاريف العقود",
+            nature: "debit",
+            isBalance: false,
+            opening: 0,
+            movement: expTotal,
+            closing: 0
+          });
+        }
+      }
+
+      return finalizeTrialBalanceLines(lines, priorDoc);
+    }
     /**
      * ميزان مراجعة من البنود الفرعية للكشوفات.
      * الافتتاحي: ختامي السنة السابقة (وثيقة CY−1) أو عمود PY عند غيابها.
@@ -5518,36 +5756,7 @@
         }
       }
 
-      const displayRows = lines.map((ln)=>{
-        const op = trialBalanceSignedToDrCr(ln.opening, ln.nature);
-        const mv = trialBalanceSignedToDrCr(ln.movement, ln.nature);
-        const cl = trialBalanceSignedToDrCr(ln.isBalance ? ln.closing : 0, ln.nature);
-        return {
-          scheduleNo: ln.scheduleNo,
-          acctCode: ln.acctCode,
-          acctName: ln.acctName,
-          isBalance: ln.isBalance,
-          opDebit: op.debit, opCredit: op.credit,
-          mvDebit: mv.debit, mvCredit: mv.credit,
-          clDebit: cl.debit, clCredit: cl.credit
-        };
-      });
-
-      displayRows.sort((a,b)=>{
-        const na = Number(toWesternDigits(a.acctCode || "9999").replace(/[^\d.]/g,"")) || 99999;
-        const nb = Number(toWesternDigits(b.acctCode || "9999").replace(/[^\d.]/g,"")) || 99999;
-        if(na !== nb) return na - nb;
-        return String(a.acctName).localeCompare(String(b.acctName), "ar");
-      });
-
-      const sum = (key)=> displayRows.reduce((s,r)=> s + Number(r[key] || 0), 0);
-      const totals = {
-        opDebit: sum("opDebit"), opCredit: sum("opCredit"),
-        mvDebit: sum("mvDebit"), mvCredit: sum("mvCredit"),
-        clDebit: sum("clDebit"), clCredit: sum("clCredit")
-      };
-      const closingDiff = totals.clDebit - totals.clCredit;
-      return { rows: displayRows, totals, closingDiff, usedPriorDoc: !!priorDoc };
+      return finalizeTrialBalanceLines(lines, priorDoc);
     }
 
     function renderInPages(yearDoc){
@@ -5922,7 +6131,7 @@
           taxOpeningFromPrior = priorTax.taxCY;
         }catch(_e){ taxOpeningFromPrior = null; }
       }
-      const tbResult = buildTrialBalanceFromSubItems({
+      const tbBaseParams = {
         n,
         reg,
         dataById,
@@ -5939,12 +6148,10 @@
         taxCY,
         taxPY,
         taxOpening: taxOpeningFromPrior
-      });
-      const tbMergedRows = tbResult.rows;
-      const tbTotals = tbResult.totals;
-      const tbClosingDiff = tbResult.closingDiff;
-      const tbTol = 0.99;
-      const tbRowsHtml = tbMergedRows.length ? tbMergedRows.map(r=>`
+      };
+      const tbSummaryResult = buildTrialBalanceBySchedule(tbBaseParams);
+      const tbResult = buildTrialBalanceFromSubItems(tbBaseParams);
+      const tbMapRowsHtml = (rows, emptyMsg)=> rows.length ? rows.map(r=>`
                 <tr>
                   <td class="num-col tb-td-sch" dir="ltr" contenteditable="false">${escHtml(toWesternDigits(String(r.scheduleNo ?? "")))}</td>
                   <td class="num-col tb-td-code" dir="ltr" contenteditable="false">${escHtml(toWesternDigits(String(r.acctCode || "")))}</td>
@@ -5955,7 +6162,68 @@
                   <td class="amount-col" dir="ltr" contenteditable="false">${tbFmtDrCr(r.mvCredit)}</td>
                   <td class="amount-col tb-section-start" dir="ltr" contenteditable="false">${tbFmtDrCr(r.clDebit)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${tbFmtDrCr(r.clCredit)}</td>
-                </tr>`).join("") : `<tr><td colspan="9" class="hint" contenteditable="false">لا توجد بنود فرعية في الكشوفات. أدخل سطور الكشوف العمودية (رمز/اسم/قيم) أولاً.</td></tr>`;
+                </tr>`).join("") : `<tr><td colspan="9" class="hint" contenteditable="false">${emptyMsg}</td></tr>`;
+      const tbBuildTotalRow = (totals)=> `
+                <tr class="row-total">
+                  <td colspan="3" class="tb-td-name" contenteditable="false" style="font-weight:700;text-align:center">المجموع</td>
+                  <td class="amount-col tb-section-start" dir="ltr" contenteditable="false">${tbFmtAmt(totals.opDebit, { total:true })}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${tbFmtAmt(totals.opCredit, { total:true })}</td>
+                  <td class="amount-col tb-section-start" dir="ltr" contenteditable="false">${tbFmtAmt(totals.mvDebit, { total:true })}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${tbFmtAmt(totals.mvCredit, { total:true })}</td>
+                  <td class="amount-col tb-section-start" dir="ltr" contenteditable="false">${tbFmtAmt(totals.clDebit, { total:true })}</td>
+                  <td class="amount-col" dir="ltr" contenteditable="false">${tbFmtAmt(totals.clCredit, { total:true })}</td>
+                </tr>`;
+      const tbTableHeadHtml = `
+              <colgroup>
+                <col class="tb-col-sch" />
+                <col class="tb-col-code" />
+                <col class="tb-col-name" />
+                <col class="tb-col-amt" /><col class="tb-col-amt" />
+                <col class="tb-col-amt" /><col class="tb-col-amt" />
+                <col class="tb-col-amt" /><col class="tb-col-amt" />
+              </colgroup>
+              <thead>
+                <tr class="tb-head-group">
+                  <th rowspan="2" class="tb-th-sch">رقم<br/>الكشف</th>
+                  <th rowspan="2" class="tb-th-code">رقم<br/>الدليل</th>
+                  <th rowspan="2" class="tb-th-name">اسم الحساب</th>
+                  <th colspan="2" class="tb-section tb-section-start">رصيد افتتاحي<br/><span dir="ltr">${PY}</span></th>
+                  <th colspan="2" class="tb-section tb-section-start">حركة السنة<br/><span dir="ltr">${CY}</span></th>
+                  <th colspan="2" class="tb-section tb-section-start">رصيد ختامي<br/><span dir="ltr">${CY}</span></th>
+                </tr>
+                <tr class="tb-head-sub">
+                  <th class="tb-th-amt tb-section-start">مدين</th>
+                  <th class="tb-th-amt">دائن</th>
+                  <th class="tb-th-amt tb-section-start">مدين</th>
+                  <th class="tb-th-amt">دائن</th>
+                  <th class="tb-th-amt tb-section-start">مدين</th>
+                  <th class="tb-th-amt">دائن</th>
+                </tr>
+              </thead>`;
+      const tbSigsHtml = `
+            <div class="fs-balance-sigs fs-tb-sigs">
+              <div class="sig-row" style="margin-top:0;text-align:center;display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+                <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+                  <div class="sig-title" contenteditable="false">المحاسب</div>
+                  <div contenteditable="false">${escHtml(meta.accountantName || "")}</div>
+                  <div class="sig-name">_______________</div>
+                </div>
+                <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+                  <div class="sig-title" contenteditable="false">المدير المفوض</div>
+                  <div contenteditable="false">${escHtml(meta.mdName || "")}</div>
+                  <div class="sig-name">_______________</div>
+                </div>
+              </div>
+            </div>`;
+      const tbSummaryRows = tbSummaryResult.rows;
+      const tbSummaryTotals = tbSummaryResult.totals;
+      const tbSummaryClosingDiff = tbSummaryResult.closingDiff;
+      const tbSummaryRowsHtml = tbMapRowsHtml(tbSummaryRows, "لا توجد كشوفات لعرضها في الميزان التجميعي.");
+      const tbMergedRows = tbResult.rows;
+      const tbTotals = tbResult.totals;
+      const tbClosingDiff = tbResult.closingDiff;
+      const tbTol = 0.99;
+      const tbRowsHtml = tbMapRowsHtml(tbMergedRows, "لا توجد بنود فرعية في الكشوفات. أدخل سطور الكشوف العمودية (رمز/اسم/قيم) أولاً.");
       const expenseRowsHtml = incomeExpenseSchedules.length ? incomeExpenseSchedules.map(sch=>{
         const tot = sumVertical(sch.id);
         const no = escHtml(toWesternDigits(String(sch.scheduleNo ?? "")));
@@ -5990,9 +6258,15 @@
             يرجى مراجعة كشف العقود والكشوفات المصنّفة كمصروفات والاهتلاك.
           </div>
         ` : ``}
+        ${Math.abs(tbSummaryClosingDiff) >= tbTol ? `
+          <div class="msg err" style="margin-top:10px">
+            تنبيه توازن الميزان التجميعي (أرصدة ختامية):
+            فرق المدين − الدائن = <b dir="ltr">${fmt(tbSummaryClosingDiff)}</b>
+          </div>
+        ` : ``}
         ${Math.abs(tbClosingDiff) >= tbTol ? `
           <div class="msg err" style="margin-top:10px">
-            تنبيه توازن ميزان المراجعة (أرصدة ختامية):
+            تنبيه توازن الميزان التفصيلي (أرصدة ختامية):
             فرق المدين − الدائن = <b dir="ltr">${fmt(tbClosingDiff)}</b>
             — راجع البنود الفرعية والافتتاحي من سنة ${PY}.
           </div>
@@ -6234,53 +6508,37 @@
           </div>
 
           <div class="page page-tb" data-fs-order="4">
-            <div class="page-label">ميزان المراجعة</div>
+            <div class="page-label">ميزان المراجعة — تجميعي</div>
             <div class="doc-subtitle">${state.selectedCompanyName || ""}</div>
-            <div class="doc-sub2 doc-underline" style="margin:6px 0">${meta.fyEndDate ? `ميزان المراجعة كما في ${formatFyEndArabic(meta.fyEndDate)}` : ""}</div>
+            <div class="doc-sub2 doc-underline" style="margin:6px 0">${meta.fyEndDate ? `ميزان المراجعة (تجميعي على مستوى الكشوفات) كما في ${formatFyEndArabic(meta.fyEndDate)}` : "ميزان المراجعة — تجميعي على مستوى الكشوفات"}</div>
             <div class="tb-table-wrap">
-            <table class="fin-table tb-table" id="table-trial-balance-live">
-              <colgroup>
-                <col class="tb-col-sch" />
-                <col class="tb-col-code" />
-                <col class="tb-col-name" />
-                <col class="tb-col-amt" /><col class="tb-col-amt" />
-                <col class="tb-col-amt" /><col class="tb-col-amt" />
-                <col class="tb-col-amt" /><col class="tb-col-amt" />
-              </colgroup>
-              <thead>
-                <tr class="tb-head-group">
-                  <th rowspan="2" class="tb-th-sch">رقم<br/>الكشف</th>
-                  <th rowspan="2" class="tb-th-code">رقم<br/>الدليل</th>
-                  <th rowspan="2" class="tb-th-name">اسم الحساب</th>
-                  <th colspan="2" class="tb-section tb-section-start">رصيد افتتاحي<br/><span dir="ltr">${PY}</span></th>
-                  <th colspan="2" class="tb-section tb-section-start">حركة السنة<br/><span dir="ltr">${CY}</span></th>
-                  <th colspan="2" class="tb-section tb-section-start">رصيد ختامي<br/><span dir="ltr">${CY}</span></th>
-                </tr>
-                <tr class="tb-head-sub">
-                  <th class="tb-th-amt tb-section-start">مدين</th>
-                  <th class="tb-th-amt">دائن</th>
-                  <th class="tb-th-amt tb-section-start">مدين</th>
-                  <th class="tb-th-amt">دائن</th>
-                  <th class="tb-th-amt tb-section-start">مدين</th>
-                  <th class="tb-th-amt">دائن</th>
-                </tr>
-              </thead>
+            <table class="fin-table tb-table" id="table-trial-balance-summary">
+              ${tbTableHeadHtml}
               <tbody>
-                ${tbRowsHtml}
-                <tr class="row-total">
-                  <td colspan="3" class="tb-td-name" contenteditable="false" style="font-weight:700;text-align:center">المجموع</td>
-                  <td class="amount-col tb-section-start" dir="ltr" contenteditable="false">${tbFmtAmt(tbTotals.opDebit, { total:true })}</td>
-                  <td class="amount-col" dir="ltr" contenteditable="false">${tbFmtAmt(tbTotals.opCredit, { total:true })}</td>
-                  <td class="amount-col tb-section-start" dir="ltr" contenteditable="false">${tbFmtAmt(tbTotals.mvDebit, { total:true })}</td>
-                  <td class="amount-col" dir="ltr" contenteditable="false">${tbFmtAmt(tbTotals.mvCredit, { total:true })}</td>
-                  <td class="amount-col tb-section-start" dir="ltr" contenteditable="false">${tbFmtAmt(tbTotals.clDebit, { total:true })}</td>
-                  <td class="amount-col" dir="ltr" contenteditable="false">${tbFmtAmt(tbTotals.clCredit, { total:true })}</td>
-                </tr>
+                ${tbSummaryRowsHtml}
+                ${tbBuildTotalRow(tbSummaryTotals)}
               </tbody>
             </table>
             </div>
+            ${tbSigsHtml}
+          </div>
+
+          <div class="page page-tb" data-fs-order="5">
+            <div class="page-label">ميزان المراجعة — تفصيلي</div>
+            <div class="doc-subtitle">${state.selectedCompanyName || ""}</div>
+            <div class="doc-sub2 doc-underline" style="margin:6px 0">${meta.fyEndDate ? `ميزان المراجعة (تفصيلي — البنود الفرعية) كما في ${formatFyEndArabic(meta.fyEndDate)}` : "ميزان المراجعة — تفصيلي (البنود الفرعية)"}</div>
+            <div class="tb-table-wrap">
+            <table class="fin-table tb-table" id="table-trial-balance-live">
+              ${tbTableHeadHtml}
+              <tbody>
+                ${tbRowsHtml}
+                ${tbBuildTotalRow(tbTotals)}
+              </tbody>
+            </table>
+            </div>
+            ${tbSigsHtml}
             <div class="hint" style="margin-top:8px">
-              يُبنى من <b>البنود الفرعية</b> لكل كشف (رمز/اسم/قيم). الافتتاحي من ختامية سنة ${PY} عند توفر وثيقتها، وإلا من عمود ${PY} في الكشف. حسابات قائمة الدخل تظهر في عمود الحركة فقط. <b>بيان أ وبيان ب</b> ما زالا مستقلين — استخدم هذا الميزان للتحقق قبل ربطهما لاحقاً.
+              يُبنى من <b>البنود الفرعية</b> لكل كشف (رمز/اسم/قيم). الافتتاحي من ختامية سنة ${PY} عند توفر وثيقتها، وإلا من عمود ${PY} في الكشف. حسابات قائمة الدخل تظهر في عمود الحركة فقط.
             </div>
           </div>
 
