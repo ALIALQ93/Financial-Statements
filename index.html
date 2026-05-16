@@ -297,10 +297,13 @@
     .fs-balance-sigs .fs-balance-sig-stack{
       display:flex;
       flex-direction:column;
-      gap:18mm;
+      gap:8mm;
       align-items:stretch;
       width:100%;
     }
+    .sig-box{ padding:4px 6px; }
+    .sig-title{ font-weight:700; }
+    .sig-name{ margin-top:5mm; line-height:1.2; }
     .fs-tb-sigs{
       margin-top:12mm;
       padding-top:6mm;
@@ -310,8 +313,40 @@
       max-width:520px;
       margin-inline:auto;
     }
+    /* شاشة: تواقيع تحت الجدول | طباعة: تكرار عبر tfoot */
+    .fin-table tfoot.fs-sigs-tfoot{ display:none; }
     @media print {
       .no-print-fs{ display:none !important; }
+      .fs-sigs-screen{ display:none !important; }
+      .fin-table tfoot.fs-sigs-tfoot{
+        display:table-footer-group !important;
+      }
+      .fin-table tfoot.fs-sigs-tfoot td.fs-sigs-tfoot-cell{
+        border:none !important;
+        background:#fff !important;
+        padding:0 !important;
+        vertical-align:top;
+      }
+      .fin-table tfoot.fs-sigs-tfoot .fs-balance-sigs{
+        margin:0 !important;
+        padding:2mm 0 0 !important;
+        border-top:1px solid rgba(176,196,216,.95);
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+      }
+      .fin-table.tb-table tfoot.fs-sigs-tfoot .fs-balance-sigs{
+        padding:1.5mm 0 0 !important;
+      }
+      .fin-table.tb-table tfoot.fs-sigs-tfoot .sig-box{
+        font-size:8pt !important;
+        padding:2px 4px !important;
+      }
+      .fin-table.tb-table tfoot.fs-sigs-tfoot .sig-name{
+        margin-top:3mm !important;
+      }
+      .fin-table tfoot.fs-sigs-tfoot .fs-balance-sig-stack{
+        gap:3mm !important;
+      }
     }
     .page-label{font-size:8pt;color:#aaa;margin-bottom:8px;font-style:italic;}
     .tech-header{
@@ -497,7 +532,7 @@
       .page-label{ display:none !important; }
       /* ميزان المراجعة — ملاءمة A4 */
       .page.page-tb{
-        padding:10mm 7mm 8mm !important;
+        padding:8mm 6mm 6mm !important;
         width:100% !important;
         max-width:none !important;
       }
@@ -589,6 +624,133 @@
     .con-table .row-total td{font-weight:700;background:#f0f4f8!important;border-top:2px solid var(--blue);}
     .con-table td[contenteditable="true"]{cursor:text;}
     .con-table td:focus{outline:2px solid rgba(232,196,106,.55);outline-offset:-2px;background:rgba(232,196,106,.10);}
+    .contracts-meta-print{ display:none; }
+    .contracts-meta-table{
+      width:100%;
+      border-collapse:collapse;
+      margin:0 0 8px;
+      font-size:9pt;
+      direction:rtl;
+    }
+    .contracts-meta-table th{
+      background:var(--blue-pale);
+      color:var(--navy);
+      font-weight:700;
+      padding:5px 8px;
+      border:1px solid var(--border);
+      text-align:center;
+    }
+    .contracts-meta-table td{
+      padding:5px 8px;
+      border:1px solid var(--border);
+      text-align:center;
+      vertical-align:middle;
+    }
+    .contracts-meta-table .meta-val{
+      font-weight:700;
+      direction:ltr;
+      unicode-bidi:plaintext;
+    }
+    /* كشف الموجودات الثابتة — رأس الأعمدة */
+    .fa-col-head{ display:grid; gap:3px; width:100%; text-align:center; }
+    .fa-col-code{ font-weight:900; font-size:9pt; line-height:1.2; }
+    .fa-col-name{ font-size:8.5pt; font-weight:600; color:var(--navy); line-height:1.35; }
+    .fa-summary{
+      margin-top:8px;
+      font-size:9pt;
+      color:var(--text);
+    }
+    .fa-print-wrap{
+      break-inside:avoid-page;
+      page-break-inside:avoid;
+    }
+    @media print {
+      .contracts-meta-screen{ display:none !important; }
+      .contracts-meta-print{ display:block !important; }
+      /* افتراضي قبل القياس: يسمح بالتقسيم | schedule-keep-whole / schedule-allow-split يُضبطان عبر JS */
+      .card-schedule.schedule-keep-whole,
+      .card-schedule.schedule-keep-whole [data-body],
+      .card-schedule.schedule-keep-whole .fa-print-wrap,
+      .card-schedule.schedule-keep-whole > .fin-table,
+      .card-schedule.schedule-keep-whole [data-body] > .fin-table,
+      .card-schedule.schedule-keep-whole [data-body] > .fa-print-wrap{
+        break-inside:avoid-page !important;
+        page-break-inside:avoid !important;
+      }
+      .card-schedule.schedule-allow-split,
+      .card-schedule.schedule-allow-split [data-body],
+      .card-schedule.schedule-allow-split .fa-print-wrap{
+        break-inside:auto !important;
+        page-break-inside:auto !important;
+      }
+      .card-schedule.schedule-allow-split .fin-table thead,
+      .card-schedule.schedule-allow-split .fa-schedule-table thead,
+      .card-schedule.schedule-allow-split .con-table thead{
+        display:table-header-group !important;
+      }
+      .card-schedule-fa:not(.schedule-allow-split):not(.schedule-keep-whole),
+      .card-schedule-fa:not(.schedule-allow-split) .fa-print-wrap,
+      .card-schedule-fa:not(.schedule-allow-split) .fa-schedule-table,
+      .card-schedule-fa:not(.schedule-allow-split) [data-body]{
+        break-inside:avoid-page !important;
+        page-break-inside:avoid !important;
+      }
+      .card-schedule-fa .fa-col-name{
+        display:block !important;
+        font-size:7pt !important;
+        font-weight:600 !important;
+        color:var(--navy) !important;
+      }
+      .card-schedule-fa .fa-summary{
+        display:block !important;
+        font-size:8pt !important;
+        margin-top:3mm !important;
+      }
+      .card-schedule-fa .fa-schedule-table{
+        font-size:7pt !important;
+      }
+      .card-schedule-fa .fa-schedule-table th,
+      .card-schedule-fa .fa-schedule-table td{
+        padding:2px 4px !important;
+      }
+      .card-schedule-contracts .con-table{
+        width:100% !important;
+        min-width:0 !important;
+        table-layout:fixed;
+        font-size:6.5pt !important;
+        break-inside:auto !important;
+        page-break-inside:auto !important;
+      }
+      .card-schedule-contracts .con-table thead{
+        display:table-header-group !important;
+      }
+      .card-schedule-contracts .con-table th{
+        font-size:6pt !important;
+        padding:2px 2px !important;
+        line-height:1.25;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+      }
+      .card-schedule-contracts .con-table td{
+        font-size:6.5pt !important;
+        padding:2px 2px !important;
+        word-wrap:break-word;
+        overflow-wrap:anywhere;
+        vertical-align:middle;
+      }
+      .card-schedule-contracts .con-table tr{
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+      }
+      .contracts-meta-table{
+        font-size:8pt !important;
+        margin-bottom:3mm !important;
+      }
+      .contracts-meta-table th,
+      .contracts-meta-table td{
+        padding:2px 4px !important;
+      }
+    }
     .hidden{display:none !important}
     .sep{height:1px;background:rgba(255,255,255,.18);width:1px;align-self:stretch}
 
@@ -698,6 +860,272 @@
     body.mode-login #btn-logout{
       display:none !important;
     }
+
+    /* ——— غلاف الطباعة + حزمة PDF في الصفحة ——— */
+    #print-package-host{ display:none !important; }
+    .aud-hd-main .office{font-size:11pt;color:var(--muted);}
+    .aud-hd-main .name{font-size:14pt;font-weight:900;color:var(--navy);}
+    .aud-hd-main .sub{font-size:10pt;color:var(--muted);}
+    .hr-blue{border:none;border-top:2px solid var(--blue);margin:12px 0;}
+    .spacer-lg{height:24px;}
+    .doc-title{font-size:14pt;font-weight:900;color:var(--navy);text-align:center;}
+    .cover-center-box{
+      border:2px solid var(--border);
+      border-radius:12px;
+      padding:30px 40px;
+      max-width:420px;
+      margin:30px auto;
+      text-align:center;
+    }
+    .addr-footer{font-size:9pt;color:var(--text);}
+    .print-md-break{ page-break-before:always; break-before:page; }
+
+    @media print {
+      @page { size: A4; margin: 9mm 8mm; }
+      .page{
+        padding:8mm 9mm 6mm !important;
+        width:100% !important;
+        max-width:none !important;
+        box-sizing:border-box;
+      }
+      .page.page-stmt-sigs{
+        display:flex;
+        flex-direction:column;
+      }
+      .page.page-stmt-sigs .fin-table{
+        flex:0 1 auto;
+        margin:4px 0 !important;
+      }
+      .page.page-stmt-sigs .fs-balance-sigs{
+        flex:0 0 auto;
+        margin-top:auto !important;
+        margin-bottom:0 !important;
+        padding-top:3mm !important;
+        border-top:1px solid rgba(176,196,216,.95);
+      }
+      .page.page-stmt-sigs .fin-table,
+      .page.page-stmt-sigs .fin-table tbody,
+      .page.page-stmt-sigs .fin-table tr{
+        break-inside:auto !important;
+        page-break-inside:auto !important;
+      }
+      .fs-sigs-screen,
+      .fs-sigs-screen .sig-row,
+      .fs-sigs-screen .sig-box,
+      .md-sig-footer,
+      .md-sig-footer .sig-box{
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+      }
+      .fs-sigs-screen,
+      .md-sig-footer{
+        break-before:avoid-page;
+        page-break-before:avoid;
+      }
+      .fin-table tfoot.fs-sigs-tfoot tr{
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+      }
+      .fs-balance-sigs .fs-balance-sig-stack{
+        gap:4mm !important;
+      }
+      .fs-balance-sigs{
+        margin-top:5mm !important;
+        padding-top:3mm !important;
+      }
+      .fs-tb-sigs{
+        margin-top:4mm !important;
+        padding-top:2mm !important;
+      }
+      .page.page-md-end .md-sig-footer{
+        margin-top:6mm !important;
+      }
+      .fin-table{ font-size:9pt !important; }
+      .fin-table th,
+      .fin-table td{ padding:3px 5px !important; }
+      body.print-pdf-mode{
+        background:#fff !important;
+      }
+      body.print-pdf-mode .topbar,
+      body.print-pdf-mode .layout,
+      body.print-pdf-mode .overlay{
+        display:none !important;
+      }
+      body.print-pdf-mode #print-package-host{
+        display:block !important;
+      }
+      body.print-pdf-mode #print-package-host .no-print-fs,
+      body.print-pdf-mode #print-package-host .hint,
+      body.print-pdf-mode #print-package-host .msg,
+      body.print-pdf-mode #print-package-host button,
+      body.print-pdf-mode #print-package-host input,
+      body.print-pdf-mode #print-package-host select,
+      body.print-pdf-mode #print-package-host textarea,
+      body.print-pdf-mode #print-package-host .md-about-toolbar,
+      body.print-pdf-mode #print-package-host .tb-btn,
+      body.print-pdf-mode #print-package-host .linkbtn{
+        display:none !important;
+      }
+      body.print-pdf-mode #print-package-host .schedule-toolbar{
+        display:flex !important;
+        align-items:center;
+        gap:8px;
+        margin:0 0 6mm;
+      }
+      body.print-pdf-mode #print-package-host .schedule-toolbar button,
+      body.print-pdf-mode #print-package-host .schedule-toolbar .hint{
+        display:none !important;
+      }
+      body.print-pdf-mode #print-package-host .card{
+        display:block !important;
+        border:none !important;
+        box-shadow:none !important;
+        background:transparent !important;
+        padding:0 !important;
+        margin:0 0 8mm !important;
+        break-inside:avoid-page;
+        page-break-inside:avoid;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule.schedule-keep-whole,
+      body.print-pdf-mode #print-package-host .card-schedule.schedule-keep-whole [data-body],
+      body.print-pdf-mode #print-package-host .card-schedule.schedule-keep-whole .fa-print-wrap{
+        break-inside:avoid-page !important;
+        page-break-inside:avoid !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule.schedule-allow-split,
+      body.print-pdf-mode #print-package-host .card-schedule.schedule-allow-split [data-body],
+      body.print-pdf-mode #print-package-host .card-schedule.schedule-allow-split .fa-print-wrap{
+        break-inside:auto !important;
+        page-break-inside:auto !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule.schedule-allow-split .fin-table thead,
+      body.print-pdf-mode #print-package-host .card-schedule.schedule-allow-split .fa-schedule-table thead,
+      body.print-pdf-mode #print-package-host .card-schedule.schedule-allow-split .con-table thead{
+        display:table-header-group !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule-fa .fa-col-name{
+        display:block !important;
+        font-size:7pt !important;
+        font-weight:600 !important;
+        color:var(--navy) !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule-fa .fa-summary{
+        display:block !important;
+        font-size:8pt !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule-contracts .con-table{
+        width:100% !important;
+        min-width:0 !important;
+        table-layout:fixed;
+        font-size:6.5pt !important;
+        break-inside:auto !important;
+        page-break-inside:auto !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule-contracts .con-table thead{
+        display:table-header-group !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule-contracts .con-table th{
+        font-size:6pt !important;
+        padding:2px 2px !important;
+        line-height:1.25;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule-contracts .con-table td{
+        font-size:6.5pt !important;
+        padding:2px 2px !important;
+        word-wrap:break-word;
+        overflow-wrap:anywhere;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule-contracts .con-table tr{
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+      }
+      body.print-pdf-mode #print-package-host .contracts-meta-screen{
+        display:none !important;
+      }
+      body.print-pdf-mode #print-package-host .contracts-meta-print{
+        display:block !important;
+      }
+      body.print-pdf-mode #print-package-host .pages{
+        width:auto;
+        margin:0;
+      }
+      body.print-pdf-mode #print-package-host .page{
+        box-shadow:none;
+        border:none;
+        margin:0 auto;
+        page-break-after:always;
+      }
+      body.print-pdf-mode #print-package-host .page-label{
+        display:none !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-stmt-sigs .fin-table,
+      body.print-pdf-mode #print-package-host .page.page-stmt-sigs .fin-table tbody,
+      body.print-pdf-mode #print-package-host .page.page-stmt-sigs .fin-table tr{
+        break-inside:auto !important;
+        page-break-inside:auto !important;
+      }
+      body.print-pdf-mode #print-package-host .fs-sigs-screen,
+      body.print-pdf-mode #print-package-host .fs-sigs-screen .sig-row,
+      body.print-pdf-mode #print-package-host .fs-sigs-screen .sig-box,
+      body.print-pdf-mode #print-package-host .md-sig-footer,
+      body.print-pdf-mode #print-package-host .md-sig-footer .sig-box{
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+      }
+      body.print-pdf-mode #print-package-host .fs-sigs-screen,
+      body.print-pdf-mode #print-package-host .md-sig-footer{
+        break-before:avoid-page;
+        page-break-before:avoid;
+      }
+      body.print-pdf-mode #print-package-host .fs-sigs-screen{
+        display:none !important;
+      }
+      body.print-pdf-mode #print-package-host .fin-table tfoot.fs-sigs-tfoot{
+        display:table-footer-group !important;
+      }
+      body.print-pdf-mode #print-package-host .fin-table.tb-table,
+      body.print-pdf-mode #print-package-host .fin-table.tb-table tbody{
+        break-inside:auto !important;
+        page-break-inside:auto !important;
+      }
+      body.print-pdf-mode #print-package-host .fin-table.tb-table tr{
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+      }
+      body.print-pdf-mode #print-package-host .fin-table.tb-table thead{
+        display:table-header-group !important;
+      }
+      body.print-pdf-mode #print-package-host .tb-table-wrap{
+        overflow:visible !important;
+      }
+      body.print-pdf-mode #print-package-host .fin-table.tb-table{
+        min-width:0 !important;
+        width:100% !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-tb{
+        padding:8mm 6mm 6mm !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-stmt-sigs{
+        display:flex;
+        flex-direction:column;
+      }
+      body.print-pdf-mode #print-package-host .page.page-stmt-sigs .fs-balance-sigs{
+        flex:0 0 auto;
+        margin-top:auto !important;
+      }
+      body.print-pdf-mode #print-package-host .fs-balance-sigs .fs-balance-sig-stack{
+        gap:4mm !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-md-end .md-sig-footer{
+        margin-top:6mm !important;
+      }
+      body.print-pdf-mode #print-package-host thead{
+        display:table-header-group;
+      }
+      body.print-pdf-mode #print-package-host tfoot{
+        display:table-footer-group;
+      }
+    }
   </style>
 </head>
 <body class="app-bg mode-login">
@@ -706,6 +1134,11 @@
     <span class="sep"></span>
     <span class="pill hidden" id="pill-active-office-wrap"><b>المكتب</b><span id="pill-active-office">—</span></span>
     <span class="sep hidden" id="sep-active-office"></span>
+    <span class="topbar-print-wrap hidden" id="topbar-print-wrap" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <button class="btn" type="button" id="btn-top-print" disabled title="طباعة الغلاف والقوائم والكشوفات وتقرير المدير">🖨️ طباعة / PDF</button>
+      <button class="btn" type="button" id="btn-top-print-tab" disabled title="فتح نافذة طباعة A4">🗂️ A4</button>
+    </span>
+    <span class="sep hidden" id="sep-top-print"></span>
     <button class="btn" id="btn-logout" disabled>خروج</button>
     <span class="brand">Financial Statements</span>
   </div>
@@ -1129,8 +1562,16 @@
         </div>
 
         <div class="card hidden" style="margin-top:12px" id="in-pages-card">
-          <h2 style="font-size:12.5pt">صفحات النموذج (CY / PY)</h2>
-          <div class="hint">هنا ستظهر القوائم الأربعة + الكشوفات الافتراضية (1–8) مع أدوات الإضافة/التعديل/الحذف، بنفس تنظيم `Financial Statements 0.0.1`.</div>
+          <div class="row" style="justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+            <div>
+              <h2 style="font-size:12.5pt;margin:0 0 6px">صفحات النموذج (CY / PY)</h2>
+              <div class="hint" style="margin:0">القوائم الأربعة + الكشوفات الافتراضية (1–8) مع أدوات الإضافة/التعديل/الحذف.</div>
+            </div>
+            <div class="row" style="gap:8px;flex-wrap:wrap;justify-content:flex-end">
+              <button class="tb-btn" type="button" id="btn-pages-print" disabled>🖨️ طباعة / PDF</button>
+              <button class="tb-btn" type="button" id="btn-pages-print-tab" disabled>🗂️ فتح للطباعة A4</button>
+            </div>
+          </div>
           <div id="in-pages" style="margin-top:10px"></div>
         </div>
 
@@ -1138,7 +1579,7 @@
           <div class="row" style="justify-content:space-between;gap:10px;flex-wrap:wrap">
             <div>
               <h2 style="font-size:12.5pt;margin:0">تقرير المدير المفوض (في نهاية الكشوفات)</h2>
-              <div class="hint">التعديل والحفظ يتمان من داخل التقرير نفسه (أزرار 💾 حفظ لكل مجموعة فقرات).</div>
+              <div class="hint">التعديل والحفظ يتمان من داخل التقرير نفسه (أزرار 💾 حفظ لكل مجموعة فقرات). زر «طباعة / PDF» يطبّع الغلاف والقوائم والكشوفات وتقرير المدير من نفس الصفحة.</div>
             </div>
             <div class="row" style="gap:8px;flex-wrap:wrap;justify-content:flex-end">
               <button class="tb-btn" type="button" id="btn-in-md-print">🖨️ طباعة / PDF</button>
@@ -1620,6 +2061,17 @@
     }
     const show = (id) => $(id).classList.remove("hidden");
     const hide = (id) => $(id).classList.add("hidden");
+    function syncPrintToolbar(){
+      const on = !$("in-pages-card")?.classList.contains("hidden");
+      ["topbar-print-wrap","sep-top-print"].forEach((id)=>{
+        const el = $(id);
+        if(el) el.classList.toggle("hidden", !on);
+      });
+      ["btn-top-print","btn-top-print-tab","btn-pages-print","btn-pages-print-tab","btn-in-md-print","btn-in-md-print-tab"].forEach((id)=>{
+        const el = $(id);
+        if(el) el.disabled = !on;
+      });
+    }
     const setText = (id, txt) => {
       const el = $(id);
       if(!el) return;
@@ -3112,6 +3564,13 @@
     }
 
     function mdV01SafeText(s){ return String(s ?? ""); }
+    function escHtml(s){
+      return String(s ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;");
+    }
 
     // Note: report content is rendered in multiple sections; avoid global getElementById by scoping
     // all edits/queries to the current rendered page root element.
@@ -3752,7 +4211,7 @@
       mdV01SyncActivityToolbar(page1);
 
       const page2 = document.createElement("div");
-      page2.className = "page";
+      page2.className = "page page-md-end";
       page2.dataset.fsOrder = "2";
       page2.innerHTML = `
         <div class="page-label">تقرير المدير المفوض – ٢</div>
@@ -3821,7 +4280,7 @@
         </div>
         <div class="doc-body doc-bold doc-underline" contenteditable="false"><span id="md-closing-text" contenteditable="false">${mdV01SafeText(mdApplyTemplate(m.closingText || "", ctx) || "")}</span></div>
         <div class="doc-body centered" contenteditable="false">ـــــــــ مع التقدير ـــــــــ</div>
-        <div class="sig-row" style="margin-top:14px;text-align:center;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div class="sig-row md-sig-footer" style="margin-top:8px;text-align:center;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
           <div class="sig-box" style="font-size:9.5pt;padding:5px;">
             <div class="sig-title" contenteditable="false">${mdV01SafeText(ctx.audName || "")}</div>
             <div contenteditable="false" style="font-size:9pt;">${mdV01SafeText(ctx.audTitleAr || "محاسب قانوني ومراقب حسابات")}</div>
@@ -5006,7 +5465,9 @@
       if(yearSearch) yearSearch.value = "";
       hide("in-year-meta-card");
       hide("in-pages-card");
+        syncPrintToolbar();
       hide("in-md-report-card");
+        syncPrintToolbar();
       setText("in-msg","");
       setText("in-ok","");
 
@@ -5077,7 +5538,9 @@
       setText("in-ok","");
       hide("in-year-meta-card");
       hide("in-pages-card");
+        syncPrintToolbar();
       hide("in-md-report-card");
+        syncPrintToolbar();
       $("btn-save-year").disabled = true;
       state.selectedYearId = null;
 
@@ -5126,6 +5589,7 @@
         await populateYearDirectoryPicks();
         show("in-year-meta-card");
         show("in-pages-card");
+        syncPrintToolbar();
         $("btn-save-year").disabled = false;
         state.activeCompanyId = companyId;
         state.activeCompanyName = state.selectedCompanyName || companyId;
@@ -5134,6 +5598,7 @@
 
         await renderYearPagesFresh(data);
         show("in-md-report-card");
+        syncPrintToolbar();
         await loadDirectorReportIntoSchedules(companyId, data);
       }catch(e){
         const code = e?.code || "";
@@ -5142,7 +5607,9 @@
           : (e?.message || String(e)));
         hide("in-year-meta-card");
         hide("in-pages-card");
+        syncPrintToolbar();
         hide("in-md-report-card");
+        syncPrintToolbar();
         $("btn-save-year").disabled = true;
         state.selectedYearId = null;
       }
@@ -5749,6 +6216,59 @@
       return finalizeTrialBalanceLines(lines, priorDoc);
     }
 
+    function buildFsStmtSigRowHtml(meta){
+      const m = meta || {};
+      return `
+              <div class="sig-row" style="margin-top:0;text-align:center;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+                <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+                  <div class="sig-title" contenteditable="false">المحاسب</div>
+                  <div contenteditable="false">${escHtml(m.accountantName || "")}</div>
+                  <div class="sig-name">_______________</div>
+                </div>
+                <div></div>
+                <div class="fs-balance-sig-stack">
+                  <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+                    <div class="sig-title" contenteditable="false">المدير المفوض</div>
+                    <div contenteditable="false">${escHtml(m.mdName || "")}</div>
+                    <div class="sig-name">_______________</div>
+                  </div>
+                  <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+                    <div class="sig-title" contenteditable="false">مراقب الحسابات</div>
+                    <div contenteditable="false">${escHtml(m.auditorNameAr || "")}</div>
+                    <div class="sig-name">_______________</div>
+                  </div>
+                </div>
+              </div>`;
+    }
+    function buildFsStmtSigsScreenHtml(meta){
+      return `<div class="fs-balance-sigs fs-sigs-screen">${buildFsStmtSigRowHtml(meta)}</div>`;
+    }
+    function buildFsStmtSigsTfootHtml(meta){
+      return `<tfoot class="fs-sigs-tfoot"><tr><td colspan="5" class="fs-sigs-tfoot-cell"><div class="fs-balance-sigs fs-sigs-tfoot-block">${buildFsStmtSigRowHtml(meta)}</div></td></tr></tfoot>`;
+    }
+    function buildTbSigRowHtml(meta){
+      const m = meta || {};
+      return `
+              <div class="sig-row" style="margin-top:0;text-align:center;display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+                <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+                  <div class="sig-title" contenteditable="false">المحاسب</div>
+                  <div contenteditable="false">${escHtml(m.accountantName || "")}</div>
+                  <div class="sig-name">_______________</div>
+                </div>
+                <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+                  <div class="sig-title" contenteditable="false">المدير المفوض</div>
+                  <div contenteditable="false">${escHtml(m.mdName || "")}</div>
+                  <div class="sig-name">_______________</div>
+                </div>
+              </div>`;
+    }
+    function buildTbSigsScreenHtml(meta){
+      return `<div class="fs-balance-sigs fs-tb-sigs fs-sigs-screen">${buildTbSigRowHtml(meta)}</div>`;
+    }
+    function buildTbSigsTfootHtml(meta){
+      return `<tfoot class="fs-sigs-tfoot"><tr><td colspan="8" class="fs-sigs-tfoot-cell"><div class="fs-balance-sigs fs-tb-sigs fs-sigs-tfoot-block">${buildTbSigRowHtml(meta)}</div></td></tr></tfoot>`;
+    }
+
     function renderInPages(yearDoc){
       const wrap = $("in-pages");
       if(!wrap) return;
@@ -6065,11 +6585,6 @@
       const priorDoc = state.priorYearDocForCashFlow;
       const contractsSchNo = (reg.find(s=>s?.active!==false && (s?.id==="sch-8" || s?.type==="contracts"))?.scheduleNo) || 8;
 
-      const escHtml = (s)=> String(s ?? "")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;");
       const tbFmtAmt = (v, { total = false } = {})=>{
         const num = Number(v || 0);
         if(!num) return "-";
@@ -6157,21 +6672,8 @@
                   <th class="tb-th-amt">دائن</th>
                 </tr>
               </thead>`;
-      const tbSigsHtml = `
-            <div class="fs-balance-sigs fs-tb-sigs">
-              <div class="sig-row" style="margin-top:0;text-align:center;display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-                <div class="sig-box" style="font-size:9.5pt;padding:5px;">
-                  <div class="sig-title" contenteditable="false">المحاسب</div>
-                  <div contenteditable="false">${escHtml(meta.accountantName || "")}</div>
-                  <div class="sig-name">_______________</div>
-                </div>
-                <div class="sig-box" style="font-size:9.5pt;padding:5px;">
-                  <div class="sig-title" contenteditable="false">المدير المفوض</div>
-                  <div contenteditable="false">${escHtml(meta.mdName || "")}</div>
-                  <div class="sig-name">_______________</div>
-                </div>
-              </div>
-            </div>`;
+      const tbSigsHtml = buildTbSigsScreenHtml(meta);
+      const tbSigsTfoot = buildTbSigsTfootHtml(meta);
       const tbSummaryRows = tbSummaryResult.rows;
       const tbSummaryTotals = tbSummaryResult.totals;
       const tbSummaryClosingDiff = tbSummaryResult.closingDiff;
@@ -6234,7 +6736,7 @@
           </div>
         ` : ``}
         <div class="pages">
-          <div class="page" data-fs-order="2">
+          <div class="page page-stmt-sigs" data-fs-order="2">
             <div class="page-label">بيان ب – كشف العمليات الجارية</div>
             <div class="doc-subtitle">${state.selectedCompanyName || ""}</div>
             <div class="doc-sub2 doc-underline" style="margin:6px 0">${meta.fyEndDate ? `كشف العمليات الجارية للسنة المالية المنتهية في ${formatFyEndArabic(meta.fyEndDate)}` : ""}</div>
@@ -6324,29 +6826,9 @@
                   <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${fmt(patPY)}</td>
                 </tr>
               </tbody>
+              ${buildFsStmtSigsTfootHtml(meta)}
             </table>
-            <div class="fs-balance-sigs">
-              <div class="sig-row" style="margin-top:0;text-align:center;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-                <div class="sig-box" style="font-size:9.5pt;padding:5px;">
-                  <div class="sig-title" contenteditable="false">المحاسب</div>
-                  <div contenteditable="false">${escHtml(meta.accountantName || "")}</div>
-                  <div class="sig-name">_______________</div>
-                </div>
-                <div></div>
-                <div class="fs-balance-sig-stack">
-                  <div class="sig-box" style="font-size:9.5pt;padding:5px;">
-                    <div class="sig-title" contenteditable="false">المدير المفوض</div>
-                    <div contenteditable="false">${escHtml(meta.mdName || "")}</div>
-                    <div class="sig-name">_______________</div>
-                  </div>
-                  <div class="sig-box" style="font-size:9.5pt;padding:5px;">
-                    <div class="sig-title" contenteditable="false">مراقب الحسابات</div>
-                    <div contenteditable="false">${escHtml(meta.auditorNameAr || "")}</div>
-                    <div class="sig-name">_______________</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ${buildFsStmtSigsScreenHtml(meta)}
           </div>
 
           <div class="page" data-fs-order="3">
@@ -6449,6 +6931,7 @@
                 ${tbSummaryRowsHtml}
                 ${tbBuildTotalRow(tbSummaryTotals)}
               </tbody>
+              ${tbSigsTfoot}
             </table>
             </div>
             ${tbSigsHtml}
@@ -6465,6 +6948,7 @@
                 ${tbRowsHtml}
                 ${tbBuildTotalRow(tbTotals)}
               </tbody>
+              ${tbSigsTfoot}
             </table>
             </div>
             ${tbSigsHtml}
@@ -6473,7 +6957,7 @@
             </div>
           </div>
 
-          <div class="page" data-fs-order="1">
+          <div class="page page-stmt-sigs" data-fs-order="1">
             <div class="page-label">بيان أ – قائمة المركز المالي</div>
             <div class="doc-subtitle">${state.selectedCompanyName || ""}</div>
             <div class="doc-sub2 doc-underline" style="margin:6px 0">${meta.fyEndDate ? `قائمة المركز المالي كما في ${formatFyEndArabic(meta.fyEndDate)}` : ""}</div>
@@ -6588,29 +7072,9 @@
                   <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${fmt(dispGrandFundingPY)}</td>
                 </tr>
               </tbody>
+              ${buildFsStmtSigsTfootHtml(meta)}
             </table>
-            <div class="fs-balance-sigs">
-              <div class="sig-row" style="margin-top:0;text-align:center;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-                <div class="sig-box" style="font-size:9.5pt;padding:5px;">
-                  <div class="sig-title" contenteditable="false">المحاسب</div>
-                  <div contenteditable="false">${escHtml(meta.accountantName || "")}</div>
-                  <div class="sig-name">_______________</div>
-                </div>
-                <div></div>
-                <div class="fs-balance-sig-stack">
-                  <div class="sig-box" style="font-size:9.5pt;padding:5px;">
-                    <div class="sig-title" contenteditable="false">المدير المفوض</div>
-                    <div contenteditable="false">${escHtml(meta.mdName || "")}</div>
-                    <div class="sig-name">_______________</div>
-                  </div>
-                  <div class="sig-box" style="font-size:9.5pt;padding:5px;">
-                    <div class="sig-title" contenteditable="false">مراقب الحسابات</div>
-                    <div contenteditable="false">${escHtml(meta.auditorNameAr || "")}</div>
-                    <div class="sig-name">_______________</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ${buildFsStmtSigsScreenHtml(meta)}
           </div>
         </div>
 
@@ -7007,9 +7471,11 @@
         .sort((a,b)=>Number(a.scheduleNo||0)-Number(b.scheduleNo||0))
       ){
         const card = document.createElement("div");
-        card.className = "card";
-        card.style.marginTop = "12px";
         const kind = sch.type;
+        card.className = "card card-schedule"
+          + (kind === "contracts" ? " card-schedule-contracts" : "")
+          + (kind === "horizontal_fixedAssets" ? " card-schedule-fa" : "");
+        card.style.marginTop = "12px";
         const canEdit = (kind === "vertical" || kind === "horizontal_fixedAssets" || kind === "contracts");
         card.innerHTML = `
           <div class="schedule-toolbar">
@@ -7061,20 +7527,20 @@
               );
             }
             const table = document.createElement("table");
-            table.className = "fin-table";
+            table.className = "fin-table fa-schedule-table";
             const head = `
               <thead><tr>
                 <th style="width:20%">اسم الحساب</th>
                 ${cols.map((c,idx)=>`<th>
                   <div style="display:flex;gap:6px;align-items:center;justify-content:space-between">
-                    <div style="display:grid;gap:4px;width:100%">
+                    <div class="fa-col-head">
                       ${editing
-                        ? `<input dir="ltr" placeholder="رمز" value="${String(c.code||"")}" data-fa-head="${idx}" data-k="code"/>`
-                        : `<div dir="ltr" style="font-weight:900">${String(c.code||"")}</div>`
+                        ? `<input dir="ltr" placeholder="رمز" value="${escHtml(String(c.code||""))}" data-fa-head="${idx}" data-k="code"/>`
+                        : `<div class="fa-col-code" dir="ltr">${escHtml(String(c.code||""))}</div>`
                       }
                       ${editing
-                        ? `<input placeholder="اسم الحساب" value="${String(c.name||"")}" data-fa-head="${idx}" data-k="name"/>`
-                        : `<div class="hint" style="margin-top:0">${String(c.name||"")}</div>`
+                        ? `<input placeholder="اسم الحساب" value="${escHtml(String(c.name||""))}" data-fa-head="${idx}" data-k="name"/>`
+                        : `<div class="fa-col-name">${escHtml(String(c.name||""))}</div>`
                       }
                     </div>
                     ${editing ? `<button class="tb-btn" data-delcol="${idx}" title="حذف عمود">×</button>` : ``}
@@ -7151,14 +7617,16 @@
             });
 
             body.innerHTML = "";
-            body.appendChild(table);
+            const faWrap = document.createElement("div");
+            faWrap.className = "fa-print-wrap";
+            faWrap.appendChild(table);
 
             const totals = computeFixedAssets();
             const sumBox = document.createElement("div");
-            sumBox.className = "hint";
-            sumBox.style.marginTop = "8px";
+            sumBox.className = "fa-summary";
             sumBox.innerHTML = `إجمالي اهتلاك CY: <b dir="ltr">${fmt(totals.depCY)}</b> — مجمع CY: <b dir="ltr">${fmt(totals.accCY)}</b> — صافي موجودات ثابتة CY: <b dir="ltr">${fmt(totals.nbvCY)}</b>`;
-            body.appendChild(sumBox);
+            faWrap.appendChild(sumBox);
+            body.appendChild(faWrap);
 
             if(editing){
               const addCol = document.createElement("button");
@@ -7493,23 +7961,46 @@
             const rate = saved.exchangeRate != null ? String(saved.exchangeRate) : "";
             const revPyTotal = saved.revPyTotalIqd != null ? String(saved.revPyTotalIqd) : "";
             const revAcct = saved.revenueAcctCode != null ? String(saved.revenueAcctCode) : "";
+            const fmtMetaNum = (raw)=>{
+              const t = String(raw ?? "").trim();
+              if(!t) return "—";
+              const v = Number(normalizeNumberString(t));
+              return Number.isFinite(v) ? fmt(v) : escHtml(t);
+            };
+            const fmtMetaAcct = (raw)=>{
+              const t = toWesternDigits(String(raw ?? "").trim());
+              return t ? escHtml(t) : "—";
+            };
             const header = document.createElement("div");
-            header.className = "row";
-            header.style.justifyContent = "space-between";
-            header.style.flexWrap = "wrap";
-            header.style.gap = "10px";
+            header.className = "contracts-meta";
             header.style.marginBottom = "10px";
             header.innerHTML = `
-              <span class="pill"><b>سعر الصرف (USD→IQD)</b>
-                <input id="contracts-exrate" dir="ltr" ${editing ? "" : "disabled"} value="${rate || ""}" placeholder="مثال: 1300" style="min-width:140px"/>
-              </span>
-              <span class="pill"><b>إيراد العقود للعام السابق (${PY}) (دينار)</b>
-                <input id="contracts-revpy" dir="ltr" ${editing ? "" : "disabled"} value="${revPyTotal || ""}" placeholder="مثال: 0" style="min-width:180px"/>
-              </span>
-              <span class="pill"><b>رمز الدليل للإيرادات (قائمة الدخل)</b>
-                <input id="contracts-rev-acct" dir="ltr" ${editing ? "" : "disabled"} value="${escHtml(revAcct)}" placeholder="مثال: 41-45" style="min-width:160px" title="يُدمج مع رموز دليل الكشوف المصنّفة «إيرادات» في عمود الدليل ببيان ب دون فصل الصفوف"/>
-              </span>
-              <span class="hint">يمكن إدخال الدولار أو الدينار مباشرة. نسبة الإنجاز تُحسب تلقائياً.</span>
+              <div class="contracts-meta-screen row" style="justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                <span class="pill"><b>سعر الصرف (USD→IQD)</b>
+                  <input id="contracts-exrate" dir="ltr" ${editing ? "" : "disabled"} value="${rate || ""}" placeholder="مثال: 1300" style="min-width:140px"/>
+                </span>
+                <span class="pill"><b>إيراد العقود للعام السابق (${PY}) (دينار)</b>
+                  <input id="contracts-revpy" dir="ltr" ${editing ? "" : "disabled"} value="${revPyTotal || ""}" placeholder="مثال: 0" style="min-width:180px"/>
+                </span>
+                <span class="pill"><b>رمز الدليل للإيرادات (قائمة الدخل)</b>
+                  <input id="contracts-rev-acct" dir="ltr" ${editing ? "" : "disabled"} value="${escHtml(revAcct)}" placeholder="مثال: 41-45" style="min-width:160px" title="يُدمج مع رموز دليل الكشوف المصنّفة «إيرادات» في عمود الدليل ببيان ب دون فصل الصفوف"/>
+                </span>
+                <span class="hint">يمكن إدخال الدولار أو الدينار مباشرة. نسبة الإنجاز تُحسب تلقائياً.</span>
+              </div>
+              <div class="contracts-meta-print">
+                <table class="contracts-meta-table">
+                  <thead><tr>
+                    <th style="width:22%">سعر الصرف<br/><span style="font-weight:500;font-size:8pt">USD → IQD</span></th>
+                    <th style="width:42%">إيراد العقود للعام السابق (${PY})<br/><span style="font-weight:500;font-size:8pt">دينار عراقي</span></th>
+                    <th style="width:36%">رمز الدليل للإيرادات<br/><span style="font-weight:500;font-size:8pt">قائمة الدخل — بيان ب</span></th>
+                  </tr></thead>
+                  <tbody><tr>
+                    <td><span class="meta-val">${fmtMetaNum(rate)}</span></td>
+                    <td><span class="meta-val">${fmtMetaNum(revPyTotal)}</span></td>
+                    <td><span class="meta-val">${fmtMetaAcct(revAcct)}</span></td>
+                  </tr></tbody>
+                </table>
+              </div>
             `;
 
             const table = document.createElement("table");
@@ -7537,6 +8028,24 @@
             };
             const rGlobal = getRate();
             const fmtUsd = (x)=> (Number(x||0)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+            const cellAmt = (raw, computed)=>{
+              if(editing) return String(raw ?? "");
+              const t = String(raw ?? "").trim();
+              if(t){
+                const v = Number(normalizeNumberString(t));
+                return Number.isFinite(v) ? fmt(v) : t;
+              }
+              return computed ? fmt(computed) : "";
+            };
+            const cellUsd = (raw, computed)=>{
+              if(editing) return String(raw ?? "");
+              const t = String(raw ?? "").trim();
+              if(t){
+                const v = Number(normalizeNumberString(t));
+                return Number.isFinite(v) ? fmtUsd(v) : t;
+              }
+              return computed ? fmtUsd(computed) : "";
+            };
 
             const compute = (r)=>{
               const contractUsd = n(r.contractUsd);
@@ -7558,14 +8067,14 @@
               const tr = document.createElement("tr");
               if(idx === selectedRow) tr.classList.add("row-sel");
               tr.innerHTML = `
-                <td contenteditable="${editing}" data-i="${idx}" data-k="projectName">${(r.projectName||"")}</td>
-                <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="contractUsd">${(r.contractUsd||"")}</td>
-                <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="contractIqd">${r.contractIqd ? r.contractIqd : (c.contractIqd ? fmt(c.contractIqd) : "")}</td>
-                <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="revUsd">${(r.revUsd||"")}</td>
-                <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="revIqd">${r.revIqd ? r.revIqd : (c.revIqd ? fmt(c.revIqd) : "")}</td>
-                <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="prevCumIqd">${(r.prevCumIqd||"")}</td>
+                <td contenteditable="${editing}" data-i="${idx}" data-k="projectName">${editing ? (r.projectName||"") : escHtml(r.projectName||"")}</td>
+                <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="contractUsd">${cellUsd(r.contractUsd, c.contractUsd)}</td>
+                <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="contractIqd">${cellAmt(r.contractIqd, c.contractIqd)}</td>
+                <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="revUsd">${cellUsd(r.revUsd, c.revUsd)}</td>
+                <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="revIqd">${cellAmt(r.revIqd, c.revIqd)}</td>
+                <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="prevCumIqd">${cellAmt(r.prevCumIqd, c.prevCumIqd)}</td>
                 <td class="num-col" dir="ltr">${c.contractIqd ? `${(c.completion*100).toFixed(1)}%` : "-"}</td>
-                <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="expensesIqd">${(r.expensesIqd||"")}</td>
+                <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="expensesIqd">${cellAmt(r.expensesIqd, c.expensesIqd)}</td>
               `;
               tb.appendChild(tr);
               tr.addEventListener("click", (ev)=>{
@@ -7926,46 +8435,199 @@
 
     // Managing Director report (in schedules): إضافة السطر تتم من داخل md-about-toolbar
     // زر "حفظ التقرير" تم إلغاؤه؛ الحفظ يتم من داخل كل مجموعة فقرات.
-    $("btn-in-md-print")?.addEventListener("click", async ()=>{
-      // ensure latest content is loaded for current selection
-      if(state.activeCompanyId && state.activeYearId){
-        const y = await getDoc(yearRef(state.activeCompanyId, state.activeYearId));
-        if(y.exists()) await loadDirectorReportIntoSchedules(state.activeCompanyId, y.data() || {});
-      }
-      window.print();
-    });
 
-    function openA4PrintTab(){
-      const companyName = state.activeCompanyName || state.selectedCompanyName || "";
-      const yearId = state.activeYearId || state.selectedYearId || "";
-      const fyEnd = ($("yr-fyEnd")?.value || "").trim();
-      const fyEndTxt = fyEnd ? formatFyEndArabic(fyEnd) : "";
-      const reportNo = ($("yr-reportNo")?.value || "").trim();
-      const reportDate = ($("yr-reportDate")?.value || "").trim();
-      const mdName = ($("yr-mdName")?.value || "").trim();
-      const audName = ($("yr-audName")?.value || "").trim();
-      const audPhone = ($("yr-audPhone")?.value || "").trim();
-      const accountantName = ($("yr-accountantName")?.value || "").trim();
+    function getPrintCoverFields(){
+      return {
+        companyName: state.activeCompanyName || state.selectedCompanyName || "",
+        yearId: state.activeYearId || state.selectedYearId || "",
+        fyEndTxt: ($("yr-fyEnd")?.value || "").trim() ? formatFyEndArabic(($("yr-fyEnd")?.value || "").trim()) : "",
+        reportNo: ($("yr-reportNo")?.value || "").trim(),
+        reportDate: ($("yr-reportDate")?.value || "").trim(),
+        mdName: ($("yr-mdName")?.value || "").trim(),
+        audName: ($("yr-audName")?.value || "").trim(),
+        audPhone: ($("yr-audPhone")?.value || "").trim(),
+        accountantName: ($("yr-accountantName")?.value || "").trim()
+      };
+    }
 
-      const mainStyle = document.querySelector("style")?.innerHTML || "";
-      const printStyle = `
-        @page { size: A4; margin: 12mm; }
+    function buildPrintCoverHtml(f){
+      const esc = (s)=> mdV01SafeText(s);
+      return `
+        <div class="page" data-fs-order="0">
+          <div class="page-label">صفحة الغلاف</div>
+          <div class="aud-hd-main" style="margin-bottom:20px;text-align:center;">
+            <div class="office" contenteditable="false">مكـتب</div>
+            <div class="name" contenteditable="false">${esc(f.audName || "")}</div>
+            <div class="sub" contenteditable="false">محاسب قانوني ومراقب حسابات</div>
+            <div class="sub" contenteditable="false">${f.audName ? `${esc(f.audName)} | CPA & Auditor` : "CPA & Auditor"}</div>
+          </div>
+          <hr class="hr-blue"/>
+          <div class="spacer-lg"></div>
+          <div class="cover-center-box">
+            <div class="doc-title doc-underline" contenteditable="false">${esc(f.companyName || "")}</div>
+            <div class="spacer-lg"></div>
+            <div class="doc-sub2 doc-underline" contenteditable="false">البيانات المالية للسنة المالية المنتهية</div>
+            <div class="doc-sub2 doc-underline" contenteditable="false">${f.fyEndTxt ? `في ${esc(f.fyEndTxt)}` : ""}</div>
+          </div>
+          <div style="position:absolute;bottom:14mm;left:14mm;right:14mm;">
+            <hr class="hr-blue"/>
+            <div class="addr-footer">
+              <div style="display:flex;justify-content:space-between;gap:10px;">
+                <div contenteditable="false">${f.reportNo ? `العدد: <span dir="ltr">${esc(f.reportNo)}</span>` : ""}</div>
+                <div contenteditable="false">${f.reportDate ? `التاريخ: <span dir="ltr">${esc(f.reportDate)}</span>` : ""}</div>
+              </div>
+              <div style="display:flex;justify-content:space-between;gap:10px;margin-top:4px;">
+                <div contenteditable="false">${f.audPhone ? `موبايل: <span dir="ltr">${esc(f.audPhone)}</span>` : ""}</div>
+                <div contenteditable="false">${f.mdName ? `المدير المفوض: ${esc(f.mdName)}` : ""}</div>
+              </div>
+              ${f.accountantName ? `<div contenteditable="false" style="margin-top:4px;">المحاسب: ${esc(f.accountantName)}</div>` : ``}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function getA4PrintableHeightPx(){
+      const probe = document.createElement("div");
+      probe.style.cssText = "position:absolute;visibility:hidden;height:280mm;width:1px;pointer-events:none;";
+      document.body.appendChild(probe);
+      const h = probe.offsetHeight;
+      probe.remove();
+      return h > 0 ? h : 1050;
+    }
+
+    /** يحدد لكل كشف: كتلة واحدة (لا تقسيم) أو تقسيم مع تكرار الرأس إن تجاوز ارتفاع صفحة A4 */
+    function prepareSchedulesForPrint(root){
+      const scope = root || document;
+      const pageH = getA4PrintableHeightPx();
+      scope.querySelectorAll(".card-schedule").forEach((card)=>{
+        card.classList.remove("schedule-keep-whole", "schedule-allow-split");
+        if(card.classList.contains("card-schedule-contracts")){
+          card.classList.add("schedule-allow-split");
+          return;
+        }
+        const measureEl = card.querySelector(".fa-print-wrap") || card.querySelector("[data-body]") || card;
+        const toolbarH = card.querySelector(".schedule-toolbar")?.offsetHeight || 0;
+        const h = measureEl.scrollHeight + toolbarH + 16;
+        if(h > pageH * 0.92){
+          card.classList.add("schedule-allow-split");
+        }else{
+          card.classList.add("schedule-keep-whole");
+        }
+      });
+    }
+
+    function resetSchedulesPrintClasses(root){
+      (root || document).querySelectorAll(".card-schedule").forEach((card)=>{
+        card.classList.remove("schedule-keep-whole", "schedule-allow-split");
+      });
+    }
+
+    function buildPrintPackageInnerHtml(){
+      const coverHtml = buildPrintCoverHtml(getPrintCoverFields());
+      const fsPages = document.querySelector("#in-pages")?.innerHTML || "";
+      const mdPages = document.querySelector("#in-md-preview .pages")?.outerHTML || "";
+      const mdWrap = mdPages ? `<div class="print-md-break">${mdPages}</div>` : "";
+      return `
+        <div class="pages">${coverHtml}</div>
+        <div class="print-fs">${fsPages}</div>
+        ${mdWrap}
+      `;
+    }
+
+    function getPrintTabExtraStyles(){
+      return `
+        @page { size: A4; margin: 9mm 8mm; }
         body{ background:#fff; }
         @media print {
           .no-print-fs{ display:none !important; }
+          .page{
+            padding:8mm 9mm 6mm !important;
+            width:100% !important;
+            max-width:none !important;
+            box-sizing:border-box;
+          }
+          .page.page-tb{ padding:8mm 6mm 6mm !important; }
+          .page.page-stmt-sigs{
+            display:flex;
+            flex-direction:column;
+          }
+          .page.page-stmt-sigs .fin-table{
+            flex:0 1 auto;
+            margin:4px 0 !important;
+          }
+          .page.page-stmt-sigs .fs-balance-sigs{
+            flex:0 0 auto;
+            margin-top:auto !important;
+            padding-top:3mm !important;
+          }
+          .page.page-stmt-sigs .fin-table,
+          .page.page-stmt-sigs .fin-table tbody,
+          .page.page-stmt-sigs .fin-table tr{
+            break-inside:auto !important;
+            page-break-inside:auto !important;
+          }
+          .fs-sigs-screen,
+          .fs-sigs-screen .sig-row,
+          .fs-sigs-screen .sig-box,
+          .md-sig-footer,
+          .md-sig-footer .sig-box{
+            break-inside:avoid !important;
+            page-break-inside:avoid !important;
+          }
+          .fs-sigs-screen,
+          .md-sig-footer{
+            break-before:avoid-page;
+            page-break-before:avoid;
+          }
+          .fs-sigs-screen{ display:none !important; }
+          .fin-table tfoot.fs-sigs-tfoot{
+            display:table-footer-group !important;
+          }
+          .fin-table tfoot.fs-sigs-tfoot td.fs-sigs-tfoot-cell{
+            border:none !important;
+            background:#fff !important;
+            padding:0 !important;
+          }
+          .fin-table tfoot.fs-sigs-tfoot .fs-balance-sigs{
+            margin:0 !important;
+            padding:2mm 0 0 !important;
+            border-top:1px solid rgba(176,196,216,.95);
+            break-inside:avoid !important;
+            page-break-inside:avoid !important;
+          }
+          .fin-table.tb-table tfoot.fs-sigs-tfoot .sig-box{ font-size:8pt !important; }
+          .fin-table.tb-table tfoot.fs-sigs-tfoot .sig-name{ margin-top:3mm !important; }
+          .fin-table tfoot.fs-sigs-tfoot .fs-balance-sig-stack{ gap:3mm !important; }
+          .fs-balance-sigs .fs-balance-sig-stack{ gap:4mm !important; }
+          .fs-balance-sigs{ margin-top:5mm !important; padding-top:3mm !important; }
+          .fs-tb-sigs{ margin-top:4mm !important; padding-top:2mm !important; }
+          .page.page-md-end .md-sig-footer{ margin-top:6mm !important; }
+          .fin-table{ font-size:9pt !important; }
+          .fin-table th, .fin-table td{ padding:3px 5px !important; }
+          .fin-table.tb-table,
+          .fin-table.tb-table tbody{
+            break-inside:auto !important;
+            page-break-inside:auto !important;
+          }
+          .fin-table.tb-table tr{
+            break-inside:avoid !important;
+            page-break-inside:avoid !important;
+          }
+          .fin-table.tb-table thead{ display:table-header-group !important; }
+          .tb-table-wrap{ overflow:visible !important; }
+          .fin-table.tb-table{ min-width:0 !important; width:100% !important; }
+          thead{ display:table-header-group; }
+          tfoot{ display:table-footer-group; }
         }
-        /* hide app UI + all toolbars/buttons/inputs in print tab */
         .overlay, .modal, nav, header{ display:none !important; }
         button, input, select, textarea{ display:none !important; }
         .actions, .msg, .md-about-toolbar{ display:none !important; }
         .tb-btn, .linkbtn{ display:none !important; }
-        /* hide helper/migration hints in print */
         .hint{ display:none !important; }
-        /* show schedule titles but hide their buttons */
         .schedule-toolbar{ display:flex !important; align-items:center; gap:8px; margin:0 0 6mm; }
         .schedule-toolbar button{ display:none !important; }
         .schedule-toolbar .hint{ display:none !important; }
-        /* show content containers */
         .card{
           display:block !important;
           border:none !important;
@@ -7976,38 +8638,42 @@
           break-inside: avoid-page;
           page-break-inside: avoid;
         }
-        .pages{ width:auto; margin:0; }
-        .page{ box-shadow:none; border:none; margin:0 auto; }
-        .page{ page-break-after: always; }
-        /* prevent splitting tables across pages; move to next page if needed */
-        table, thead, tbody, tr, td, th{
-          break-inside: avoid;
-          page-break-inside: avoid;
+        .card-schedule.schedule-keep-whole,
+        .card-schedule.schedule-keep-whole [data-body],
+        .card-schedule.schedule-keep-whole .fa-print-wrap{
+          break-inside:avoid-page !important;
+          page-break-inside:avoid !important;
         }
-        table{ break-inside: avoid-page; page-break-inside: avoid; }
-        /* ميزان المراجعة: جدول طويل — يُقسَّم بين الصفحات مع تكرار الرأس */
-        .fin-table.tb-table,
-        .fin-table.tb-table tbody{
-          break-inside: auto !important;
-          page-break-inside: auto !important;
+        .card-schedule.schedule-allow-split,
+        .card-schedule.schedule-allow-split [data-body],
+        .card-schedule.schedule-allow-split .fa-print-wrap{
+          break-inside:auto !important;
+          page-break-inside:auto !important;
         }
-        .fin-table.tb-table tr{
-          break-inside: avoid !important;
-          page-break-inside: avoid !important;
+        .card-schedule.schedule-allow-split .fin-table thead,
+        .card-schedule.schedule-allow-split .fa-schedule-table thead,
+        .card-schedule.schedule-allow-split .con-table thead{
+          display:table-header-group !important;
         }
-        .fin-table.tb-table thead{ display:table-header-group !important; }
-        .tb-table-wrap{ overflow:visible !important; }
-        .fin-table.tb-table{
-          min-width:0 !important;
+        .card-schedule-fa .fa-col-name{ display:block !important; font-size:7pt !important; }
+        .card-schedule-fa .fa-summary{ display:block !important; font-size:8pt !important; }
+        .card-schedule-contracts .con-table{
           width:100% !important;
+          min-width:0 !important;
+          table-layout:fixed;
+          font-size:6.5pt !important;
+          break-inside:auto !important;
+          page-break-inside:auto !important;
         }
-        .page.page-tb{
-          padding:10mm 7mm 8mm !important;
-        }
+        .card-schedule-contracts .con-table thead{ display:table-header-group !important; }
+        .card-schedule-contracts .con-table th{ font-size:6pt !important; padding:2px 2px !important; }
+        .card-schedule-contracts .con-table td{ font-size:6.5pt !important; padding:2px 2px !important; word-wrap:break-word; }
+        .card-schedule-contracts .con-table tr{ break-inside:avoid !important; page-break-inside:avoid !important; }
+        .contracts-meta-screen{ display:none !important; }
+        .contracts-meta-print{ display:block !important; }
+        .pages{ width:auto; margin:0; }
+        .page{ box-shadow:none; border:none; margin:0 auto; page-break-after: always; }
         .page-label{ display:none !important; }
-        thead{ display: table-header-group; }
-        tfoot{ display: table-footer-group; }
-        /* cover page helpers (0.0.1-like) */
         .cover-center-box{
           border:2px solid var(--border);
           border-radius:12px;
@@ -8016,47 +8682,71 @@
           margin:30px auto;
           text-align:center;
         }
+        .print-md-break{ page-break-before:always; break-before:page; }
       `;
+    }
 
-      const coverHtml = `
-        <div class="page" data-fs-order="0">
-          <div class="page-label">صفحة الغلاف</div>
-          <div class="aud-hd-main" style="margin-bottom:20px;text-align:center;">
-            <div class="office" contenteditable="false">مكـتب</div>
-            <div class="name" contenteditable="false">${mdV01SafeText(audName || "")}</div>
-            <div class="sub" contenteditable="false">محاسب قانوني ومراقب حسابات</div>
-            <div class="sub" contenteditable="false">${audName ? `${mdV01SafeText(audName)} | CPA & Auditor` : "CPA & Auditor"}</div>
-          </div>
-          <hr class="hr-blue"/>
-          <div class="spacer-lg"></div>
+    async function ensurePrintYearContentLoaded(){
+      if(!state.activeCompanyId || !state.activeYearId){
+        throw new Error("اختر شركة وسنة من قسم الكشوفات أولاً.");
+      }
+      const y = await getDoc(yearRef(state.activeCompanyId, state.activeYearId));
+      if(!y.exists()) throw new Error("تعذر تحميل وثيقة السنة.");
+      await loadDirectorReportIntoSchedules(state.activeCompanyId, y.data() || {});
+    }
 
-          <div class="cover-center-box">
-            <div class="doc-title doc-underline" contenteditable="false">${mdV01SafeText(companyName || "")}</div>
-            <div class="spacer-lg"></div>
-            <div class="doc-sub2 doc-underline" contenteditable="false">البيانات المالية للسنة المالية المنتهية</div>
-            <div class="doc-sub2 doc-underline" contenteditable="false">${fyEndTxt ? `في ${mdV01SafeText(fyEndTxt)}` : ""}</div>
-          </div>
+    async function runInPlacePrintPdf(){
+      try{
+        await ensurePrintYearContentLoaded();
+        const host = $("print-package-host");
+        if(!host) throw new Error("حاوية الطباعة غير متوفرة.");
+        const inPages = $("in-pages");
+        if(!inPages?.innerHTML?.trim()){
+          throw new Error("لا توجد صفحات كشوفات للطباعة. افتح سنة وشركة أولاً.");
+        }
+        prepareSchedulesForPrint(inPages);
+        const inner = buildPrintPackageInnerHtml();
+        resetSchedulesPrintClasses(inPages);
+        host.innerHTML = inner;
+        host.setAttribute("aria-hidden", "false");
+        document.body.classList.add("print-pdf-mode");
+        const cleanup = ()=>{
+          document.body.classList.remove("print-pdf-mode");
+          host.innerHTML = "";
+          host.setAttribute("aria-hidden", "true");
+        };
+        window.addEventListener("afterprint", cleanup, { once: true });
+        setTimeout(()=> window.print(), 150);
+      }catch(e){
+        document.body.classList.remove("print-pdf-mode");
+        const host = $("print-package-host");
+        if(host){
+          host.innerHTML = "";
+          host.setAttribute("aria-hidden", "true");
+        }
+        alert(e?.message || String(e));
+      }
+    }
 
-          <div style="position:absolute;bottom:14mm;left:14mm;right:14mm;">
-            <hr class="hr-blue"/>
-            <div class="addr-footer">
-              <div style="display:flex;justify-content:space-between;gap:10px;">
-                <div contenteditable="false">${reportNo ? `العدد: <span dir="ltr">${mdV01SafeText(reportNo)}</span>` : ""}</div>
-                <div contenteditable="false">${reportDate ? `التاريخ: <span dir="ltr">${mdV01SafeText(reportDate)}</span>` : ""}</div>
-              </div>
-              <div style="display:flex;justify-content:space-between;gap:10px;margin-top:4px;">
-                <div contenteditable="false">${audPhone ? `موبايل: <span dir="ltr">${mdV01SafeText(audPhone)}</span>` : ""}</div>
-                <div contenteditable="false">${mdName ? `المدير المفوض: ${mdV01SafeText(mdName)}` : ""}</div>
-              </div>
-              ${accountantName ? `<div contenteditable="false" style="margin-top:4px;">المحاسب: ${mdV01SafeText(accountantName)}</div>` : ``}
-            </div>
-          </div>
-        </div>
-      `;
+    const onPrintPdf = ()=> void runInPlacePrintPdf();
+    const onPrintTab = async ()=>{
+      try{
+        await ensurePrintYearContentLoaded();
+        openA4PrintTab();
+      }catch(e){
+        alert(e?.message || String(e));
+      }
+    };
+    ["btn-in-md-print","btn-top-print","btn-pages-print"].forEach((id)=> $(id)?.addEventListener("click", onPrintPdf));
+    ["btn-in-md-print-tab","btn-top-print-tab","btn-pages-print-tab"].forEach((id)=> $(id)?.addEventListener("click", ()=> void onPrintTab()));
 
-      const fsPages = document.querySelector("#in-pages")?.innerHTML || "";
-      const mdPages = document.querySelector("#in-md-preview .pages")?.outerHTML || "";
-      const mdWrap = mdPages ? `<div style="page-break-before:always"></div>${mdPages}` : "";
+    function openA4PrintTab(){
+      const mainStyle = document.querySelector("style")?.innerHTML || "";
+      const printStyle = getPrintTabExtraStyles();
+      const inPages = document.querySelector("#in-pages");
+      if(inPages) prepareSchedulesForPrint(inPages);
+      const bodyContent = buildPrintPackageInnerHtml();
+      if(inPages) resetSchedulesPrintClasses(inPages);
       const html = `<!doctype html>
 <html dir="rtl" lang="ar">
 <head>
@@ -8066,11 +8756,7 @@
   <style>${mainStyle}\n${printStyle}</style>
 </head>
 <body>
-  <div class="pages">
-    ${coverHtml}
-  </div>
-  <div id="print-fs">${fsPages}</div>
-  ${mdWrap}
+  ${bodyContent}
   <script>
     window.addEventListener('load', () => { setTimeout(() => window.print(), 250); });
   <\/script>
@@ -8084,14 +8770,7 @@
       w.document.close();
     }
 
-    $("btn-in-md-print-tab")?.addEventListener("click", async ()=>{
-      // ensure latest MD report for current selection
-      if(state.activeCompanyId && state.activeYearId){
-        const y = await getDoc(yearRef(state.activeCompanyId, state.activeYearId));
-        if(y.exists()) await loadDirectorReportIntoSchedules(state.activeCompanyId, y.data() || {});
-      }
-      openA4PrintTab();
-    });
+
 
     $("yr-pick-accountant")?.addEventListener("change", ()=>{
       const sel = $("yr-pick-accountant");
@@ -8600,5 +9279,6 @@
       }
     });
   </script>
+  <div id="print-package-host" aria-hidden="true"></div>
 </body>
 </html>
