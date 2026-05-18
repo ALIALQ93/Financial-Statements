@@ -351,15 +351,33 @@
     .page-label{font-size:8pt;color:#aaa;margin-bottom:8px;font-style:italic;}
     .tech-header{
       display:flex;
-      justify-content:space-between;
-      align-items:center;
+      align-items:stretch;
+      width:100%;
       border-bottom:2px solid var(--blue);
       margin-bottom:12px;
       padding-bottom:8px;
     }
-    .tech-name{font-size:12pt;font-weight:900;color:var(--navy);text-align:right;}
-    .tech-name-en{font-size:9pt;color:var(--muted);text-align:right;}
-    .tech-hd-right{display:flex;flex-direction:column;gap:2px;align-items:flex-end;text-align:right;}
+    .tech-hd-right{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      align-items:stretch;
+      width:100%;
+      min-width:0;
+      text-align:right;
+    }
+    .tech-name,
+    .tech-name-en,
+    .tech-hd-meta{
+      width:100%;
+      max-width:100%;
+      white-space:normal;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+      line-height:1.35;
+    }
+    .tech-name{font-size:12pt;font-weight:900;color:var(--navy);}
+    .tech-name-en{font-size:9pt;color:var(--muted);}
     .tech-hd-meta{font-size:9pt;color:var(--muted);}
 
     .md-about-toolbar{
