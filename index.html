@@ -357,14 +357,6 @@
       margin-bottom:12px;
       padding-bottom:8px;
     }
-    .tech-logo{display:flex;align-items:center;gap:8px;}
-    .tech-logo-box{
-      width:50px;height:50px;border-radius:8px;
-      background:linear-gradient(135deg,#0a5c8a,#1a8cc0);
-      display:flex;align-items:center;justify-content:center;
-      color:#fff;font-weight:900;font-size:10pt;text-align:center;line-height:1.1;
-      flex:0 0 auto;
-    }
     .tech-name{font-size:12pt;font-weight:900;color:var(--navy);text-align:right;}
     .tech-name-en{font-size:9pt;color:var(--muted);text-align:right;}
     .tech-hd-right{display:flex;flex-direction:column;gap:2px;align-items:flex-end;text-align:right;}
@@ -3871,9 +3863,6 @@
             <div class="tech-hd-meta" contenteditable="false">${mdV01SafeText(ctx.companyEmail || "")}${ctx.companyPhone ? (" | " + mdV01SafeText(ctx.companyPhone)) : ""}</div>
             <div class="tech-hd-meta" contenteditable="false">${mdV01SafeText(ctx.companyAddress || ctx.hqAddress || "")}</div>
           </div>
-          <div class="tech-logo">
-            <div class="tech-logo-box">4<br/>TECH<br/>IRAQ</div>
-          </div>
         </div>
         <div class="doc-heading centered" contenteditable="false">الموضوع/ تقرير المدير المفوض السنوي في <span class="fin-bind-md-topic-date">${mdV01SafeText(ctx.fyEndDate_greg || "")}</span></div>
         <div class="doc-body" contenteditable="false">استناداً الى قانون الشركات رقم ( 21 ) لسنة 1997 المعدل وتنفيذا لأحكام المواد (117 و 134) منه ، وعملا بأحكام الفصل الثالث من تعليمات النظام المحاسبي الموحد للشركات رقم ( 1 ) لسنة 1998 ، يتقدم المدير المفوض للشركة بتقريره السنوي موضحا فيه مسيرة الشركة خلال السنة المالية المنتهية في <span class="fin-bind-fy-end-date">${mdV01SafeText(ctx.fyEndDate_greg || "")}</span>.</div>
@@ -4221,9 +4210,6 @@
             <div class="tech-name-en" contenteditable="false">${mdV01SafeText(ctx.companyNameEn || "")}</div>
             <div class="tech-hd-meta" contenteditable="false">${mdV01SafeText(ctx.companyEmail || "")}${ctx.companyPhone ? (" | " + mdV01SafeText(ctx.companyPhone)) : ""}</div>
             <div class="tech-hd-meta" contenteditable="false">${mdV01SafeText(ctx.companyAddress || ctx.hqAddress || "")}</div>
-          </div>
-          <div class="tech-logo">
-            <div class="tech-logo-box">4<br/>TECH<br/>IRAQ</div>
           </div>
         </div>
         <div class="doc-heading" contenteditable="false">ثالثا: ندرج في ادناه أسماء المساهمين و مقدار مساهمتهم  برأسمال الشركة و كما يلي :</div>
@@ -6219,26 +6205,19 @@
     function buildFsStmtSigRowHtml(meta){
       const m = meta || {};
       return `
-              <div class="sig-row" style="margin-top:0;text-align:center;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+              <div class="sig-row" style="margin-top:0;text-align:center;display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:520px;margin-inline:auto;">
                 <div class="sig-box" style="font-size:9.5pt;padding:5px;">
                   <div class="sig-title" contenteditable="false">المحاسب</div>
                   <div contenteditable="false">${escHtml(m.accountantName || "")}</div>
                   <div class="sig-name">_______________</div>
                 </div>
-                <div></div>
-                <div class="fs-balance-sig-stack">
-                  <div class="sig-box" style="font-size:9.5pt;padding:5px;">
-                    <div class="sig-title" contenteditable="false">المدير المفوض</div>
-                    <div contenteditable="false">${escHtml(m.mdName || "")}</div>
-                    <div class="sig-name">_______________</div>
-                  </div>
-                  <div class="sig-box" style="font-size:9.5pt;padding:5px;">
-                    <div class="sig-title" contenteditable="false">مراقب الحسابات</div>
-                    <div contenteditable="false">${escHtml(m.auditorNameAr || "")}</div>
-                    <div class="sig-name">_______________</div>
-                  </div>
+                <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+                  <div class="sig-title" contenteditable="false">المدير المفوض</div>
+                  <div contenteditable="false">${escHtml(m.mdName || "")}</div>
+                  <div class="sig-name">_______________</div>
                 </div>
-              </div>`;
+              </div>
+      `;
     }
     function buildFsStmtSigsScreenHtml(meta){
       return `<div class="fs-balance-sigs fs-sigs-screen">${buildFsStmtSigRowHtml(meta)}</div>`;
