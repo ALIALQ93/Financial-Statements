@@ -274,7 +274,8 @@
       line-height:1.9;
     }
     .doc-ol li{margin:2px 0}
-    .pages{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:12px;}
+    .pages{display:flex;flex-direction:column;align-items:stretch;gap:18px;margin-top:12px;}
+    .pages > .page{align-self:center;width:min(210mm,100%);}
     .pages > .page[data-fs-order="1"]{order:1;}
     .pages > .page[data-fs-order="2"]{order:2;}
     .pages > .page[data-fs-order="3"]{order:3;}
@@ -3876,7 +3877,7 @@
         <div class="page-label">تقرير المدير المفوض – ١</div>
         <div class="tech-header">
           <div class="tech-hd-right">
-            <div class="tech-name" contenteditable="false">${mdV01SafeText(ctx.companyShortAr || ctx.companyName || "")}</div>
+            <div class="tech-name" contenteditable="false">${mdV01SafeText(ctx.companyName || "")}</div>
             <div class="tech-name-en" contenteditable="false">${mdV01SafeText(ctx.companyNameEn || "")}</div>
             <div class="tech-hd-meta" contenteditable="false">${mdV01SafeText(ctx.companyEmail || "")}${ctx.companyPhone ? (" | " + mdV01SafeText(ctx.companyPhone)) : ""}</div>
             <div class="tech-hd-meta" contenteditable="false">${mdV01SafeText(ctx.companyAddress || ctx.hqAddress || "")}</div>
@@ -4224,7 +4225,7 @@
         <div class="page-label">تقرير المدير المفوض – ٢</div>
         <div class="tech-header">
           <div class="tech-hd-right">
-            <div class="tech-name" contenteditable="false">${mdV01SafeText(ctx.companyShortAr || ctx.companyName || "")}</div>
+            <div class="tech-name" contenteditable="false">${mdV01SafeText(ctx.companyName || "")}</div>
             <div class="tech-name-en" contenteditable="false">${mdV01SafeText(ctx.companyNameEn || "")}</div>
             <div class="tech-hd-meta" contenteditable="false">${mdV01SafeText(ctx.companyEmail || "")}${ctx.companyPhone ? (" | " + mdV01SafeText(ctx.companyPhone)) : ""}</div>
             <div class="tech-hd-meta" contenteditable="false">${mdV01SafeText(ctx.companyAddress || ctx.hqAddress || "")}</div>
@@ -4929,7 +4930,6 @@
         const ctx = {
           ...ctx0,
           companyNameEn: String(companyDoc?.legalNameEn || ""),
-          companyShortAr: String(companyDoc?.legalName || ctx0.companyName || "").slice(0, 42),
           companyEmail: String(companyDoc?.companyEmail || ""),
           companyPhone: String(companyDoc?.companyPhone || ""),
           companyAddress: String(companyDoc?.companyAddress || ctx0.hqAddress || ""),
@@ -5117,7 +5117,6 @@
       const ctx = {
         ...ctx0,
         companyNameEn: String(companyDoc?.legalNameEn || ""),
-        companyShortAr: String(companyDoc?.legalName || ctx0.companyName || "").slice(0, 42),
         companyEmail: String(companyDoc?.companyEmail || ""),
         companyPhone: String(companyDoc?.companyPhone || ""),
         companyAddress: String(companyDoc?.companyAddress || ctx0.hqAddress || ""),
