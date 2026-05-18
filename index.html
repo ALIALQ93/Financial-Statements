@@ -381,6 +381,33 @@
     .tech-name-en{font-size:9pt;color:var(--muted);}
     .tech-hd-meta{font-size:9pt;color:var(--muted);}
 
+    .md-sig-footer{
+      margin-top:8px;
+      display:flex;
+      justify-content:flex-end;
+      text-align:right;
+    }
+    .md-sig-footer .sig-box{
+      font-size:9.5pt;
+      padding:5px;
+      min-width:200px;
+    }
+    .page.page-md{
+      position:relative;
+      padding-bottom:14mm;
+    }
+    .md-page-num{
+      position:absolute;
+      bottom:5mm;
+      left:0;
+      right:0;
+      text-align:center;
+      font-size:9pt;
+      color:var(--muted);
+      pointer-events:none;
+      user-select:none;
+    }
+
     .md-about-toolbar{
       display:flex;
       flex-wrap:wrap;
@@ -951,6 +978,10 @@
       .page.page-md-end .md-sig-footer{
         margin-top:6mm !important;
       }
+      .page.page-md .md-page-num{
+        display:block !important;
+        bottom:4mm !important;
+      }
       .fin-table{ font-size:9pt !important; }
       .fin-table th,
       .fin-table td{ padding:3px 5px !important; }
@@ -1129,6 +1160,10 @@
       }
       body.print-pdf-mode #print-package-host .page.page-md-end .md-sig-footer{
         margin-top:6mm !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-md .md-page-num{
+        display:block !important;
+        bottom:4mm !important;
       }
       body.print-pdf-mode #print-package-host thead{
         display:table-header-group;
@@ -3852,6 +3887,22 @@
       m.closingText = (el.textContent || "").trim();
     }
 
+    function mdApplyMdPageNumbers(pagesRoot){
+      if(!pagesRoot) return;
+      const list = Array.from(pagesRoot.querySelectorAll(":scope > .page.page-md"));
+      const total = list.length;
+      list.forEach((pageEl, idx)=>{
+        let num = pageEl.querySelector(".md-page-num");
+        if(!num){
+          num = document.createElement("div");
+          num.className = "md-page-num";
+          num.contentEditable = "false";
+          pageEl.appendChild(num);
+        }
+        num.textContent = `صفحة ${toArabicIndicDigits(idx + 1)} من ${toArabicIndicDigits(total)}`;
+      });
+    }
+
     function mdRenderPreviewV01(ctx, hostId="rep-md-preview"){
       const host = $(hostId);
       if(!host) return;
@@ -3871,7 +3922,7 @@
       pages.className = "pages";
 
       const page1 = document.createElement("div");
-      page1.className = "page";
+      page1.className = "page page-md";
       page1.dataset.fsOrder = "1";
       page1.innerHTML = `
         <div class="page-label">تقرير المدير المفوض – ١</div>
@@ -4219,7 +4270,7 @@
       mdV01SyncActivityToolbar(page1);
 
       const page2 = document.createElement("div");
-      page2.className = "page page-md-end";
+      page2.className = "page page-md page-md-end";
       page2.dataset.fsOrder = "2";
       page2.innerHTML = `
         <div class="page-label">تقرير المدير المفوض – ٢</div>
@@ -4285,14 +4336,8 @@
         </div>
         <div class="doc-body doc-bold doc-underline" contenteditable="false"><span id="md-closing-text" contenteditable="false">${mdV01SafeText(mdApplyTemplate(m.closingText || "", ctx) || "")}</span></div>
         <div class="doc-body centered" contenteditable="false">ـــــــــ مع التقدير ـــــــــ</div>
-        <div class="sig-row md-sig-footer" style="margin-top:8px;text-align:center;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-          <div class="sig-box" style="font-size:9.5pt;padding:5px;">
-            <div class="sig-title" contenteditable="false">${mdV01SafeText(ctx.audName || "")}</div>
-            <div contenteditable="false" style="font-size:9pt;">${mdV01SafeText(ctx.audTitleAr || "محاسب قانوني ومراقب حسابات")}</div>
-            <div class="sig-name">_______________</div>
-          </div>
-          <div></div>
-          <div class="sig-box" style="font-size:9.5pt;padding:5px;">
+        <div class="sig-row md-sig-footer">
+          <div class="sig-box">
             <div class="sig-title" contenteditable="false">المدير المفوض</div>
             <div contenteditable="false">${mdV01SafeText(ctx.mdName || "")}</div>
             <div class="sig-name">_______________</div>
@@ -4302,6 +4347,7 @@
 
       pages.appendChild(page1);
       pages.appendChild(page2);
+      mdApplyMdPageNumbers(pages);
       host.appendChild(pages);
 
       // fill shareholders table + handlers (page2)
@@ -8599,6 +8645,10 @@
           .fs-balance-sigs{ margin-top:5mm !important; padding-top:3mm !important; }
           .fs-tb-sigs{ margin-top:4mm !important; padding-top:2mm !important; }
           .page.page-md-end .md-sig-footer{ margin-top:6mm !important; }
+          .page.page-md .md-page-num{
+            display:block !important;
+            bottom:4mm !important;
+          }
           .fin-table{ font-size:9pt !important; }
           .fin-table th, .fin-table td{ padding:3px 5px !important; }
           .fin-table.tb-table,
