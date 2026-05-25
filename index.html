@@ -2221,6 +2221,12 @@
         .replace(/[\u2212]/g, "-");                 // minus sign
       return w.trim();
     }
+    const FMT_AMOUNT_OPTS = { minimumFractionDigits: 0, maximumFractionDigits: 0 };
+    function fmtAmount(v){
+      const n0 = Number(v ?? 0);
+      if(!Number.isFinite(n0)) return "-";
+      return Math.round(n0).toLocaleString("en-US", FMT_AMOUNT_OPTS);
+    }
     function plainPaste(ev, text){
       try{
         ev.preventDefault();
@@ -3362,9 +3368,7 @@
     }
 
     function fmtIqd(v){
-      const n0 = Number(v||0);
-      if(!Number.isFinite(n0)) return \"-\";
-      return n0.toLocaleString(\"en-US\");
+      return fmtAmount(v);
     }
 
     function computeEquityCapitalClosingFromYearDoc(yearDoc){
@@ -3452,9 +3456,7 @@
     }
 
     function mdFmtIqd(v){
-      const n0 = Number(v || 0);
-      if(!Number.isFinite(n0)) return "-";
-      return n0.toLocaleString("en-US");
+      return fmtAmount(v);
     }
 
     function mdEquityCapitalClosing(yearDoc){
@@ -6324,8 +6326,8 @@
         if(!s) return 0;
         return Number(normalizeNumberString(s)) || 0;
       };
-      // Force English digits for numeric fields
-      const fmt = (x)=> (Number(x||0)).toLocaleString("en-US");
+      // Force English digits for numeric fields (whole amounts, no decimals)
+      const fmt = fmtAmount;
       const sumVertical = (schId)=>{
         const rows = (dataById?.[schId]?.rows) || [];
         return rows.reduce((acc,r)=>({ cy: acc.cy + n(r?.cy), py: acc.py + n(r?.py) }), { cy:0, py:0 });
@@ -7639,11 +7641,12 @@
                 if(!editing){
                   if(r.k === "ratePct"){
                     const vv = String(val||"").trim();
-                    const shown = vv ? `${n(vv)}%` : "";
+                    const shown = vv ? `${Math.round(n(vv))}%` : "";
                     return `<td dir="ltr" class="amount-col">${shown}</td>`;
                   }
                   total += n(val);
-                  return `<td dir="ltr" class="amount-col">${String(val||"")}</td>`;
+                  const raw = String(val||"").trim();
+                  return `<td dir="ltr" class="amount-col">${raw ? fmt(n(val)) : ""}</td>`;
                 }
                 if(r.k === "ratePct"){
                   const shown = String(val||"").trim() ? `${n(val)}%` : "";
@@ -8069,7 +8072,6 @@
               return Number.isFinite(v) && v > 0 ? v : 0;
             };
             const rGlobal = getRate();
-            const fmtUsd = (x)=> (Number(x||0)).toLocaleString("en-US", { maximumFractionDigits: 2 });
             const cellAmt = (raw, computed)=>{
               if(editing) return String(raw ?? "");
               const t = String(raw ?? "").trim();
@@ -8084,9 +8086,9 @@
               const t = String(raw ?? "").trim();
               if(t){
                 const v = Number(normalizeNumberString(t));
-                return Number.isFinite(v) ? fmtUsd(v) : t;
+                return Number.isFinite(v) ? fmtAmount(v) : t;
               }
-              return computed ? fmtUsd(computed) : "";
+              return computed ? fmtAmount(computed) : "";
             };
 
             const compute = (r)=>{
@@ -8115,7 +8117,7 @@
                 <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="revUsd">${cellUsd(r.revUsd, c.revUsd)}</td>
                 <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="revIqd">${cellAmt(r.revIqd, c.revIqd)}</td>
                 <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="prevCumIqd">${cellAmt(r.prevCumIqd, c.prevCumIqd)}</td>
-                <td class="num-col" dir="ltr">${c.contractIqd ? `${(c.completion*100).toFixed(1)}%` : "-"}</td>
+                <td class="num-col" dir="ltr">${c.contractIqd ? `${Math.round(c.completion * 100)}%` : "-"}</td>
                 <td class="amount-col" dir="ltr" contenteditable="${editing}" data-i="${idx}" data-k="expensesIqd">${cellAmt(r.expensesIqd, c.expensesIqd)}</td>
               `;
               tb.appendChild(tr);
@@ -8130,9 +8132,9 @@
             trTot.className = "row-total";
             trTot.innerHTML = `
               <td style="font-weight:700">المجموع</td>
-              <td class="amount-col" dir="ltr" style="font-weight:700">${sumRevUsd ? fmtUsd(sumRevUsd) : "-"}</td>
+              <td class="amount-col" dir="ltr" style="font-weight:700">${sumRevUsd ? fmtAmount(sumRevUsd) : "-"}</td>
               <td class="amount-col" dir="ltr" style="font-weight:700">-</td>
-              <td class="amount-col" dir="ltr" style="font-weight:700">${sumRevUsd ? fmtUsd(sumRevUsd) : "-"}</td>
+              <td class="amount-col" dir="ltr" style="font-weight:700">${sumRevUsd ? fmtAmount(sumRevUsd) : "-"}</td>
               <td class="amount-col" dir="ltr" style="font-weight:700">${fmt(sumRevIqd)}</td>
               <td class="amount-col" dir="ltr" style="font-weight:700">${fmt(sumPrev)}</td>
               <td class="num-col" dir="ltr" style="font-weight:700">-</td>
@@ -8234,7 +8236,7 @@
                   // numeric: keep english format
                   const raw = clip.trim();
                   if(!raw){ plainPaste(ev, ""); rows[i][k] = ""; return; }
-                  const formatted = (k === "contractUsd" || k === "revUsd") ? String(Number(normalizeNumberString(raw)) || "") : fmt(n(raw));
+                  const formatted = fmtAmount(n(raw));
                   plainPaste(ev, formatted);
                   rows[i][k] = formatted;
                 });
@@ -8249,8 +8251,8 @@
                   const i = Number(cell.getAttribute("data-i"));
                   const raw = String(cell.textContent||"").trim();
                   if(k === "contractUsd" || k === "revUsd"){
-                    const num = raw ? (Number(normalizeNumberString(raw)) || 0) : 0;
-                    const out = raw ? num.toString() : "";
+                    if(!raw){ rows[i][k] = ""; renderContracts(); return; }
+                    const out = fmtAmount(n(raw));
                     cell.textContent = out;
                     rows[i][k] = out;
                     renderContracts();
