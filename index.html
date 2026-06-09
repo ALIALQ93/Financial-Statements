@@ -771,12 +771,41 @@
     .fin-table.tb-table col.tb-col-code{width:6.5%;}
     .fin-table.tb-table col.tb-col-name{width:17%;}
     .fin-table.tb-table col.tb-col-amt{width:11.5%;}
+    /* حدود أقسام الميزان: إطار خارجي واضح — بدون خط غامق بين مدين/دائن
+       (حدود فيزيائية لأن خلايا المبالغ dir=ltr تعكس inline-start/end) */
     .fin-table.tb-table th.tb-section{
-      border-bottom:1px solid var(--border);
+      border-bottom:1px solid var(--fin-table-border);
+      font-weight:700;
     }
-    .fin-table.tb-table th.tb-section-start,
-    .fin-table.tb-table td.tb-section-start{
-      border-inline-start:2px solid var(--navy);
+    .fin-table.tb-table th.tb-section.tb-sec-op{
+      background:var(--surface-container);
+    }
+    .fin-table.tb-table td.tb-sec-op,
+    .fin-table.tb-table thead tr.tb-head-sub th.tb-sec-op{
+      background:var(--surface-container);
+    }
+    .fin-table.tb-table tbody tr:nth-child(even) td.tb-sec-op{
+      background:var(--surface-container);
+    }
+    .fin-table.tb-table tbody tr:hover td.tb-sec-op{
+      background:var(--surface-hover);
+    }
+    .fin-table.tb-table .row-total td.tb-sec-op{
+      background:var(--surface-container-low)!important;
+    }
+    .fin-table.tb-table .tb-sec-debit{
+      border-right:2px solid var(--navy)!important;
+      border-left:1px solid var(--border)!important;
+    }
+    .fin-table.tb-table .tb-sec-credit{
+      border-right:1px solid var(--border)!important;
+      border-left:2px solid var(--navy)!important;
+    }
+    .fin-table.tb-table thead tr.tb-head-group th.tb-sec-op,
+    .fin-table.tb-table thead tr.tb-head-group th.tb-sec-mv,
+    .fin-table.tb-table thead tr.tb-head-group th.tb-sec-cl{
+      border-right:2px solid var(--navy);
+      border-left:2px solid var(--navy);
     }
     .fin-table.tb-table tbody tr:nth-child(even) td{
       background:var(--surface);
@@ -1277,6 +1306,33 @@
       .fin-table.tb-table thead tr.tb-head-sub th{
         background:#e5e8eb !important;
         color:#1a3a5c !important;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+      }
+      .fin-table.tb-table .tb-sec-debit{
+        border-right:2px solid #1a3a5c !important;
+        border-left:1px solid #c3c6cf !important;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+      }
+      .fin-table.tb-table .tb-sec-credit{
+        border-right:1px solid #c3c6cf !important;
+        border-left:2px solid #1a3a5c !important;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+      }
+      .fin-table.tb-table thead tr.tb-head-group th.tb-sec-op,
+      .fin-table.tb-table thead tr.tb-head-group th.tb-sec-mv,
+      .fin-table.tb-table thead tr.tb-head-group th.tb-sec-cl{
+        border-right:2px solid #1a3a5c !important;
+        border-left:2px solid #1a3a5c !important;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+      }
+      .fin-table.tb-table th.tb-section.tb-sec-op,
+      .fin-table.tb-table td.tb-sec-op,
+      .fin-table.tb-table thead tr.tb-head-sub th.tb-sec-op{
+        background:#ebeef1 !important;
         -webkit-print-color-adjust:exact;
         print-color-adjust:exact;
       }
@@ -7132,22 +7188,22 @@
                   <td class="num-col tb-td-sch" dir="ltr" contenteditable="false">${escHtml(toWesternDigits(String(r.scheduleNo ?? "")))}</td>
                   <td class="num-col tb-td-code" dir="ltr" contenteditable="false">${escHtml(toWesternDigits(String(r.acctCode || "")))}</td>
                   <td class="tb-td-name" contenteditable="false">${escHtml(r.acctName || "")}</td>
-                  <td class="amount-col tb-section-start" dir="ltr" contenteditable="false">${tbFmtDrCr(r.opDebit)}</td>
-                  <td class="amount-col" dir="ltr" contenteditable="false">${tbFmtDrCr(r.opCredit)}</td>
-                  <td class="amount-col tb-section-start" dir="ltr" contenteditable="false">${tbFmtDrCr(r.mvDebit)}</td>
-                  <td class="amount-col" dir="ltr" contenteditable="false">${tbFmtDrCr(r.mvCredit)}</td>
-                  <td class="amount-col tb-section-start" dir="ltr" contenteditable="false">${tbFmtDrCr(r.clDebit)}</td>
-                  <td class="amount-col" dir="ltr" contenteditable="false">${tbFmtDrCr(r.clCredit)}</td>
+                  <td class="amount-col tb-sec-op tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.opDebit)}</td>
+                  <td class="amount-col tb-sec-op tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.opCredit)}</td>
+                  <td class="amount-col tb-sec-mv tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.mvDebit)}</td>
+                  <td class="amount-col tb-sec-mv tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.mvCredit)}</td>
+                  <td class="amount-col tb-sec-cl tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.clDebit)}</td>
+                  <td class="amount-col tb-sec-cl tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.clCredit)}</td>
                 </tr>`).join("") : `<tr><td colspan="9" class="hint" contenteditable="false">${emptyMsg}</td></tr>`;
       const tbBuildTotalRow = (totals)=> `
                 <tr class="row-total">
                   <td colspan="3" class="tb-td-name" contenteditable="false" style="font-weight:700;text-align:center">المجموع</td>
-                  <td class="amount-col tb-section-start" dir="ltr" contenteditable="false">${tbFmtAmt(totals.opDebit, { total:true })}</td>
-                  <td class="amount-col" dir="ltr" contenteditable="false">${tbFmtAmt(totals.opCredit, { total:true })}</td>
-                  <td class="amount-col tb-section-start" dir="ltr" contenteditable="false">${tbFmtAmt(totals.mvDebit, { total:true })}</td>
-                  <td class="amount-col" dir="ltr" contenteditable="false">${tbFmtAmt(totals.mvCredit, { total:true })}</td>
-                  <td class="amount-col tb-section-start" dir="ltr" contenteditable="false">${tbFmtAmt(totals.clDebit, { total:true })}</td>
-                  <td class="amount-col" dir="ltr" contenteditable="false">${tbFmtAmt(totals.clCredit, { total:true })}</td>
+                  <td class="amount-col tb-sec-op tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtAmt(totals.opDebit, { total:true })}</td>
+                  <td class="amount-col tb-sec-op tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtAmt(totals.opCredit, { total:true })}</td>
+                  <td class="amount-col tb-sec-mv tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtAmt(totals.mvDebit, { total:true })}</td>
+                  <td class="amount-col tb-sec-mv tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtAmt(totals.mvCredit, { total:true })}</td>
+                  <td class="amount-col tb-sec-cl tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtAmt(totals.clDebit, { total:true })}</td>
+                  <td class="amount-col tb-sec-cl tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtAmt(totals.clCredit, { total:true })}</td>
                 </tr>`;
       const tbTableHeadHtml = `
               <colgroup>
@@ -7163,17 +7219,17 @@
                   <th rowspan="2" class="tb-th-sch">رقم<br/>الكشف</th>
                   <th rowspan="2" class="tb-th-code">رقم<br/>الدليل</th>
                   <th rowspan="2" class="tb-th-name">اسم الحساب</th>
-                  <th colspan="2" class="tb-section tb-section-start">رصيد افتتاحي<br/><span dir="ltr">${PY}</span></th>
-                  <th colspan="2" class="tb-section tb-section-start">حركة السنة<br/><span dir="ltr">${CY}</span></th>
-                  <th colspan="2" class="tb-section tb-section-start">رصيد ختامي<br/><span dir="ltr">${CY}</span></th>
+                  <th colspan="2" class="tb-section tb-sec-op">رصيد افتتاحي<br/><span dir="ltr">${PY}</span></th>
+                  <th colspan="2" class="tb-section tb-sec-mv">حركة السنة<br/><span dir="ltr">${CY}</span></th>
+                  <th colspan="2" class="tb-section tb-sec-cl">رصيد ختامي<br/><span dir="ltr">${CY}</span></th>
                 </tr>
                 <tr class="tb-head-sub">
-                  <th class="tb-th-amt tb-section-start">مدين</th>
-                  <th class="tb-th-amt">دائن</th>
-                  <th class="tb-th-amt tb-section-start">مدين</th>
-                  <th class="tb-th-amt">دائن</th>
-                  <th class="tb-th-amt tb-section-start">مدين</th>
-                  <th class="tb-th-amt">دائن</th>
+                  <th class="tb-th-amt tb-sec-op tb-sec-debit">مدين</th>
+                  <th class="tb-th-amt tb-sec-op tb-sec-credit">دائن</th>
+                  <th class="tb-th-amt tb-sec-mv tb-sec-debit">مدين</th>
+                  <th class="tb-th-amt tb-sec-mv tb-sec-credit">دائن</th>
+                  <th class="tb-th-amt tb-sec-cl tb-sec-debit">مدين</th>
+                  <th class="tb-th-amt tb-sec-cl tb-sec-credit">دائن</th>
                 </tr>
               </thead>`;
       const tbSigsHtml = buildTbSigsScreenHtml(meta);
@@ -7304,11 +7360,7 @@
                   <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${fmt(patCY)}</td>
                   <td class="amount-col" dir="ltr" contenteditable="false" style="font-weight:700">${fmt(patPY)}</td>
                 </tr>
-                <tr>
-                  <td colspan="3" contenteditable="false"></td>
-                  <td class="amount-col" contenteditable="false">ويوزع كما يلي:</td>
-                  <td class="amount-col" contenteditable="false"></td>
-                </tr>
+                <tr class="row-subheader"><td colspan="5" contenteditable="false">ويوزع كما يلي:</td></tr>
                 <tr>
                   <td colspan="3" contenteditable="false">احتياطي قانوني ${n(meta.legalReserveRatePct)}٪ من صافي الربح بعد الضريبة</td>
                   <td class="amount-col" dir="ltr" contenteditable="false">${fmt(reserveCY)}</td>
