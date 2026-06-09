@@ -1192,26 +1192,6 @@
       box-shadow:0 0 0 2px rgba(26,58,92,.15);
       outline:none;
     }
-    .auth-notice{
-      margin-bottom:var(--space-md);
-      padding:10px 12px;
-      border-radius:var(--radius-sm);
-      border:1px solid rgba(186,26,26,.25);
-      background:#ffdad6;
-      color:#93000a;
-      font-size:11px;line-height:1.5;
-    }
-    .auth-notice code{
-      display:block;margin-top:6px;
-      padding:6px 8px;
-      border-radius:var(--radius-sm);
-      background:rgba(255,255,255,.65);
-      border:1px solid rgba(186,26,26,.12);
-      font-family:var(--font-mono);
-      font-size:10px;
-      word-break:break-all;
-      direction:ltr;text-align:left;
-    }
     .auth-actions{margin-top:var(--space-md)}
     .btn.auth{
       width:100%;
@@ -1683,12 +1663,6 @@
           <h2 class="auth-form-title">تسجيل الدخول</h2>
           <p class="auth-form-lead hint">أدخل البريد وكلمة المرور المسجّلين في Firebase Authentication.</p>
 
-          <div id="file-origin-warning" class="auth-notice hidden" role="alert">
-            <strong>تنبيه:</strong> الصفحة تُفتح عبر <span dir="ltr">file://</span> وهذا قد يمنع Firebase. شغّل خادماً محلياً ثم افتح:
-            <code>npx --yes serve . -l 5500</code>
-            <code>http://localhost:5500/index.html</code>
-          </div>
-
           <div class="auth-field">
             <label for="login-email">البريد الإلكتروني</label>
             <input id="login-email" type="email" dir="ltr" autocomplete="username" placeholder="name@example.com" />
@@ -1705,7 +1679,6 @@
         </div>
         <div class="auth-footer">
           <a id="link-presentation" href="presentation.html" rel="noopener noreferrer">عرض تقديمي يشرح البرنامج</a>
-          <p id="presentation-file-hint" class="hint hidden">يفضّل فتح العرض بعد تشغيل الخادم المحلي (انظر التنبيه أعلاه).</p>
         </div>
       </div>
     </div>
@@ -2613,15 +2586,6 @@
     // ===== UI helpers =====
     const $ = (id) => document.getElementById(id);
 
-    if(globalThis.location?.protocol === "file:"){
-      $("file-origin-warning")?.classList.remove("hidden");
-      $("presentation-file-hint")?.classList.remove("hidden");
-      const lp = $("link-presentation");
-      if(lp){
-        lp.removeAttribute("target");
-        lp.title = "يفضّل تشغيل التطبيق عبر خادم محلي (http://localhost) وليس عبر فتح الملف مباشرة.";
-      }
-    }
     const show = (id) => $(id).classList.remove("hidden");
     const hide = (id) => $(id).classList.add("hidden");
     function syncPrintToolbar(){
