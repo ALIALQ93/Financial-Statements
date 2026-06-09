@@ -4,34 +4,60 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Financial Statements – لوحة التحكم</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
     :root{
-      --navy:#1a3a5c; --blue:#1F4E79; --blue-ultra:#EBF3FB;
-      --gold:#e8c46a; --border:#b0c4d8; --bg:#eef1f4; --text:#111;
-      --danger:#b00020;
-      --shadow: 0 18px 50px rgba(0,0,0,.18);
+      /* DESIGN.md — Financial Professionalism Modernized */
+      --navy:#1a3a5c;
+      --blue:#1F4E79;
+      --blue-ultra:#EBF3FB;
+      --gold:#e8c46a;
+      --border:#c3c6cf;
+      --border-strong:#b0c4d8;
+      --fin-table-border:#73777f;
+      --bg:#eef1f4;
+      --surface:#ffffff;
+      --surface-container-low:#f1f4f7;
+      --surface-container:#ebeef1;
+      --surface-container-high:#e5e8eb;
+      --surface-table-head:#f8fafc;
+      --surface-hover:#f1f5f9;
+      --text:#181c1e;
+      --text-muted:#64748b;
+      --muted:#64748b;
+      --blue-pale:#ebeef1;
+      --danger:#ba1a1a;
+      --status-success:#2d6a4f;
+      --shadow-modal:0 4px 12px rgba(26,58,92,.08);
+      --shadow:var(--shadow-modal);
       --font:'Noto Naskh Arabic',serif;
+      --font-mono:'JetBrains Mono',Consolas,'Courier New',monospace;
+      --radius-sm:4px;
+      --radius-md:8px;
+      --space-sm:8px;
+      --space-md:16px;
+      --space-lg:24px;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
     .app-bg{
       min-height:100vh;
-      background:
-        radial-gradient(900px 520px at 12% 10%, rgba(232,196,106,.35), transparent 65%),
-        radial-gradient(800px 500px at 90% 0%, rgba(46,117,182,.26), transparent 60%),
-        linear-gradient(180deg, #f3f6f9 0%, #eef1f4 45%, #e9edf2 100%);
+      background:var(--bg);
     }
     .topbar{
       position:sticky;top:0;z-index:5;
-      display:flex;align-items:center;gap:10px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
       min-height:58px;
-      padding:14px 18px;background:var(--navy);color:#fff;
-      box-shadow:0 2px 12px rgba(0,0,0,.25);
-      position:sticky;
-      /* allow centered brand */
-      position:relative;
+      padding:10px 18px;background:var(--navy);color:#fff;
+      box-shadow:none;
+      border-bottom:1px solid rgba(255,255,255,.08);
     }
+    .topbar-side{
+      display:flex;align-items:center;gap:10px;
+      flex-wrap:wrap;min-width:0;
+    }
+    .topbar-side-start{flex:1 1 0;justify-content:flex-start}
+    .topbar-side-end{flex:0 0 auto;justify-content:flex-end;margin-inline-start:auto}
     .topbar .brand{
       font-weight:900;
       color:var(--gold);
@@ -42,30 +68,100 @@
       white-space:nowrap;
       pointer-events:none;
     }
+    .topbar-user{
+      display:flex;flex-direction:column;gap:3px;
+      padding:6px 12px;
+      border-radius:var(--radius-md);
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      min-width:0;max-width:min(360px,42vw);
+    }
+    .topbar-user-main{
+      display:flex;align-items:center;gap:8px;
+      flex-wrap:wrap;min-width:0;
+    }
+    .topbar-user-email{
+      font-size:11pt;font-weight:600;color:#fff;
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+      min-width:0;flex:1 1 auto;
+    }
+    .topbar-user-role{
+      flex:0 0 auto;font-size:9pt;padding:2px 8px;
+    }
+    .topbar-user-role.users-badge--admin{background:rgba(255,255,255,.18);color:#fff}
+    .topbar-user-role.users-badge--staff{background:rgba(255,255,255,.12);color:rgba(255,255,255,.92)}
+    .topbar-user-role.users-badge--trial{background:var(--gold);color:var(--navy)}
+    .topbar-user-role.users-badge--active,
+    .topbar-user-role.users-badge--inactive{display:none}
+    .topbar-user-office{
+      display:flex;align-items:center;gap:6px;
+      font-size:10pt;color:rgba(255,255,255,.72);
+      min-width:0;
+    }
+    .topbar-user-office-label{font-weight:600;color:rgba(255,255,255,.55);flex:0 0 auto}
+    .topbar-user-office #pill-active-office{
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
+    }
+    .topbar-status{
+      display:inline-flex;align-items:center;gap:6px;
+      font-size:10pt;color:rgba(255,255,255,.65);
+      padding:4px 2px;
+    }
+    .topbar-status-dot{
+      width:8px;height:8px;border-radius:50%;
+      background:rgba(255,255,255,.35);flex:0 0 auto;
+    }
+    .topbar-status.is-online .topbar-status-dot{background:#4ade80}
+    .topbar-status.is-busy .topbar-status-dot{background:#fbbf24}
+    .topbar-status.is-offline .topbar-status-dot{background:rgba(255,255,255,.28)}
+    .topbar-status.is-error .topbar-status-dot{background:#f87171}
+    .topbar-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .btn-topbar{
+      border:1px solid rgba(255,255,255,.25);
+      background:rgba(255,255,255,.1);color:#fff;
+      padding:6px 11px;border-radius:var(--radius-sm);
+      font-size:10.5pt;
+    }
+    .btn-topbar:hover{background:rgba(255,255,255,.16)}
+    .btn-topbar-logout{margin-inline-start:4px}
+    @media(max-width:780px){
+      .topbar{padding:8px 12px;gap:8px}
+      .topbar .brand{font-size:11pt;max-width:42%;overflow:hidden;text-overflow:ellipsis}
+      .topbar-user{max-width:min(240px,48vw);padding:5px 10px}
+      .topbar-user-email{font-size:10pt}
+      .btn-topbar{padding:5px 9px;font-size:10pt}
+    }
+
     .btn{
       border:1px solid rgba(255,255,255,.25);
       background:rgba(255,255,255,.12);color:#fff;
-      padding:7px 12px;border-radius:8px;cursor:pointer;
-      font-family:inherit;font-weight:700
+      padding:7px 12px;border-radius:var(--radius-sm);cursor:pointer;
+      font-family:inherit;font-weight:700;
+      transition:background .15s ease;
     }
-    .btn.primary{background:var(--gold);color:var(--navy);border-color:transparent}
+    .btn:hover{background:rgba(255,255,255,.18)}
+    /* Primary = navy */
+    .btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .btn.primary:hover{background:#002444}
+    /* Accent = gold (Save / high-intent commit) */
+    .btn.accent{background:var(--gold);color:var(--navy);border-color:transparent}
+    .btn.accent:hover{background:#fed97c}
     .btn.danger{background:transparent;border-color:rgba(255,255,255,.35);color:#fff}
     .btn:disabled{opacity:.55;cursor:not-allowed}
-    .wrap{max-width:1100px;margin:18px auto;padding:0 14px 28px}
+    .wrap{max-width:1280px;margin:18px auto;padding:0 var(--space-md) 28px}
     .layout{display:flex;min-height:calc(100vh - 58px)}
     .sidebar{
       width:260px;flex:0 0 auto;
-      background:rgba(255,255,255,.55);
-      border-left:1px solid rgba(176,196,216,.75);
-      backdrop-filter: blur(10px);
+      background:var(--navy);
+      border-left:1px solid rgba(255,255,255,.08);
       padding:14px 12px;
     }
     .main{flex:1 1 auto}
     @media(max-width:900px){
       .layout{display:block}
-      .sidebar{width:auto;border-left:none;border-bottom:1px solid rgba(176,196,216,.75)}
+      .sidebar{width:auto;border-left:none;border-bottom:1px solid rgba(255,255,255,.08)}
     }
-    .nav-title{font-weight:900;color:var(--navy);margin:6px 8px 10px;font-size:12pt}
+    .nav-title{font-weight:900;color:rgba(255,255,255,.65);margin:6px 8px 10px;font-size:12pt}
     .nav{
       display:flex;flex-direction:column;gap:8px;
       padding:6px;
@@ -74,19 +170,32 @@
       width:100%;
       display:flex;align-items:center;gap:10px;
       padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(176,196,216,.9);
-      background:#fff;
-      color:var(--navy);
+      border-radius:var(--radius-sm);
+      border:none;
+      background:transparent;
+      color:rgba(255,255,255,.78);
       cursor:pointer;
-      font-weight:900;
+      font-weight:700;
       font-family:inherit;
       text-align:right;
+      position:relative;
+      transition:background .15s ease,color .15s ease;
     }
-    .nav-btn .ic{width:22px;text-align:center;opacity:.9}
+    .nav-btn .ic{width:22px;text-align:center;color:rgba(255,255,255,.5)}
+    .nav-btn:hover{background:rgba(255,255,255,.08);color:#fff}
     .nav-btn.active{
-      background:linear-gradient(180deg, rgba(232,196,106,.55) 0%, rgba(232,196,106,.25) 100%);
-      border-color:rgba(232,196,106,.85);
+      background:rgba(255,255,255,.1);
+      color:#fff;
+    }
+    .nav-btn.active .ic{color:var(--gold)}
+    .nav-btn.active::before{
+      content:"";
+      position:absolute;
+      inset-inline-start:0;
+      top:6px;bottom:6px;
+      width:3px;
+      background:var(--gold);
+      border-radius:0;
     }
     body.mode-login .sidebar{display:none !important;}
 
@@ -101,10 +210,10 @@
     .overlay.show{display:flex}
     .modal{
       width:min(560px,100%);
-      background:#fff;
-      border-radius:16px;
-      border:1px solid rgba(176,196,216,.85);
-      box-shadow:var(--shadow);
+      background:var(--surface);
+      border-radius:var(--radius-md);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow-modal);
       overflow:hidden;
       max-height: calc(100vh - 32px);
       display:flex;
@@ -141,53 +250,62 @@
     }
     .modal-ft{
       padding:12px 14px;
-      background:var(--blue-ultra);
-      border-top:1px solid rgba(176,196,216,.75);
+      background:var(--surface-container-low);
+      border-top:1px solid var(--border);
       display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap
     }
     .btn.modal{
-      border:1px solid rgba(26,58,92,.18);
-      background:#fff;color:var(--navy);
-      padding:9px 12px;border-radius:12px;
-      font-weight:900;
+      border:1px solid var(--navy);
+      background:transparent;color:var(--navy);
+      padding:9px 12px;border-radius:var(--radius-sm);
+      font-weight:700;
       cursor:pointer;
       font-family:inherit;
+      transition:background .15s ease;
     }
-    .btn.modal.primary{
-      background:linear-gradient(180deg, #f4d98d 0%, var(--gold) 100%);
-      border-color:transparent;
-    }
+    .btn.modal:hover{background:rgba(26,58,92,.06)}
+    .btn.modal.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .btn.modal.primary:hover{background:#002444}
+    .btn.modal.accent{background:var(--gold);color:var(--navy);border-color:transparent}
+    .btn.modal.accent:hover{background:#fed97c}
     .card{
-      background:#fff;border:1px solid var(--border);border-radius:14px;
-      box-shadow:0 6px 18px rgba(0,0,0,.06);
-      padding:14px 16px;margin:12px 0
+      background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+      box-shadow:none;
+      padding:var(--space-md);margin:12px 0
     }
     .card h2{margin:0 0 10px;font-size:15pt;color:var(--navy)}
+    #section-dashboard > .grid > .card{border-top:2px solid var(--gold)}
     .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     @media(max-width:780px){.grid{grid-template-columns:1fr}}
     .form-section{
       grid-column:1/-1;
       padding:10px 12px;
-      border:1px solid rgba(176,196,216,.75);
-      background:rgba(240,246,255,.65);
-      border-radius:12px;
-      font-weight:900;
+      border:1px solid var(--border);
+      background:var(--surface-container-low);
+      border-radius:var(--radius-md);
+      font-weight:700;
       color:var(--navy);
       margin-top:4px;
     }
-    label{display:block;font-size:10pt;color:#444;font-weight:700;margin-bottom:5px}
+    label{display:block;font-size:10pt;color:var(--text-muted);font-weight:600;margin-bottom:5px}
     input,select{
-      width:100%;padding:10px 10px;border:1px solid var(--border);border-radius:10px;
-      font-family:inherit;font-size:11pt;outline:none
+      width:100%;padding:10px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);
+      font-family:inherit;font-size:11pt;outline:none;
+      background:var(--surface);
+      transition:border-color .15s ease,box-shadow .15s ease;
+    }
+    input:focus,select:focus{
+      border-color:var(--navy);
+      box-shadow:0 0 0 2px rgba(26,58,92,.15);
     }
     input[dir="ltr"]{text-align:left}
-    .hint{font-size:10pt;color:#555;line-height:1.5}
+    .hint{font-size:10pt;color:var(--text-muted);line-height:1.5}
     .msg{margin-top:8px;font-size:10.5pt}
     .msg.err{color:var(--danger);font-weight:700}
-    .msg.ok{color:#0b6b2a;font-weight:700}
+    .msg.ok{color:var(--status-success);font-weight:700}
     .pill{
       display:inline-flex;gap:8px;align-items:center;
-      background:var(--blue-ultra);
+      background:var(--surface-container-low);
       border:1px solid var(--border);
       padding:7px 11px;
       border-radius:999px;
@@ -210,15 +328,80 @@
     th{background:var(--blue);color:#fff;text-align:right}
     tr:nth-child(even) td{background:var(--blue-ultra)}
     .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap}
+    /* Secondary */
     .linkbtn{
-      border:1px solid var(--border);background:#fff;color:var(--navy);
-      padding:7px 10px;border-radius:10px;cursor:pointer;font-weight:700;font-family:inherit
+      border:1px solid var(--navy);background:transparent;color:var(--navy);
+      padding:7px 10px;border-radius:var(--radius-sm);cursor:pointer;font-weight:600;font-family:inherit;
+      transition:background .15s ease;
     }
+    .linkbtn:hover{background:rgba(26,58,92,.06)}
+    /* Primary = navy */
+    .linkbtn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .linkbtn.primary:hover{background:#002444}
+    /* Accent = gold (Save) */
+    .linkbtn.accent{background:var(--gold);color:var(--navy);border-color:transparent}
+    .linkbtn.accent:hover{background:#fed97c}
+    /* @deprecated alias */
+    .linkbtn.emphasis{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+    /* ===== Users section ===== */
+    #section-users .section-lead{margin:0 0 4px;font-size:10.5pt;color:#555;line-height:1.55}
+    .users-stats{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+    .users-info{
+      margin-top:12px;padding:12px 14px;
+      background:var(--surface-container-low);
+      border:1px solid var(--border);
+      border-radius:var(--radius-md);font-size:10.5pt;line-height:1.6;color:var(--text-muted);
+    }
+    .users-info-title{font-weight:900;color:var(--navy);margin-bottom:6px;font-size:11pt}
+    .users-info ol{margin:6px 0 0;padding-inline-start:20px}
+    .users-info li{margin:4px 0}
+    .users-info code{
+      font-size:10pt;background:rgba(255,255,255,.7);
+      padding:1px 6px;border-radius:6px;border:1px solid rgba(176,196,216,.6);
+    }
+    .users-panel{
+      margin-top:12px;background:var(--surface);
+      border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;
+    }
+    .users-panel-title{
+      margin:0 0 12px;font-size:12.5pt;font-weight:900;color:var(--navy);
+    }
+    .users-panel-head{
+      display:flex;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;gap:10px;margin-bottom:12px;
+    }
+    .users-panel-head .users-panel-title{margin:0}
+    .users-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    @media(max-width:780px){.users-form-grid{grid-template-columns:1fr}}
+    .users-form-grid .span-full{grid-column:1/-1}
+    .users-trial-box{
+      padding:12px;border-radius:10px;
+      background:rgba(232,196,106,.14);border:1px solid rgba(232,196,106,.55);
+    }
+    .users-form-foot{
+      display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;
+      margin-top:14px;padding-top:12px;border-top:1px solid rgba(176,196,216,.5);
+    }
+    .users-badge{
+      display:inline-block;padding:3px 10px;border-radius:999px;
+      font-size:10pt;font-weight:700;white-space:nowrap;
+    }
+    .users-badge--admin{background:rgba(26,58,92,.12);color:var(--navy)}
+    .users-badge--staff{background:rgba(31,78,121,.1);color:var(--blue)}
+    .users-badge--trial{background:rgba(232,196,106,.4);color:#5c4800}
+    .users-badge--active{background:rgba(11,107,42,.12);color:#0b6b2a}
+    .users-badge--inactive{background:rgba(176,0,32,.1);color:var(--danger)}
+    #users-tbody tr.users-row-self td{background:rgba(235,243,251,.95)!important}
+    .users-cell-uid{font-size:10pt;word-break:break-all;font-family:var(--font-mono)}
+    .users-cell-trial{font-size:10pt;color:#555;line-height:1.45}
+    .users-cell-actions{white-space:nowrap}
+    #users-uid[readonly]{background:rgba(240,246,255,.85);cursor:not-allowed}
 
     /* ===== Input model (match 0.0.1 look) ===== */
     .tb-btn{
       display:inline-flex;align-items:center;gap:5px;
-      padding:6px 12px;border-radius:6px;
+      padding:6px 12px;border-radius:var(--radius-sm);
       border:1px solid var(--border);
       background:#fff;
       cursor:pointer;
@@ -234,15 +417,18 @@
       border-color:rgba(176,196,216,.95);
       color:var(--navy);
     }
-    .tb-btn.primary{background:var(--gold);border-color:transparent;color:var(--navy);}
+    .tb-btn.primary{background:var(--navy);border-color:transparent;color:#fff}
+    .tb-btn.primary:hover{background:#002444}
+    .tb-btn.accent{background:var(--gold);border-color:transparent;color:var(--navy)}
+    .tb-btn.accent:hover{background:#fed97c}
 
     .schedule-toolbar{
       display:flex;flex-wrap:wrap;align-items:center;gap:8px;
       margin:0 0 10px;
       padding:10px 12px;
-      background:var(--blue-ultra);
+      background:var(--surface-container-low);
       border:1px solid var(--border);
-      border-radius:8px;
+      border-radius:var(--radius-md);
       font-size:11px;
     }
     .schedule-toolbar .schedule-title{font-weight:700;color:var(--navy);margin-left:8px;}
@@ -415,9 +601,9 @@
       gap:8px;
       margin:8px 0 10px;
       padding:10px 12px;
-      background:var(--blue-ultra);
+      background:var(--surface-container-low);
       border:1px solid var(--border);
-      border-radius:8px;
+      border-radius:var(--radius-md);
       font-size:11px;
     }
     .md-about-toolbar.md-edit-on{background:rgba(232,196,106,.2);border-color:#e8c46a;}
@@ -443,24 +629,66 @@
     .md-activity-num{font-weight:900;color:var(--navy);margin-left:6px;}
 
     .fin-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:9.5pt;direction:rtl;}
-    .fin-table th{
-      background:var(--navy);
-      color:#fff;
+    /* Financial tables — DESIGN.md (excludes admin-data-table) */
+    .fin-table:not(.admin-data-table) th{
+      background:var(--surface-table-head);
+      color:var(--navy);
       padding:7px 8px;
       text-align:center;
-      border:1px solid #1a3a5c;
+      border:1px solid var(--fin-table-border);
       font-weight:600;
     }
-    .fin-table th .hint{color:#fff;opacity:.9}
-    .fin-table th input{color:#fff}
-    .fin-table th input::placeholder{color:rgba(255,255,255,.75)}
-    .fin-table td{border:1px solid var(--border);padding:5px 8px;vertical-align:middle;}
-    .fin-table tr:nth-child(even) td{background:var(--blue-ultra);}
-    .fin-table .row-total td{background:#fff!important;font-weight:700;border-top:2px solid var(--blue);}
-    .fin-table .row-header td{background:var(--blue-pale)!important;font-weight:700;font-size:10pt;}
-    .fin-table .row-subheader td{background:var(--blue-ultra)!important;font-weight:700;text-decoration:underline;}
+    .fin-table:not(.admin-data-table) th .hint{color:var(--text-muted);opacity:1}
+    .fin-table:not(.admin-data-table) th input{color:var(--navy)}
+    .fin-table:not(.admin-data-table) th input::placeholder{color:var(--text-muted)}
+    .fin-table td{padding:5px 8px;vertical-align:middle;background:var(--surface)}
+    .fin-table:not(.admin-data-table) td{border:1px solid var(--fin-table-border)}
+    .fin-table.admin-data-table td{border:1px solid var(--border)}
+    .fin-table:not(.admin-data-table) tbody tr:hover td{background:var(--surface-hover)}
+    .fin-table:not(.admin-data-table) tr:nth-child(even) td{background:var(--surface)}
+    .fin-table:not(.admin-data-table) .row-total td{
+      background:var(--surface-container-low)!important;
+      font-weight:700;
+      border-top:2px solid var(--navy);
+    }
+    .fin-table:not(.admin-data-table) .row-header td{
+      background:var(--surface-container)!important;
+      font-weight:700;
+      font-size:10pt;
+      color:var(--navy);
+    }
+    .fin-table:not(.admin-data-table) .row-subheader td{
+      background:var(--surface-container-low)!important;
+      font-weight:700;
+      text-decoration:underline;
+      color:var(--navy);
+    }
     .fin-table .num-col{text-align:center;}
-    .fin-table .amount-col{text-align:center;font-size:9pt;}
+    .fin-table .amount-col{
+      text-align:center;
+      font-size:9pt;
+      font-family:var(--font-mono);
+      font-variant-numeric:tabular-nums;
+    }
+
+    /* Admin data tables (DESIGN.md — users, movements, platform; not financial schedules) */
+    .fin-table.admin-data-table th,
+    #section-companies table th{
+      background:var(--surface-table-head);
+      color:var(--navy);
+      font-weight:600;
+      border-color:var(--border);
+      text-align:right;
+    }
+    .fin-table.admin-data-table td,
+    #section-companies table td{
+      background:var(--surface);
+      border-color:var(--border);
+    }
+    .fin-table.admin-data-table tr:nth-child(even) td,
+    #section-companies table tr:nth-child(even) td{background:var(--surface)}
+    .fin-table.admin-data-table tbody tr:hover td,
+    #section-companies table tbody tr:hover td{background:var(--surface-hover)}
     /* ميزان المراجعة — جدول كثيف الأعمدة */
     .tb-table-wrap{
       width:100%;
@@ -480,17 +708,23 @@
       font-size:7.5pt;
       line-height:1.4;
       vertical-align:middle;
+      background:var(--surface-table-head);
+      color:var(--navy);
+      border-color:var(--fin-table-border);
     }
     .fin-table.tb-table thead tr.tb-head-sub th{
-      background:#2a5a8a;
+      background:var(--surface-container-high);
+      color:var(--navy);
       font-size:7pt;
       font-weight:600;
       padding:4px 3px;
+      border-color:var(--fin-table-border);
     }
     .fin-table.tb-table td{
       padding:4px 5px;
       font-size:8.5pt;
       line-height:1.35;
+      border-color:var(--fin-table-border);
     }
     .fin-table.tb-table .tb-th-sch,
     .fin-table.tb-table .tb-td-sch{
@@ -538,17 +772,20 @@
     .fin-table.tb-table col.tb-col-name{width:17%;}
     .fin-table.tb-table col.tb-col-amt{width:11.5%;}
     .fin-table.tb-table th.tb-section{
-      border-bottom:1px solid rgba(255,255,255,.3);
+      border-bottom:1px solid var(--border);
     }
     .fin-table.tb-table th.tb-section-start,
     .fin-table.tb-table td.tb-section-start{
-      border-inline-start:2px solid var(--blue);
+      border-inline-start:2px solid var(--navy);
     }
     .fin-table.tb-table tbody tr:nth-child(even) td{
-      background:var(--blue-ultra);
+      background:var(--surface);
+    }
+    .fin-table.tb-table tbody tr:hover td{
+      background:var(--surface-hover);
     }
     .fin-table.tb-table .row-total td{
-      background:#f7fafd!important;
+      background:var(--surface-container-low)!important;
       font-size:8pt;
       border-top:2px solid var(--navy);
       padding:4px 2px;
@@ -649,17 +886,29 @@
       text-align:center;
     }
     .fin-table td:has(input:focus){
-      outline:2px solid rgba(232,196,106,.55);
+      outline:2px solid rgba(26,58,92,.25);
       outline-offset:-2px;
-      background:rgba(232,196,106,.10);
+      background:rgba(26,58,92,.04);
     }
 
-    /* Contracts table (match 0.0.1) */
+    /* Contracts table */
     .con-table{width:100%;border-collapse:collapse;font-size:9pt;direction:rtl;}
-    .con-table th{background:var(--navy);color:#fff;padding:6px 8px;border:1px solid #1a3a5c;text-align:center;}
-    .con-table td{border:1px solid var(--border);padding:5px 8px;vertical-align:top;}
-    .con-table tr:nth-child(even) td{background:var(--blue-ultra);}
-    .con-table .row-total td{font-weight:700;background:#f0f4f8!important;border-top:2px solid var(--blue);}
+    .con-table th{
+      background:var(--surface-table-head);
+      color:var(--navy);
+      padding:6px 8px;
+      border:1px solid var(--fin-table-border);
+      text-align:center;
+      font-weight:600;
+    }
+    .con-table td{border:1px solid var(--fin-table-border);padding:5px 8px;vertical-align:top;background:var(--surface)}
+    .con-table tbody tr:hover td{background:var(--surface-hover)}
+    .con-table tr:nth-child(even) td{background:var(--surface)}
+    .con-table .row-total td{
+      font-weight:700;
+      background:var(--surface-container-low)!important;
+      border-top:2px solid var(--navy);
+    }
     .con-table td[contenteditable="true"]{cursor:text;}
     .con-table td:focus{outline:2px solid rgba(232,196,106,.55);outline-offset:-2px;background:rgba(232,196,106,.10);}
     .contracts-meta-print{ display:none; }
@@ -675,12 +924,12 @@
       color:var(--navy);
       font-weight:700;
       padding:5px 8px;
-      border:1px solid var(--border);
+      border:1px solid var(--fin-table-border);
       text-align:center;
     }
     .contracts-meta-table td{
       padding:5px 8px;
-      border:1px solid var(--border);
+      border:1px solid var(--fin-table-border);
       text-align:center;
       vertical-align:middle;
     }
@@ -792,109 +1041,132 @@
     .hidden{display:none !important}
     .sep{height:1px;background:rgba(255,255,255,.18);width:1px;align-self:stretch}
 
-    /* Professional login */
+    /* ===== Login page (DESIGN.md) ===== */
+    body.mode-login .wrap{max-width:none;margin:0;padding:0}
+    body.mode-login .main{width:100%}
     .auth-shell{
-      min-height:calc(100vh - 56px);
-      display:grid;place-items:center;
-      padding:22px 14px 34px;
+      min-height:calc(100vh - 58px);
+      display:flex;align-items:center;justify-content:center;
+      padding:var(--space-lg) var(--space-md);
+      background:var(--bg);
     }
     .auth-card{
-      width:min(520px,100%);
+      width:min(420px,100%);
       overflow:hidden;
-      border-radius:18px;
-      box-shadow:var(--shadow);
-      border:1px solid rgba(176,196,216,.7);
-      background:#fff;
+      border-radius:var(--radius-md);
+      box-shadow:var(--shadow-modal);
+      border:1px solid var(--border);
+      background:var(--surface);
     }
     .auth-header{
-      background:linear-gradient(135deg, rgba(26,58,92,1) 0%, rgba(31,78,121,1) 40%, rgba(46,117,182,1) 100%);
+      background:var(--navy);
       color:#fff;
-      padding:18px 18px 14px;
-      position:relative;
-    }
-    .auth-header:after{
-      content:"";
-      position:absolute;inset:auto -120px -160px auto;
-      width:420px;height:420px;border-radius:50%;
-      background:rgba(232,196,106,.26);
+      padding:var(--space-lg) var(--space-md) var(--space-md);
+      border-bottom:2px solid var(--gold);
+      text-align:center;
     }
     .auth-brand{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      position:relative;
-      z-index:1;
-      width:100%;
+      display:flex;align-items:center;justify-content:center;
+      gap:12px;
     }
     .auth-logo{
-      width:42px;height:42px;border-radius:12px;
-      background:rgba(255,255,255,.14);
-      border:1px solid rgba(255,255,255,.22);
+      width:44px;height:44px;border-radius:var(--radius-md);
+      background:rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.18);
       display:grid;place-items:center;
       font-weight:900;color:var(--gold);
-      letter-spacing:.5px;
+      font-size:18pt;
       flex:0 0 auto;
     }
-    .auth-title{margin:0;font-size:15pt;font-weight:900;line-height:1.2;white-space:nowrap}
-    .auth-sub{margin:8px 0 0;color:rgba(255,255,255,.88);font-size:10.6pt;line-height:1.6;position:relative;z-index:1}
-    .auth-form{
-      padding:16px 18px 18px;
-      background:#fff;
+    .auth-title{margin:0;font-size:16pt;font-weight:900;line-height:1.25;color:#fff}
+    .auth-sub{
+      margin:10px 0 0;
+      color:rgba(255,255,255,.78);
+      font-size:10.5pt;line-height:1.55;
     }
-    .auth-form h2{margin:0 0 10px;color:var(--navy);font-size:15pt}
-    .field{margin:10px 0}
-    .field label{margin-bottom:6px}
-    .auth-actions{display:flex;gap:10px;justify-content:flex-end;align-items:center;margin-top:12px;flex-wrap:wrap}
+    .auth-form{padding:var(--space-md) var(--space-md) var(--space-lg)}
+    .auth-form-title{margin:0 0 4px;color:var(--navy);font-size:14pt;font-weight:900}
+    .auth-form-lead{margin:0 0 var(--space-md);font-size:10.5pt}
+    .auth-field{margin:0 0 14px}
+    .auth-field label{
+      display:block;margin-bottom:6px;
+      font-size:10pt;font-weight:600;color:var(--text-muted);
+    }
+    .auth-field input{
+      width:100%;padding:11px 12px;
+      border:1px solid var(--border);border-radius:var(--radius-sm);
+      font-family:inherit;font-size:11pt;background:var(--surface);
+      transition:border-color .15s ease,box-shadow .15s ease;
+    }
+    .auth-field input:focus{
+      border-color:var(--navy);
+      box-shadow:0 0 0 2px rgba(26,58,92,.15);
+      outline:none;
+    }
+    .auth-notice{
+      margin-bottom:var(--space-md);
+      padding:10px 12px;
+      border-radius:var(--radius-sm);
+      border:1px solid rgba(186,26,26,.25);
+      background:#ffdad6;
+      color:#93000a;
+      font-size:11px;line-height:1.5;
+    }
+    .auth-notice code{
+      display:block;margin-top:6px;
+      padding:6px 8px;
+      border-radius:var(--radius-sm);
+      background:rgba(255,255,255,.65);
+      border:1px solid rgba(186,26,26,.12);
+      font-family:var(--font-mono);
+      font-size:10px;
+      word-break:break-all;
+      direction:ltr;text-align:left;
+    }
+    .auth-actions{margin-top:var(--space-md)}
     .btn.auth{
-      border:1px solid rgba(26,58,92,.18);
-      background:#fff;color:var(--navy);
-      padding:10px 12px;border-radius:12px;
+      width:100%;
+      border:1px solid var(--navy);
+      background:var(--navy);color:#fff;
+      padding:12px 14px;border-radius:var(--radius-sm);
+      font-family:inherit;font-size:12pt;font-weight:700;
+      cursor:pointer;
+      transition:background .15s ease;
     }
-    .btn.auth.primary{
-      background:linear-gradient(180deg, #f4d98d 0%, var(--gold) 100%);
-      color:var(--navy);
-      border-color:transparent;
-      box-shadow:0 10px 22px rgba(232,196,106,.35);
-    }
+    .btn.auth:hover{background:#002444}
+    .btn.auth:disabled{opacity:.55;cursor:not-allowed}
     .alert{
-      margin-top:10px;
-      padding:10px 12px;border-radius:12px;
-      border:1px solid rgba(176,0,32,.22);
-      background:rgba(176,0,32,.06);
-      color:var(--danger);
-      font-weight:800;
-      display:none;
+      margin-top:12px;
+      padding:10px 12px;border-radius:var(--radius-sm);
+      border:1px solid rgba(186,26,26,.25);
+      background:#ffdad6;
+      color:#93000a;
+      font-weight:700;font-size:10.5pt;
+      display:none;line-height:1.45;
     }
     .alert.show{display:block}
-
-    .auth-presentation-link{
-      margin:14px 0 0;
-      padding-top:14px;
-      border-top:1px solid rgba(176,196,216,.65);
+    .auth-footer{
+      padding:0 var(--space-md) var(--space-md);
       text-align:center;
-      font-size:10.5pt;
-      line-height:1.5;
+      font-size:10.5pt;line-height:1.5;
     }
-    .auth-presentation-link a{
+    .auth-footer a{
       color:var(--blue);
-      font-weight:800;
+      font-weight:700;
       text-decoration:none;
-      border-bottom:1px dashed rgba(31,78,121,.45);
+      border-bottom:1px dashed rgba(31,78,121,.4);
     }
-    .auth-presentation-link a:hover{
-      color:var(--navy);
-      border-bottom-color:var(--navy);
+    .auth-footer a:hover{color:var(--navy);border-bottom-color:var(--navy)}
+    .auth-footer a:focus-visible{
+      outline:2px solid rgba(26,58,92,.25);
+      outline-offset:3px;border-radius:var(--radius-sm);
     }
-    .auth-presentation-link a:focus-visible{
-      outline:2px solid rgba(232,196,106,.75);
-      outline-offset:3px;
-      border-radius:4px;
-    }
+    .auth-footer .hint{margin-top:8px;font-size:10pt}
 
-    /* Hide technical pills on login */
-    body.mode-login .topbar .pill,
-    body.mode-login .topbar .sep,
+    /* Hide user chrome on login */
+    body.mode-login .topbar-user,
+    body.mode-login .topbar-status,
+    body.mode-login .topbar-actions,
     body.mode-login #btn-logout{
       display:none !important;
     }
@@ -909,7 +1181,7 @@
     .doc-title{font-size:14pt;font-weight:900;color:var(--navy);text-align:center;}
     .cover-center-box{
       border:2px solid var(--border);
-      border-radius:12px;
+      border-radius:var(--radius-md);
       padding:30px 40px;
       max-width:420px;
       margin:30px auto;
@@ -985,6 +1257,42 @@
       .fin-table{ font-size:9pt !important; }
       .fin-table th,
       .fin-table td{ padding:3px 5px !important; }
+      .fin-table:not(.admin-data-table) th,
+      .con-table th{
+        background:#f8fafc !important;
+        color:#1a3a5c !important;
+        border-color:#73777f !important;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+      }
+      .fin-table:not(.admin-data-table) td,
+      .fin-table.tb-table td,
+      .con-table td,
+      .contracts-meta-table th,
+      .contracts-meta-table td{
+        border-color:#73777f !important;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+      }
+      .fin-table.tb-table thead tr.tb-head-sub th{
+        background:#e5e8eb !important;
+        color:#1a3a5c !important;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+      }
+      .fin-table:not(.admin-data-table) tbody tr td,
+      .fin-table.tb-table tbody tr td,
+      .con-table tbody tr td{
+        background:#fff !important;
+      }
+      .fin-table:not(.admin-data-table) .row-total td,
+      .fin-table.tb-table .row-total td,
+      .con-table .row-total td{
+        background:#f1f4f7 !important;
+        border-top:2px solid #1a3a5c !important;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+      }
       body.print-pdf-mode{
         background:#fff !important;
       }
@@ -1176,17 +1484,30 @@
 </head>
 <body class="app-bg mode-login">
   <div class="topbar">
-    <span class="pill"><b>الاتصال</b><span id="ui-conn">غير متصل</span></span>
-    <span class="sep"></span>
-    <span class="pill hidden" id="pill-active-office-wrap"><b>المكتب</b><span id="pill-active-office">—</span></span>
-    <span class="sep hidden" id="sep-active-office"></span>
-    <span class="topbar-print-wrap hidden" id="topbar-print-wrap" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <button class="btn" type="button" id="btn-top-print" disabled title="طباعة الغلاف والقوائم والكشوفات وتقرير المدير">🖨️ طباعة / PDF</button>
-      <button class="btn" type="button" id="btn-top-print-tab" disabled title="فتح نافذة طباعة A4">🗂️ A4</button>
-    </span>
-    <span class="sep hidden" id="sep-top-print"></span>
-    <button class="btn" id="btn-logout" disabled>خروج</button>
+    <div class="topbar-side topbar-side-start">
+      <div class="topbar-user hidden" id="topbar-user-wrap" aria-label="معلومات المستخدم">
+        <div class="topbar-user-main">
+          <span class="topbar-user-email" id="topbar-user-email" dir="ltr">—</span>
+          <span class="topbar-user-role users-badge users-badge--staff" id="topbar-user-role">—</span>
+        </div>
+        <span class="topbar-user-office hidden" id="pill-active-office-wrap">
+          <span class="topbar-user-office-label">المكتب</span>
+          <span id="pill-active-office">—</span>
+        </span>
+      </div>
+      <div class="topbar-status is-offline hidden" id="topbar-status" aria-live="polite">
+        <span class="topbar-status-dot" id="topbar-status-dot" aria-hidden="true"></span>
+        <span id="ui-conn">غير متصل</span>
+      </div>
+    </div>
     <span class="brand">Financial Statements</span>
+    <div class="topbar-side topbar-side-end">
+      <div class="topbar-actions hidden" id="topbar-print-wrap">
+        <button class="btn btn-topbar" type="button" id="btn-top-print" disabled title="طباعة الغلاف والقوائم والكشوفات وتقرير المدير">🖨️ طباعة / PDF</button>
+        <button class="btn btn-topbar" type="button" id="btn-top-print-tab" disabled title="فتح نافذة طباعة A4">🗂️ A4</button>
+      </div>
+      <button class="btn btn-topbar btn-topbar-logout" id="btn-logout" disabled>خروج</button>
+    </div>
   </div>
 
   <div class="layout">
@@ -1231,37 +1552,40 @@
       <div class="auth-card" role="region" aria-label="تسجيل الدخول">
         <div class="auth-header">
           <div class="auth-brand">
-            <div class="auth-logo" aria-label="شعار">$</div>
-            <div class="auth-title">Financial Statements</div>
+            <div class="auth-logo" aria-hidden="true">$</div>
+            <div>
+              <h1 class="auth-title">Financial Statements</h1>
+            </div>
           </div>
+          <p class="auth-sub">نظام إعداد القوائم المالية والكشوفات للمكاتب المحاسبية</p>
         </div>
         <div class="auth-form">
-          <h2>تسجيل الدخول</h2>
+          <h2 class="auth-form-title">تسجيل الدخول</h2>
+          <p class="auth-form-lead hint">أدخل البريد وكلمة المرور المسجّلين في Firebase Authentication.</p>
 
-          <div id="file-origin-warning" class="hidden" style="margin-bottom:12px;padding:10px 12px;border-radius:10px;border:1px solid var(--danger);background:rgba(176,0,32,.08);font-size:12px;line-height:1.45;color:var(--text)">
-            <strong>تنبيه:</strong> الصفحة تُفتح عبر <span dir="ltr">file://</span>، وهذا يقيّد المتصفح وقد يمنع Firebase أو يُظهر تحذيرات أمان عند فتح روابط أخرى. شغّل خادماً محلياً من مجلد المشروع ثم افتح التطبيق عبر <span dir="ltr">http://localhost</span>، مثلاً في PowerShell:
-            <code dir="ltr" style="display:block;margin-top:6px;font-size:11px;word-break:break-all">npx --yes serve . -l 5500</code>
-            ثم افتح في المتصفح:
-            <code dir="ltr" style="display:block;margin-top:4px;font-size:11px;word-break:break-all">http://localhost:5500/FinancialStatementsApp.html</code>
+          <div id="file-origin-warning" class="auth-notice hidden" role="alert">
+            <strong>تنبيه:</strong> الصفحة تُفتح عبر <span dir="ltr">file://</span> وهذا قد يمنع Firebase. شغّل خادماً محلياً ثم افتح:
+            <code>npx --yes serve . -l 5500</code>
+            <code>http://localhost:5500/index.html</code>
           </div>
 
-          <div class="field">
-            <label>البريد الإلكتروني</label>
-            <input id="login-email" dir="ltr" autocomplete="username" placeholder="name@example.com" />
+          <div class="auth-field">
+            <label for="login-email">البريد الإلكتروني</label>
+            <input id="login-email" type="email" dir="ltr" autocomplete="username" placeholder="name@example.com" />
           </div>
-          <div class="field">
-            <label>كلمة المرور</label>
+          <div class="auth-field">
+            <label for="login-pass">كلمة المرور</label>
             <input id="login-pass" type="password" dir="ltr" autocomplete="current-password" placeholder="••••••••" />
           </div>
 
           <div class="auth-actions">
-            <button class="btn auth primary" id="btn-login">دخول</button>
+            <button class="btn auth" type="button" id="btn-login">دخول</button>
           </div>
           <div class="alert" id="login-msg" role="alert"></div>
-          <div class="auth-presentation-link">
-            <a id="link-presentation" href="presentation.html" rel="noopener noreferrer">عرض تقديمي يشرح البرنامج</a>
-            <span id="presentation-file-hint" class="hidden hint" style="display:block;margin-top:6px">يفضّل فتح العرض بعد تشغيل الخادم المحلي (انظر التنبيه أعلاه) لتجنب قيود المتصفح على <span dir="ltr">file://</span>.</span>
-          </div>
+        </div>
+        <div class="auth-footer">
+          <a id="link-presentation" href="presentation.html" rel="noopener noreferrer">عرض تقديمي يشرح البرنامج</a>
+          <p id="presentation-file-hint" class="hint hidden">يفضّل فتح العرض بعد تشغيل الخادم المحلي (انظر التنبيه أعلاه).</p>
         </div>
       </div>
     </div>
@@ -1284,11 +1608,7 @@
     <!-- Dashboard container -->
     <div class="card hidden" id="view-dashboard">
       <h2 style="margin-bottom:6px">لوحة التحكم</h2>
-      <p class="hint" style="margin:0 0 12px">نظرة عامة على المكتب؛ استخدم الشريط الجانبي أو الاختصارات أدناه للانتقال.</p>
-      <div class="row" style="margin-bottom:10px;flex-wrap:wrap;gap:8px">
-        <span class="pill"><b>المستخدم</b><span id="dash-user" dir="ltr"></span></span>
-        <span class="pill"><b>الصلاحية</b><span id="dash-role"></span></span>
-      </div>
+      <p class="hint" style="margin:0 0 12px">نظرة عامة على المكتب؛ معلومات حسابك تظهر في الشريط العلوي. استخدم الشريط الجانبي أو الاختصارات أدناه للانتقال.</p>
 
       <div class="card" id="section-dashboard">
         <h2 style="font-size:13pt">إحصائيات سريعة</h2>
@@ -1334,7 +1654,7 @@
               <label>اسم المكتب</label>
               <input id="platform-new-office-name" placeholder="مثال: مكتب بغداد" />
             </div>
-            <button type="button" class="linkbtn" id="btn-platform-create-office">➕ إنشاء مكتب</button>
+            <button type="button" class="linkbtn primary" id="btn-platform-create-office">➕ إنشاء مكتب</button>
           </div>
           <div class="msg err" id="platform-msg" style="margin-top:8px"></div>
           <div class="msg ok" id="platform-ok" style="margin-top:4px"></div>
@@ -1342,7 +1662,7 @@
         <div class="card" style="margin-top:12px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px">
           <div style="font-weight:900;color:var(--navy);margin-bottom:8px">المكاتب المسجّلة</div>
           <div style="overflow:auto">
-            <table class="fin-table" style="width:100%">
+            <table class="fin-table admin-data-table" style="width:100%">
               <thead>
                 <tr>
                   <th style="width:22%">المعرّف</th>
@@ -1392,7 +1712,7 @@
             <h2 style="font-size:13pt">قائمة الشركات</h2>
             <div class="hint">هذا القسم لتعريف الشركة فقط. إدخال البيانات المالية واختيار السنة يتم من قسم “الكشوفات”.</div>
             <div class="actions">
-              <button class="linkbtn" id="btn-open-create-company">➕ شركة جديدة</button>
+              <button class="linkbtn primary" id="btn-open-create-company">➕ شركة جديدة</button>
             </div>
             <div class="msg err" id="newco-msg"></div>
           </div>
@@ -1416,62 +1736,43 @@
       </div>
 
       <div class="card hidden" id="section-users">
-        <h2 style="font-size:13pt">المستخدمين</h2>
-        <div class="hint">هذا القسم يظهر للمدير (Admin) فقط. إنشاء <b>حساب تسجيل الدخول</b> يتم من Firebase Authentication (تسجيل مستخدم بالبريد أو من وحدة تحكم Firebase)، ثم تُسجَّل <b>العضوية</b> هنا باستخدام نفس <b>UID</b> ليُسمح بالدخول إلى المكتب. الصلاحية <b>تجريبي (trial)</b> تمنح عميلاً عدداً محدداً من الأيام يبدأ احتسابها من <b>أول تسجيل دخول ناجح</b> لهذا المكتب؛ عند انتهاء المدة يُمنع الدخول.</div>
-        <div class="hint" style="margin-top:8px">النسخ السريع للـ UID: Firebase Console → Authentication → Users → عمود User UID.</div>
+        <h2 style="font-size:13pt;margin-bottom:6px">المستخدمين</h2>
+        <p class="section-lead">إدارة عضويات المكتب — يظهر هذا القسم لمدير النظام (Admin) فقط.</p>
 
-        <div class="card" style="margin-top:12px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px">
-          <div style="font-weight:900;color:var(--navy);margin-bottom:8px">إضافة أو تحديث عضوية</div>
-          <div class="grid" style="gap:10px">
-            <div>
-              <label>معرف المستخدم UID</label>
-              <input id="users-uid" dir="ltr" placeholder="مثال: AbCdEfGh..." autocomplete="off" />
-            </div>
-            <div>
-              <label>البريد (للعرض فقط)</label>
-              <input id="users-email" dir="ltr" placeholder="user@example.com" autocomplete="off" />
-            </div>
-            <div>
-              <label>الصلاحية</label>
-              <select id="users-role">
-                <option value="staff">محاسب / موظف (staff)</option>
-                <option value="admin">مدير (admin)</option>
-                <option value="trial">تجريبي — عميل (trial)</option>
-              </select>
-            </div>
-            <div id="users-trial-days-wrap" class="hidden" style="grid-column:1/-1">
-              <label>أيام الفترة التجريبية (تبدأ من أول دخول لهذا المكتب)</label>
-              <input id="users-trial-days" type="number" min="1" max="3650" step="1" dir="ltr" placeholder="مثال: 14" />
-              <div class="hint" style="margin-top:6px">يجب أن يكون إعداد المكتب الأولي قد اكتمل مسبقاً (مستند الإعداد) قبل أن يستطيع العميل التجريبي الدخول.</div>
-            </div>
-            <div>
-              <label>الحالة</label>
-              <select id="users-active">
-                <option value="yes">مفعّل</option>
-                <option value="no">معطّل</option>
-              </select>
-            </div>
-          </div>
-          <div class="actions" style="margin-top:12px">
-            <button class="linkbtn" id="btn-users-save" type="button">حفظ العضوية</button>
-            <button class="linkbtn" id="btn-users-refresh" type="button">تحديث القائمة</button>
-          </div>
-          <div class="msg err" id="users-msg" style="margin-top:8px"></div>
-          <div class="msg ok" id="users-ok" style="margin-top:4px"></div>
+        <div class="users-stats">
+          <span class="pill"><b>الإجمالي</b><span id="users-stat-total">—</span></span>
+          <span class="pill"><b>مفعّل</b><span id="users-stat-active">—</span></span>
+          <span class="pill"><b>تجريبي</b><span id="users-stat-trial">—</span></span>
         </div>
 
-        <div class="card" style="margin-top:12px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px">
-          <div style="font-weight:900;color:var(--navy);margin-bottom:8px">المستخدمون المسجّلون في المكتب</div>
+        <div class="users-info">
+          <div class="users-info-title">كيف تُضاف عضوية؟</div>
+          <ol>
+            <li>أنشئ حساب تسجيل الدخول من <b>Firebase Authentication</b> (Console أو تسجيل بالبريد).</li>
+            <li>انسخ <b>User UID</b> من: Firebase Console → Authentication → Users.</li>
+            <li>اضغط <b>➕ إضافة عضوية</b>، أدخل الـ UID وحدّد الصلاحية — الصلاحية <b>تجريبي</b> تبدأ احتساب أيامها من <b>أول دخول ناجح</b> لهذا المكتب.</li>
+          </ol>
+        </div>
+
+        <div class="users-panel">
+          <div class="users-panel-head">
+            <h3 class="users-panel-title">المستخدمون المسجّلون في المكتب</h3>
+            <div class="row" style="gap:8px">
+              <button type="button" class="linkbtn primary" id="btn-open-users-membership">➕ إضافة عضوية</button>
+              <button type="button" class="linkbtn" id="btn-users-refresh">تحديث القائمة</button>
+            </div>
+          </div>
+          <div class="msg err" id="users-list-msg"></div>
           <div style="overflow:auto">
-            <table class="fin-table" style="width:100%">
+            <table class="fin-table admin-data-table" style="width:100%">
               <thead>
                 <tr>
-                  <th style="width:24%">UID</th>
-                  <th style="width:22%">البريد</th>
-                  <th style="width:12%">الصلاحية</th>
-                  <th style="width:18%">التجربة</th>
-                  <th style="width:10%">الحالة</th>
-                  <th style="width:14%">إجراءات</th>
+                  <th style="width:22%">UID</th>
+                  <th style="width:20%">البريد</th>
+                  <th style="width:11%">الصلاحية</th>
+                  <th style="width:20%">التجربة</th>
+                  <th style="width:11%">الحالة</th>
+                  <th style="width:16%">إجراءات</th>
                 </tr>
               </thead>
               <tbody id="users-tbody">
@@ -1490,7 +1791,7 @@
         </div>
         <div class="msg err" id="movements-msg" style="margin-top:8px"></div>
         <div style="overflow:auto;margin-top:12px">
-          <table class="fin-table" style="width:100%">
+          <table class="fin-table admin-data-table" style="width:100%">
             <thead>
               <tr>
                 <th style="width:22%">الوقت</th>
@@ -1520,8 +1821,8 @@
               <datalist id="in-year-list"></datalist>
               <select id="in-year" style="min-width:140px;display:none" dir="ltr"></select>
             </span>
-            <button class="linkbtn" id="btn-in-open-year" type="button">فتح</button>
-            <button class="linkbtn" id="btn-in-new-year" type="button">➕ سنة جديدة</button>
+            <button class="linkbtn primary" id="btn-in-open-year" type="button">فتح</button>
+            <button class="linkbtn primary" id="btn-in-new-year" type="button">➕ سنة جديدة</button>
           </div>
           <div class="msg err" id="in-msg"></div>
           <div class="msg ok" id="in-ok"></div>
@@ -1601,7 +1902,7 @@
             </div>
           </div>
           <div class="actions">
-            <button class="linkbtn" id="btn-save-year" disabled>حفظ مرجعيات السنة</button>
+            <button class="linkbtn accent" id="btn-save-year" disabled>حفظ مرجعيات السنة</button>
           </div>
           <div class="msg err" id="year-msg"></div>
           <div class="msg ok" id="year-ok"></div>
@@ -1752,7 +2053,7 @@
       </div>
       <div class="modal-ft">
         <button class="btn modal" id="btn-cancel-create-company" type="button">إلغاء</button>
-        <button class="btn modal primary" id="btn-create-company" type="button">إنشاء</button>
+        <button class="btn modal accent" id="btn-create-company" type="button">إنشاء</button>
       </div>
     </div>
   </div>
@@ -1946,7 +2247,7 @@
       </div>
       <div class="modal-ft">
         <button class="btn modal" id="btn-close-edit-company" type="button">إغلاق</button>
-        <button class="btn modal primary" id="btn-save-company-modal" type="button">حفظ</button>
+        <button class="btn modal accent" id="btn-save-company-modal" type="button">حفظ</button>
       </div>
     </div>
   </div>
@@ -1993,7 +2294,60 @@
       </div>
       <div class="modal-ft">
         <button class="btn modal" type="button" id="btn-directory-person-cancel">إلغاء</button>
-        <button class="btn modal primary" type="button" id="btn-directory-person-save">حفظ في الدليل</button>
+        <button class="btn modal accent" type="button" id="btn-directory-person-save">حفظ في الدليل</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users membership modal -->
+  <div class="overlay" id="ov-users-membership" aria-hidden="true">
+    <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="users-modal-title">
+      <div class="modal-hd">
+        <span id="users-modal-title">إضافة عضوية</span>
+        <button class="modal-close" type="button" id="btn-x-users-membership" aria-label="إغلاق">×</button>
+      </div>
+      <div class="modal-bd">
+        <div class="users-form-grid">
+          <div class="form-section span-full">بيانات الحساب</div>
+          <div class="span-full">
+            <label for="users-uid">معرف المستخدم (UID)</label>
+            <input id="users-uid" dir="ltr" placeholder="مثال: AbCdEfGhIjKlMnOpQrStUvWxYz" autocomplete="off" />
+          </div>
+          <div class="span-full">
+            <label for="users-email">البريد الإلكتروني</label>
+            <input id="users-email" dir="ltr" placeholder="user@example.com" autocomplete="off" />
+            <div class="hint" style="margin-top:5px">للعرض والتعرف فقط — لا يُستخدم لتسجيل الدخول من هنا.</div>
+          </div>
+          <div class="form-section span-full">الصلاحيات والحالة</div>
+          <div>
+            <label for="users-role">الصلاحية</label>
+            <select id="users-role">
+              <option value="staff">محاسب / موظف (staff)</option>
+              <option value="admin">مدير (admin)</option>
+              <option value="trial">تجريبي — عميل (trial)</option>
+            </select>
+          </div>
+          <div>
+            <label for="users-active">الحالة</label>
+            <select id="users-active">
+              <option value="yes">مفعّل</option>
+              <option value="no">معطّل</option>
+            </select>
+          </div>
+          <div id="users-trial-days-wrap" class="hidden span-full">
+            <div class="users-trial-box">
+              <label for="users-trial-days">أيام الفترة التجريبية</label>
+              <input id="users-trial-days" type="number" min="1" max="3650" step="1" dir="ltr" placeholder="مثال: 14" />
+              <div class="hint" style="margin-top:6px">تبدأ من أول دخول ناجح لهذا المكتب. يجب أن يكون الإعداد الأولي للمكتب قد اكتمل مسبقاً.</div>
+            </div>
+          </div>
+        </div>
+        <div class="msg err" id="users-modal-msg"></div>
+        <div class="msg ok" id="users-modal-ok"></div>
+      </div>
+      <div class="modal-ft">
+        <button class="btn modal" type="button" id="btn-users-cancel">إلغاء</button>
+        <button class="btn modal accent" type="button" id="btn-users-save">حفظ العضوية</button>
       </div>
     </div>
   </div>
@@ -2016,7 +2370,7 @@
       </div>
       <div class="modal-ft">
         <button class="btn modal" id="btn-cancel-new-year" type="button">إلغاء</button>
-        <button class="btn modal primary" id="btn-confirm-new-year" type="button">إنشاء</button>
+        <button class="btn modal accent" id="btn-confirm-new-year" type="button">إنشاء</button>
       </div>
     </div>
   </div>
@@ -2061,7 +2415,7 @@
       </div>
       <div class="modal-ft">
         <button class="btn modal" id="btn-cancel-sch" type="button">إلغاء</button>
-        <button class="btn modal primary" id="btn-save-sch" type="button">حفظ</button>
+        <button class="btn modal accent" id="btn-save-sch" type="button">حفظ</button>
       </div>
     </div>
   </div>
@@ -2109,10 +2463,8 @@
     const hide = (id) => $(id).classList.add("hidden");
     function syncPrintToolbar(){
       const on = !$("in-pages-card")?.classList.contains("hidden");
-      ["topbar-print-wrap","sep-top-print"].forEach((id)=>{
-        const el = $(id);
-        if(el) el.classList.toggle("hidden", !on);
-      });
+      const wrap = $("topbar-print-wrap");
+      if(wrap) wrap.classList.toggle("hidden", !on);
       ["btn-top-print","btn-top-print-tab","btn-pages-print","btn-pages-print-tab","btn-in-md-print","btn-in-md-print-tab"].forEach((id)=>{
         const el = $(id);
         if(el) el.disabled = !on;
@@ -2498,21 +2850,68 @@
 
     async function updateTopbarOfficeName(){
       const wrap = $("pill-active-office-wrap");
-      const sep = $("sep-active-office");
       const span = $("pill-active-office");
       if(!span) return;
       const oid = officeId();
       try{
         const d = await getDoc(doc(db, "offices", oid));
         const name = d.exists() ? (d.data()?.name || oid) : oid;
-        span.textContent = `${name} (${oid})`;
+        span.textContent = name;
+        span.title = oid;
         wrap?.classList.remove("hidden");
-        sep?.classList.remove("hidden");
       }catch(_){
         span.textContent = oid;
+        span.title = oid;
         wrap?.classList.remove("hidden");
-        sep?.classList.remove("hidden");
       }
+    }
+
+    function setTopbarConnStatus(state, label){
+      const wrap = $("topbar-status");
+      if(!wrap) return;
+      wrap.classList.remove("is-online","is-busy","is-offline","is-error");
+      if(state === "online") wrap.classList.add("is-online");
+      else if(state === "busy") wrap.classList.add("is-busy");
+      else if(state === "error") wrap.classList.add("is-error");
+      else wrap.classList.add("is-offline");
+      if(label != null) setText("ui-conn", label);
+      wrap.classList.toggle("hidden", state === "hidden");
+    }
+
+    function updateTopbarUser(user, mem){
+      const wrap = $("topbar-user-wrap");
+      if(!wrap) return;
+      if(!user){
+        wrap.classList.add("hidden");
+        setTopbarConnStatus("hidden");
+        return;
+      }
+      wrap.classList.remove("hidden");
+      const emailEl = $("topbar-user-email");
+      if(emailEl){
+        emailEl.textContent = user.email || user.uid || "—";
+        emailEl.title = user.email || user.uid || "";
+      }
+      const roleEl = $("topbar-user-role");
+      if(roleEl){
+        const role = mem?.role || "";
+        if(role){
+          roleEl.textContent = usersRoleColLabel(role);
+          roleEl.className = "topbar-user-role users-badge " + usersRoleBadgeClass(role);
+          roleEl.classList.remove("hidden");
+        }else{
+          roleEl.textContent = "إعداد أولي";
+          roleEl.className = "topbar-user-role users-badge users-badge--staff";
+          roleEl.classList.remove("hidden");
+        }
+      }
+      setTopbarConnStatus("hidden");
+    }
+
+    function clearTopbarUser(){
+      updateTopbarUser(null, null);
+      $("pill-active-office-wrap")?.classList.add("hidden");
+      setTopbarConnStatus("offline", "غير متصل");
     }
 
     async function switchToOffice(oid){
@@ -2630,6 +3029,73 @@
       if(endMs <= Date.now()) return "انتهت الفترة";
       const left = Math.max(0, Math.ceil((endMs - Date.now()) / 86400000));
       return `${left} يومًا · حتى ${exp.toLocaleDateString("ar-IQ")}`;
+    }
+
+    function usersRoleBadgeClass(role){
+      const r = String(role || "staff").toLowerCase();
+      if(r === "admin") return "users-badge--admin";
+      if(r === "trial") return "users-badge--trial";
+      return "users-badge--staff";
+    }
+
+    function appendUsersBadge(td, text, cls){
+      const span = document.createElement("span");
+      span.className = "users-badge " + cls;
+      span.textContent = text;
+      td.appendChild(span);
+    }
+
+    function updateUsersStats(items){
+      const total = items.length;
+      const active = items.filter((u) => u.active !== false).length;
+      const trial = items.filter((u) => String(u.role || "").toLowerCase() === "trial").length;
+      setText("users-stat-total", String(total));
+      setText("users-stat-active", String(active));
+      setText("users-stat-trial", String(trial));
+    }
+
+    function clearUsersForm(){
+      if($("users-uid")){
+        $("users-uid").value = "";
+        $("users-uid").readOnly = false;
+      }
+      if($("users-email")) $("users-email").value = "";
+      if($("users-role")) $("users-role").value = "staff";
+      if($("users-active")) $("users-active").value = "yes";
+      if($("users-trial-days")) $("users-trial-days").value = "";
+      syncUsersTrialFieldsVisibility();
+      setText("users-modal-msg", "");
+      setText("users-modal-ok", "");
+    }
+
+    function fillUsersFormFields(u){
+      $("users-uid").value = u.id;
+      $("users-email").value = u.email ? String(u.email) : "";
+      const rr = String(u.role || "staff").toLowerCase();
+      if(rr === "admin") $("users-role").value = "admin";
+      else if(rr === "trial") $("users-role").value = "trial";
+      else $("users-role").value = "staff";
+      $("users-active").value = u.active === false ? "no" : "yes";
+      const td = Number(u.trialDays);
+      $("users-trial-days").value = Number.isFinite(td) && td > 0 ? String(td) : "";
+      syncUsersTrialFieldsVisibility();
+      setText("users-modal-msg", "");
+      setText("users-modal-ok", "");
+    }
+
+    function openAddUsersMembership(){
+      clearUsersForm();
+      $("users-modal-title").textContent = "إضافة عضوية";
+      openOverlay("ov-users-membership");
+      $("users-uid")?.focus();
+    }
+
+    function openEditUsersMembership(u){
+      fillUsersFormFields(u);
+      $("users-uid").readOnly = true;
+      $("users-modal-title").textContent = "تعديل عضوية";
+      openOverlay("ov-users-membership");
+      $("users-email")?.focus();
     }
 
     function syncUsersTrialFieldsVisibility(){
@@ -3050,7 +3516,6 @@
     }
 
     // اتصال قاعدة البيانات (يعتمد على نجاح قراءات Firestore)
-    setText("ui-conn", "غير متصل");
 
     function bootRef() { return doc(db, "offices", officeId(), "settings", "bootstrap"); }
     function memberRef(uid) { return doc(db, "offices", officeId(), "users", uid); }
@@ -3948,7 +4413,7 @@
           <button type="button" class="tb-btn secondary" id="md-about-del">🗑 حذف السطر</button>
           <button type="button" class="tb-btn secondary" id="md-about-up">⬆️</button>
           <button type="button" class="tb-btn secondary" id="md-about-down">⬇️</button>
-          <button type="button" class="tb-btn primary" id="md-about-save">💾 حفظ</button>
+          <button type="button" class="tb-btn accent" id="md-about-save">💾 حفظ</button>
           <span style="font-size:9pt;color:var(--muted);">الفقرة (1) ثابتة من المرجعية</span>
         </div>
         <ol id="md-about-list" class="md-about-list" start="2"></ol>
@@ -3965,7 +4430,7 @@
           <button type="button" class="tb-btn secondary" id="md-activity-bank-del">🗑 حذف جدول المصارف</button>
           <button type="button" class="tb-btn secondary" id="md-bank-row-add">➕ إضافة صف للمصارف</button>
           <button type="button" class="tb-btn secondary" id="md-bank-row-del">🗑 حذف صف للمصارف</button>
-          <button type="button" class="tb-btn primary" id="md-activity-save">💾 حفظ</button>
+          <button type="button" class="tb-btn accent" id="md-activity-save">💾 حفظ</button>
           <span style="font-size:9pt;color:var(--muted);">الفقرة (١) والفقرة (٢) تُدرجان تلقائياً عند وجود إيراد/مصاريف.</span>
         </div>
         <ol id="md-activity-list" class="md-about-list" style="list-style:none;padding-right:0;margin-top:8px;"></ol>
@@ -4292,7 +4757,7 @@
           <button type="button" class="tb-btn secondary" id="md-sh-del">🗑 حذف الصف</button>
           <button type="button" class="tb-btn secondary" id="md-sh-up">⬆️</button>
           <button type="button" class="tb-btn secondary" id="md-sh-down">⬇️</button>
-          <button type="button" class="tb-btn primary" id="md-sh-save">💾 حفظ</button>
+          <button type="button" class="tb-btn accent" id="md-sh-save">💾 حفظ</button>
           <span style="font-size:9pt;color:var(--muted);">جدول المساهمين خاص بالشركة/السنة.</span>
         </div>
         <table class="fin-table" id="md-shareholders-table" style="font-size:9pt;margin-top:6px;">
@@ -4309,7 +4774,7 @@
           <button type="button" class="tb-btn secondary" id="md-pol-del">🗑 حذف السطر</button>
           <button type="button" class="tb-btn secondary" id="md-pol-up">⬆️</button>
           <button type="button" class="tb-btn secondary" id="md-pol-down">⬇️</button>
-          <button type="button" class="tb-btn primary" id="md-pol-save">💾 حفظ</button>
+          <button type="button" class="tb-btn accent" id="md-pol-save">💾 حفظ</button>
         </div>
         <ol id="md-policies-list" class="md-about-list" style="margin-top:6px;"></ol>
         <div class="doc-heading" contenteditable="false">سادسا  : الاحداث اللاحقة :</div>
@@ -4320,21 +4785,21 @@
           <button type="button" class="tb-btn secondary" id="md-ev-del">🗑 حذف السطر</button>
           <button type="button" class="tb-btn secondary" id="md-ev-up">⬆️</button>
           <button type="button" class="tb-btn secondary" id="md-ev-down">⬇️</button>
-          <button type="button" class="tb-btn primary" id="md-ev-save">💾 حفظ</button>
+          <button type="button" class="tb-btn accent" id="md-ev-save">💾 حفظ</button>
         </div>
         <ol id="md-events-list" class="md-about-list" style="margin-top:6px;"></ol>
         <div class="doc-heading" contenteditable="false">سابعاً- التعهد :</div>
         <div id="md-commitment-toolbar" class="md-about-toolbar" style="margin-top:8px;">
           <button type="button" class="tb-btn secondary" id="md-com-edit-start">✏️ تعديل التعهد</button>
           <button type="button" class="tb-btn secondary hidden" id="md-com-edit-done">✅ إنهاء التعديل</button>
-          <button type="button" class="tb-btn primary" id="md-com-save">💾 حفظ</button>
+          <button type="button" class="tb-btn accent" id="md-com-save">💾 حفظ</button>
         </div>
         <div class="doc-body" contenteditable="false"><span id="md-commitment-text" contenteditable="false">${mdV01SafeText(m.commitmentText || "")}</span></div>
         <div class="doc-heading" contenteditable="false">ثامناً- الفقرة الختامية :</div>
         <div id="md-closing-toolbar" class="md-about-toolbar" style="margin-top:8px;">
           <button type="button" class="tb-btn secondary" id="md-clo-edit-start">✏️ تعديل الفقرة الختامية</button>
           <button type="button" class="tb-btn secondary hidden" id="md-clo-edit-done">✅ إنهاء التعديل</button>
-          <button type="button" class="tb-btn primary" id="md-clo-save">💾 حفظ</button>
+          <button type="button" class="tb-btn accent" id="md-clo-save">💾 حفظ</button>
         </div>
         <div class="doc-body doc-bold doc-underline" contenteditable="false"><span id="md-closing-text" contenteditable="false">${mdV01SafeText(mdApplyTemplate(m.closingText || "", ctx) || "")}</span></div>
         <div class="doc-body centered" contenteditable="false">ـــــــــ مع التقدير ـــــــــ</div>
@@ -5268,8 +5733,7 @@
     async function loadUsersSection(){
       const tbody = $("users-tbody");
       if(!tbody) return;
-      setText("users-msg", "");
-      setText("users-ok", "");
+      setText("users-list-msg", "");
       tbody.innerHTML = "";
       const loadingRow = document.createElement("tr");
       const loadingCell = document.createElement("td");
@@ -5283,6 +5747,7 @@
         const items = [];
         snap.forEach((d) => items.push({ id: d.id, ...d.data() }));
         items.sort((a,b)=> String(a.email||a.id||"").localeCompare(String(b.email||b.id||""), "ar"));
+        updateUsersStats(items);
         tbody.innerHTML = "";
         const curUid = auth.currentUser?.uid || "";
         if(!items.length){
@@ -5298,41 +5763,29 @@
         }
         for(const u of items){
           const tr = document.createElement("tr");
-          if(u.id === curUid) tr.style.background = "var(--blue-ultra)";
+          if(u.id === curUid) tr.classList.add("users-row-self");
           const tdUid = document.createElement("td");
+          tdUid.className = "users-cell-uid";
           tdUid.dir = "ltr";
-          tdUid.style.fontSize = "11px";
-          tdUid.style.wordBreak = "break-all";
           tdUid.textContent = u.id;
           const tdEmail = document.createElement("td");
           tdEmail.dir = "ltr";
           tdEmail.textContent = u.email || "—";
           const tdRole = document.createElement("td");
-          tdRole.textContent = usersRoleColLabel(u.role);
+          appendUsersBadge(tdRole, usersRoleColLabel(u.role), usersRoleBadgeClass(u.role));
           const tdTrial = document.createElement("td");
-          tdTrial.className = "hint";
-          tdTrial.style.fontSize = "12px";
+          tdTrial.className = "users-cell-trial";
           tdTrial.textContent = usersTrialSummary(u);
           const tdAct = document.createElement("td");
-          tdAct.textContent = u.active === false ? "معطّل" : "مفعّل";
+          const active = u.active !== false;
+          appendUsersBadge(tdAct, active ? "مفعّل" : "معطّل", active ? "users-badge--active" : "users-badge--inactive");
           const tdBtn = document.createElement("td");
+          tdBtn.className = "users-cell-actions";
           const btn = document.createElement("button");
           btn.type = "button";
           btn.className = "linkbtn";
-          btn.textContent = "تعديل في النموذج";
-          btn.addEventListener("click", ()=>{
-            $("users-uid").value = u.id;
-            $("users-email").value = u.email ? String(u.email) : "";
-            const rr = String(u.role||"staff").toLowerCase();
-            if(rr === "admin") $("users-role").value = "admin";
-            else if(rr === "trial") $("users-role").value = "trial";
-            else $("users-role").value = "staff";
-            $("users-active").value = u.active === false ? "no" : "yes";
-            const td = Number(u.trialDays);
-            $("users-trial-days").value = Number.isFinite(td) && td > 0 ? String(td) : "";
-            syncUsersTrialFieldsVisibility();
-            $("users-uid").scrollIntoView({ behavior:"smooth", block:"center" });
-          });
+          btn.textContent = "تعديل";
+          btn.addEventListener("click", ()=> openEditUsersMembership(u));
           tdBtn.appendChild(btn);
           tr.appendChild(tdUid);
           tr.appendChild(tdEmail);
@@ -5344,6 +5797,7 @@
         }
         syncUsersTrialFieldsVisibility();
       }catch(e){
+        updateUsersStats([]);
         tbody.innerHTML = "";
         const tr = document.createElement("tr");
         const td = document.createElement("td");
@@ -5352,14 +5806,14 @@
         td.textContent = "تعذر تحميل المستخدمين.";
         tr.appendChild(td);
         tbody.appendChild(tr);
-        setText("users-msg", e?.message || String(e));
+        setText("users-list-msg", e?.message || String(e));
       }
     }
 
     $("btn-users-save")?.addEventListener("click", async ()=>{
       try{
-        setText("users-msg","");
-        setText("users-ok","");
+        setText("users-modal-msg","");
+        setText("users-modal-ok","");
         const uid = ($("users-uid")?.value||"").trim();
         if(!uid) throw new Error("أدخل UID صالحاً من Firebase Authentication.");
         const email = ($("users-email")?.value||"").trim();
@@ -5400,13 +5854,19 @@
         await setDoc(ref, payload, { merge: true });
         const trialNote = role === "trial" ? ` — تجربة ${trialDays} يومًا` : "";
         await appendActivityLog("عضوية مستخدم", `UID: ${uid} — الدور: ${role} — ${active ? "مفعّل" : "معطّل"}${trialNote}${email ? ` — ${email}` : ""}`);
-        setText("users-ok", "تم حفظ العضوية.");
+        closeOverlay("ov-users-membership");
         await loadUsersSection();
       }catch(e){
-        setText("users-msg", e?.message || String(e));
+        setText("users-modal-msg", e?.message || String(e));
       }
     });
+    $("btn-open-users-membership")?.addEventListener("click", ()=> openAddUsersMembership());
     $("btn-users-refresh")?.addEventListener("click", ()=> void loadUsersSection());
+    $("btn-x-users-membership")?.addEventListener("click", ()=> closeOverlay("ov-users-membership"));
+    $("btn-users-cancel")?.addEventListener("click", ()=> closeOverlay("ov-users-membership"));
+    $("ov-users-membership")?.addEventListener("click", (e)=>{
+      if(e.target && e.target.id === "ov-users-membership") closeOverlay("ov-users-membership");
+    });
     $("users-role")?.addEventListener("change", ()=> syncUsersTrialFieldsVisibility());
 
     async function refreshCompanies() {
@@ -7196,7 +7656,7 @@
             <span style="font-weight:900;color:var(--navy)">بيان د – كشف حركة المخزون</span>
             <span class="hint" style="margin-right:auto">${CY} / ${PY}</span>
             <button class="tb-btn secondary" data-act="edit">✏️ تعديل</button>
-            <button class="tb-btn primary" data-act="save" disabled>💾 حفظ</button>
+            <button class="tb-btn accent" data-act="save" disabled>💾 حفظ</button>
           </div>
           <div class="hint">هذا الكشف مستقل عن كشف (٦). يتم إدخال قيم المخزون يدوياً ثم يُرحّل: مخزون نهاية السنة للميزانية (15) وتكلفة المواد المستخدمة لقائمة الدخل (الخامات والمواد الأولية 321).</div>
           <div data-body style="margin-top:10px"></div>
@@ -7345,7 +7805,7 @@
             <span style="font-weight:900;color:var(--navy)">بيان ج – قائمة التغيرات في حقوق الملكية</span>
             <span class="hint" style="margin-right:auto">${endTxt ? `كما في ${endTxt}` : ""}</span>
             <button class="tb-btn secondary" data-act="edit">✏️ تعديل</button>
-            <button class="tb-btn primary" data-act="save" disabled>💾 حفظ</button>
+            <button class="tb-btn accent" data-act="save" disabled>💾 حفظ</button>
           </div>
           <div class="hint">هذا البيان مستقل (لا يعتمد على معلومات الشركة). الافتتاحي والتنزيلات يدوي، والإضافات تأتي تلقائياً من قائمة الدخل (الاحتياطي القانوني + الفائض/العجز).</div>
           <div data-body style="margin-top:10px"></div>
@@ -7528,7 +7988,7 @@
             <span class="hint" style="margin-right:auto">${CY} / ${PY}</span>
             ${(kind === "vertical") ? `<button class="tb-btn secondary" data-act="cfg" title="إعداد ربط هذا الكشف بالحسابات الختامية">⚙️ إعداد</button>` : ``}
             ${canEdit ? `<button class="tb-btn secondary" data-act="edit">✏️ تعديل</button>` : ``}
-            ${canEdit ? `<button class="tb-btn primary" data-act="save" disabled>💾 حفظ</button>` : ``}
+            ${canEdit ? `<button class="tb-btn accent" data-act="save" disabled>💾 حفظ</button>` : ``}
             <button class="tb-btn" data-act="del">🗑 حذف</button>
           </div>
           <div data-body style="margin-top:10px"></div>
@@ -8327,13 +8787,17 @@
 
     // ===== UI actions =====
     $("btn-login").addEventListener("click", async () => {
+      const btn = $("btn-login");
       try {
         setAlert("login-msg", "");
+        if(btn) btn.disabled = true;
         const email = $("login-email").value.trim();
         const pass = $("login-pass").value.trim();
         await signInWithEmailAndPassword(auth, email, pass);
       } catch (e) {
         setAlert("login-msg", e?.message || String(e));
+      } finally {
+        if(btn) btn.disabled = false;
       }
     });
 
@@ -8868,9 +9332,11 @@
       const ov1 = $("ov-create-company");
       const ov3 = $("ov-new-year");
       const ovDir = $("ov-directory-person");
+      const ovUsers = $("ov-users-membership");
       if (ov1?.classList.contains("show")) closeOverlay("ov-create-company");
       if (ov3?.classList.contains("show")) closeOverlay("ov-new-year");
       if (ovDir?.classList.contains("show")) closeOverlay("ov-directory-person");
+      if (ovUsers?.classList.contains("show")) closeOverlay("ov-users-membership");
     });
 
     $("btn-x-new-year").addEventListener("click", ()=>closeOverlay("ov-new-year"));
@@ -9220,9 +9686,8 @@
       hide("view-login");
       hide("view-bootstrap");
       show("view-dashboard");
-      setText("dash-user", `${user.email}`);
-      setText("dash-role", roleLabelAr(mem.role));
-      setText("ui-conn", "متصل");
+      updateTopbarUser(user, mem);
+      setTopbarConnStatus("online", "متصل");
       setMode("app");
       await updateTopbarOfficeName();
       try{
@@ -9257,10 +9722,8 @@
 
       if (!user) {
         setMode("login");
-        setText("ui-conn", "غير متصل");
+        clearTopbarUser();
         $("btn-logout").disabled = true;
-        $("pill-active-office-wrap")?.classList.add("hidden");
-        $("sep-active-office")?.classList.add("hidden");
         state.activeOfficeId = null;
         state.isPlatformSuperAdmin = false;
         // ensure modal dynamic fields are ready when opened
@@ -9275,7 +9738,8 @@
         return;
       }
 
-      setText("ui-conn", "جاري الاتصال...");
+      setTopbarConnStatus("busy", "جاري الاتصال…");
+      updateTopbarUser(user, null);
       $("btn-logout").disabled = false;
 
       try {
@@ -9301,8 +9765,10 @@
           show("view-bootstrap");
           hide("view-dashboard");
           setText("bootstrap-user", `المستخدم الحالي: ${user.email} / ${user.uid} — المكتب: ${officeId()}`);
-          setText("ui-conn", "متصل");
+          updateTopbarUser(user, null);
+          setTopbarConnStatus("online", "متصل");
           setMode("app");
+          void updateTopbarOfficeName();
           return;
         }
 
@@ -9314,7 +9780,8 @@
         const mem = await ensureMembership(user);
         await openDashboardForUser(user, mem);
       } catch (e) {
-        setText("ui-conn", "خطأ اتصال/صلاحيات");
+        clearTopbarUser();
+        setTopbarConnStatus("error", "خطأ اتصال/صلاحيات");
         setMode("login");
         show("view-login");
         hide("view-bootstrap");
