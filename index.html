@@ -967,6 +967,63 @@
       direction:ltr;
       unicode-bidi:plaintext;
     }
+    /* دليل الحسابات الموحّد — اقتراح تلقائي */
+    .coa-ac-wrap{ position:relative; }
+    .coa-ac-menu{
+      position:absolute;
+      top:100%;
+      right:0;
+      left:0;
+      z-index:500;
+      max-height:220px;
+      overflow:auto;
+      margin:2px 0 0;
+      padding:4px 0;
+      list-style:none;
+      background:var(--surface-container-lowest);
+      border:1px solid var(--border);
+      border-radius:8px;
+      box-shadow:0 8px 24px rgba(0,36,68,.12);
+    }
+    .coa-ac-item{
+      display:flex;
+      gap:8px;
+      align-items:baseline;
+      padding:6px 10px;
+      cursor:pointer;
+      font-size:9pt;
+    }
+    .coa-ac-item:hover{ background:var(--surface-hover); }
+    .coa-ac-code{
+      flex:0 0 auto;
+      min-width:3.5em;
+      font-family:var(--font-mono, ui-monospace, monospace);
+      font-weight:700;
+      color:var(--navy);
+    }
+    .coa-ac-name{ flex:1; text-align:right; }
+    .fin-table .coa-inp{
+      width:100%;
+      box-sizing:border-box;
+      border:1px solid var(--border);
+      border-radius:6px;
+      padding:4px 6px;
+      font:inherit;
+      background:var(--surface);
+    }
+    .fin-table .coa-inp:focus{
+      outline:2px solid rgba(232,196,106,.55);
+      outline-offset:0;
+    }
+    .coa-toolbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      margin:12px 0 14px;
+    }
+    .coa-toolbar > div{ flex:1; min-width:180px; }
+    .coa-toolbar .coa-filter-narrow{ flex:0 1 200px; min-width:160px; }
     /* كشف الموجودات الثابتة — رأس الأعمدة */
     .fa-col-head{ display:grid; gap:3px; width:100%; text-align:center; }
     .fa-col-code{ font-weight:900; font-size:9pt; line-height:1.2; }
@@ -1582,6 +1639,10 @@
           <span class="ic">📇</span>
           دليل المحاسبين والمراقبين
         </button>
+        <button class="nav-btn" id="nav-coa" data-section="coa">
+          <span class="ic">📒</span>
+          دليل الحسابات الموحّد
+        </button>
         <button class="nav-btn" id="nav-schedules" data-section="schedules">
           <span class="ic">🧾</span>
           الكشوفات
@@ -1692,7 +1753,8 @@
           <div class="row" style="gap:8px;flex-wrap:wrap">
             <button type="button" class="linkbtn" id="dash-go-companies">الشركات</button>
             <button type="button" class="linkbtn" id="dash-go-schedules">الكشوفات</button>
-            <button type="button" class="linkbtn" id="dash-go-directory">الدليل</button>
+            <button type="button" class="linkbtn" id="dash-go-directory">المحاسبون والمراقبون</button>
+            <button type="button" class="linkbtn" id="dash-go-coa">دليل الحسابات</button>
             <button type="button" class="linkbtn hidden" id="dash-go-users">المستخدمين</button>
             <button type="button" class="linkbtn hidden" id="dash-go-movements">مسجل الحركات</button>
             <button type="button" class="linkbtn hidden" id="dash-go-platform">مكاتب المنصّة</button>
@@ -1760,6 +1822,44 @@
         </div>
         <div class="msg err" id="directory-msg" style="margin-top:10px"></div>
         <div class="msg ok" id="directory-ok" style="margin-top:6px"></div>
+      </div>
+
+      <div class="card hidden" id="section-coa">
+        <h2 style="font-size:13pt">دليل الحسابات الموحّد (العراق)</h2>
+        <div class="hint">مرجع للحسابات الشائعة في المكاتب العراقية. عند إدخال الكشوفات يظهر اقتراح تلقائي — الاختيار اختياري؛ إذا اخترت حساباً يُملأ الرمز والاسم معاً. يمكنك دائماً كتابة اسم أو رمز مخصص.</div>
+        <div class="coa-toolbar">
+          <div>
+            <label for="coa-search">بحث</label>
+            <input id="coa-search" type="search" placeholder="رمز أو اسم الحساب…" autocomplete="off" />
+          </div>
+          <div class="coa-filter-narrow">
+            <label for="coa-class-filter">الفئة</label>
+            <select id="coa-class-filter">
+              <option value="">الكل</option>
+              <option value="1">الموجودات</option>
+              <option value="2">المطلوبات</option>
+              <option value="3">حقوق الملكية</option>
+              <option value="4">الإيرادات</option>
+              <option value="5">المصاريف</option>
+            </select>
+          </div>
+          <span class="pill"><b>النتائج</b><span id="coa-stat-count">—</span></span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="fin-table admin-data-table">
+            <thead>
+              <tr>
+                <th style="width:14%">الرمز</th>
+                <th style="width:56%">اسم الحساب</th>
+                <th style="width:30%">الفئة</th>
+              </tr>
+            </thead>
+            <tbody id="coa-tbody">
+              <tr><td colspan="3" class="hint">جاري التحميل…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="msg err" id="coa-msg" style="margin-top:10px"></div>
       </div>
 
       <div class="card hidden" id="section-companies">
@@ -2448,11 +2548,15 @@
         <div class="grid" style="margin-top:10px">
           <div>
             <label>رقم الدليل المحاسبي</label>
-            <input id="sch-acctCode" dir="ltr" placeholder="مثال: 31" />
+            <div class="coa-ac-wrap">
+              <input id="sch-acctCode" dir="ltr" placeholder="مثال: 31" autocomplete="off" />
+            </div>
           </div>
           <div>
             <label>اسم الحساب الختامي</label>
-            <input id="sch-acctName" placeholder="مثال: الرواتب والاجور" />
+            <div class="coa-ac-wrap">
+              <input id="sch-acctName" placeholder="مثال: الرواتب والاجور" autocomplete="off" />
+            </div>
           </div>
           <div>
             <label>يرحل إلى</label>
@@ -2713,6 +2817,7 @@
       fillSectionOptions($("sch-target").value, payload?.section || "");
       // schedule 1 is reserved for fixed assets
       $("sch-no").disabled = (payload?.id === "sch-1" || payload?.id === "sch-8" || payload?.type === "contracts");
+      wireCoaScheduleModalFields();
       openOverlay("ov-schedule");
       $("sch-title").focus();
     }
@@ -3167,7 +3272,7 @@
     }
 
     function setSection(sec){
-      const ids = ["dashboard","companies","directory","schedules","users","movements","platform"];
+      const ids = ["dashboard","companies","directory","coa","schedules","users","movements","platform"];
       for(const k of ids){
         const secEl = $("section-"+k);
         const navEl = $("nav-"+k);
@@ -3268,12 +3373,13 @@
     function goToSection(sec){
       setSection(sec);
       if(sec === "directory") void loadDirectorySection();
+      if(sec === "coa") void loadCoaSection();
       if(sec === "users") void loadUsersSection();
       if(sec === "movements") void loadMovementsSection();
       if(sec === "platform") void loadPlatformOfficesSection();
     }
 
-    ["nav-dashboard","nav-companies","nav-directory","nav-schedules","nav-users","nav-movements","nav-platform"].forEach((id)=>{
+    ["nav-dashboard","nav-companies","nav-directory","nav-coa","nav-schedules","nav-users","nav-movements","nav-platform"].forEach((id)=>{
       $(id).addEventListener("click", ()=>{
         const sec = $(id).getAttribute("data-section");
         goToSection(sec);
@@ -3283,6 +3389,7 @@
     $("dash-go-companies")?.addEventListener("click", ()=> goToSection("companies"));
     $("dash-go-schedules")?.addEventListener("click", ()=> goToSection("schedules"));
     $("dash-go-directory")?.addEventListener("click", ()=> goToSection("directory"));
+    $("dash-go-coa")?.addEventListener("click", ()=> goToSection("coa"));
     $("dash-go-users")?.addEventListener("click", ()=> goToSection("users"));
     $("dash-go-movements")?.addEventListener("click", ()=> goToSection("movements"));
     $("dash-go-platform")?.addEventListener("click", ()=> goToSection("platform"));
@@ -4140,6 +4247,185 @@
         .replace(/>/g,"&gt;")
         .replace(/"/g,"&quot;");
     }
+    function escAttr(s){ return escHtml(s); }
+
+    // ===== دليل الحسابات الموحّد (العراق) =====
+    let coaCatalog = null;
+    let coaLoadPromise = null;
+    const coaAcState = new WeakMap();
+
+    function coaNormalizeText(s){
+      return String(s || "")
+        .toLowerCase()
+        .replace(/[أإآ]/g, "ا")
+        .replace(/ى/g, "ي")
+        .replace(/ة/g, "ه")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    async function loadCoaCatalog(){
+      if(coaCatalog) return coaCatalog;
+      if(coaLoadPromise) return coaLoadPromise;
+      coaLoadPromise = (async ()=>{
+        try{
+          const url = new URL("iraq-coa.json", import.meta.url);
+          const res = await fetch(url);
+          if(!res.ok) throw new Error("تعذر تحميل دليل الحسابات.");
+          const data = await res.json();
+          coaCatalog = Array.isArray(data) ? data : [];
+        }catch(e){
+          coaCatalog = [];
+          console.warn("[coa]", e?.message || e);
+        }
+        return coaCatalog;
+      })();
+      return coaLoadPromise;
+    }
+
+    function coaSearch(query, limit = 12){
+      if(!Array.isArray(coaCatalog) || !coaCatalog.length) return [];
+      const q = coaNormalizeText(toWesternDigits(String(query || "")));
+      if(!q) return [];
+      const out = [];
+      for(const acc of coaCatalog){
+        const code = coaNormalizeText(toWesternDigits(acc.code));
+        const name = coaNormalizeText(acc.name);
+        if(code.includes(q) || name.includes(q)){
+          out.push(acc);
+          if(out.length >= limit) break;
+        }
+      }
+      return out;
+    }
+
+    function closeCoaMenu(input){
+      const st = coaAcState.get(input);
+      if(st?.menu?.parentNode) st.menu.remove();
+      if(st) st.menu = null;
+    }
+
+    function attachCoaAutocomplete(input, { onPick } = {}){
+      if(!input || input.dataset.coaWired === "1") return;
+      input.dataset.coaWired = "1";
+      input.setAttribute("autocomplete", "off");
+      let wrap = input.closest(".coa-ac-wrap");
+      if(!wrap){
+        wrap = document.createElement("div");
+        wrap.className = "coa-ac-wrap";
+        input.parentNode?.insertBefore(wrap, input);
+        wrap.appendChild(input);
+      }
+
+      const showMenu = (items)=>{
+        closeCoaMenu(input);
+        if(!items.length) return;
+        const menu = document.createElement("ul");
+        menu.className = "coa-ac-menu";
+        menu.setAttribute("role", "listbox");
+        items.forEach((acc)=>{
+          const li = document.createElement("li");
+          li.className = "coa-ac-item";
+          li.setAttribute("role", "option");
+          li.innerHTML = `<span class="coa-ac-code" dir="ltr">${escHtml(acc.code)}</span><span class="coa-ac-name">${escHtml(acc.name)}</span>`;
+          li.addEventListener("mousedown", (ev)=>{
+            ev.preventDefault();
+            onPick?.(acc);
+            closeCoaMenu(input);
+          });
+          menu.appendChild(li);
+        });
+        wrap.appendChild(menu);
+        coaAcState.set(input, { menu });
+      };
+
+      input.addEventListener("input", ()=>{
+        const v = String(input.value || "").trim();
+        showMenu(v ? coaSearch(v) : []);
+      });
+      input.addEventListener("focus", ()=>{
+        const v = String(input.value || "").trim();
+        if(v) showMenu(coaSearch(v));
+      });
+      input.addEventListener("blur", ()=>{
+        setTimeout(()=> closeCoaMenu(input), 160);
+      });
+    }
+
+    function wireCoaScheduleModalFields(){
+      const codeInp = $("sch-acctCode");
+      const nameInp = $("sch-acctName");
+      if(!codeInp || !nameInp) return;
+      const fillBoth = (acc)=>{
+        codeInp.value = acc.code;
+        nameInp.value = acc.name;
+      };
+      attachCoaAutocomplete(codeInp, { onPick: fillBoth });
+      attachCoaAutocomplete(nameInp, { onPick: fillBoth });
+    }
+
+    function renderCoaBrowseTable(){
+      const tbody = $("coa-tbody");
+      if(!tbody) return;
+      const q = coaNormalizeText($("coa-search")?.value || "");
+      const cls = $("coa-class-filter")?.value || "";
+      let rows = Array.isArray(coaCatalog) ? coaCatalog.slice() : [];
+      if(cls) rows = rows.filter((r)=> String(r.class || "") === cls);
+      if(q){
+        rows = rows.filter((r)=>{
+          const code = coaNormalizeText(toWesternDigits(r.code));
+          const name = coaNormalizeText(r.name);
+          return code.includes(q) || name.includes(q);
+        });
+      }
+      tbody.innerHTML = "";
+      setText("coa-stat-count", String(rows.length));
+      if(!rows.length){
+        const tr0 = document.createElement("tr");
+        const td0 = document.createElement("td");
+        td0.colSpan = 3;
+        td0.className = "hint";
+        td0.textContent = coaCatalog?.length ? "لا توجد نتائج." : "تعذر تحميل الدليل. شغّل التطبيق عبر خادم محلي.";
+        tr0.appendChild(td0);
+        tbody.appendChild(tr0);
+        return;
+      }
+      for(const r of rows){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="num-col" dir="ltr">${escHtml(r.code)}</td>
+          <td>${escHtml(r.name)}</td>
+          <td>${escHtml(r.className || "")}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    async function loadCoaSection(){
+      setText("coa-msg", "");
+      const tbody = $("coa-tbody");
+      if(tbody) tbody.innerHTML = `<tr><td colspan="3" class="hint">جاري التحميل…</td></tr>`;
+      try{
+        await loadCoaCatalog();
+        renderCoaBrowseTable();
+        const qInp = $("coa-search");
+        const clsSel = $("coa-class-filter");
+        if(qInp && !qInp.dataset.coaBound){
+          qInp.dataset.coaBound = "1";
+          qInp.addEventListener("input", renderCoaBrowseTable);
+          clsSel?.addEventListener("change", renderCoaBrowseTable);
+        }
+        if(!coaCatalog?.length){
+          setText("coa-msg", "لم يُحمَّل دليل الحسابات. افتح التطبيق عبر خادم محلي (مثلاً: npx serve .) وليس file://");
+        }
+      }catch(e){
+        setText("coa-msg", e?.message || String(e));
+      }
+    }
+
+    void loadCoaCatalog().then(()=>{
+      wireCoaScheduleModalFields();
+    });
 
     // Note: report content is rendered in multiple sections; avoid global getElementById by scoping
     // all edits/queries to the current rendered page root element.
@@ -8343,8 +8629,8 @@
               sumCY += cy; sumPY += py;
               if(idx === selectedRow) tr.classList.add("row-sel");
               tr.innerHTML = editing ? `
-                <td class="num-col" dir="ltr" contenteditable="true" data-k="code" data-i="${idx}">${r.code||""}</td>
-                <td contenteditable="true" data-k="name" data-i="${idx}">${r.name||""}</td>
+                <td class="num-col"><div class="coa-ac-wrap"><input type="text" class="coa-inp" dir="ltr" data-k="code" data-i="${idx}" value="${escAttr(r.code||"")}" autocomplete="off" /></div></td>
+                <td><div class="coa-ac-wrap"><input type="text" class="coa-inp" data-k="name" data-i="${idx}" value="${escAttr(r.name||"")}" autocomplete="off" /></div></td>
                 <td class="amount-col" dir="ltr" contenteditable="true" data-k="cy" data-i="${idx}">${r.cy||""}</td>
                 <td class="amount-col" dir="ltr" contenteditable="true" data-k="py" data-i="${idx}">${r.py||""}</td>
                 <td><button class="tb-btn" data-rm="${idx}">×</button></td>
@@ -8378,7 +8664,7 @@
               btns.innerHTML = `
                 <button class="tb-btn" data-add>➕ إضافة سطر</button>
                 <button class="tb-btn" data-delrow>🗑 حذف السطر المحدد</button>
-                <span class="hint">انقر على سطر لتحديده ثم «حذف»</span>
+                <span class="hint">انقر على سطر لتحديده ثم «حذف». عند كتابة الرمز أو الاسم يظهر اقتراح من دليل الحسابات (اختياري).</span>
               `;
               body.appendChild(btns);
               btns.querySelector("button[data-add]").addEventListener("click", ()=>{
@@ -8453,6 +8739,34 @@
                   }
                   saved[i][k] = raw;
                 });
+              });
+              body.querySelectorAll(".coa-inp").forEach((inp)=>{
+                const i = Number(inp.getAttribute("data-i"));
+                const k = inp.getAttribute("data-k");
+                const row = inp.closest("tr");
+                attachCoaAutocomplete(inp, {
+                  onPick: (acc)=>{
+                    saved[i] = saved[i] || {};
+                    saved[i].code = acc.code;
+                    saved[i].name = acc.name;
+                    const codeInp = row?.querySelector('.coa-inp[data-k="code"]');
+                    const nameInp = row?.querySelector('.coa-inp[data-k="name"]');
+                    if(codeInp) codeInp.value = acc.code;
+                    if(nameInp) nameInp.value = acc.name;
+                  }
+                });
+                inp.addEventListener("input", ()=>{
+                  saved[i] = saved[i] || {};
+                  saved[i][k] = inp.value;
+                });
+                inp.addEventListener("blur", ()=>{
+                  saved[i] = saved[i] || {};
+                  saved[i][k] = String(inp.value || "").trim();
+                });
+                inp.addEventListener("focus", ()=>{
+                  if(!Number.isNaN(i) && selectedRow !== i) selectedRow = i;
+                });
+                ["mousedown","click"].forEach((t)=> inp.addEventListener(t, (e)=> e.stopPropagation()));
               });
             }
           };
