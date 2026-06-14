@@ -44,8 +44,13 @@
       min-height:100vh;
       background:var(--bg);
     }
+    .app-shell-header{
+      position:sticky;
+      top:0;
+      z-index:5;
+    }
     .topbar{
-      position:sticky;top:0;z-index:5;
+      position:relative;
       display:flex;align-items:center;justify-content:space-between;gap:12px;
       min-height:58px;
       padding:10px 18px;background:var(--navy);color:#fff;
@@ -149,27 +154,36 @@
     .btn.danger{background:transparent;border-color:rgba(255,255,255,.35);color:#fff}
     .btn:disabled{opacity:.55;cursor:not-allowed}
     .wrap{max-width:1280px;margin:18px auto;padding:0 var(--space-md) 28px}
-    .layout{display:flex;min-height:calc(100vh - 58px)}
+    .layout{min-height:calc(100vh - 58px)}
     .sidebar{
-      width:260px;flex:0 0 auto;
-      background:var(--navy);
-      border-left:1px solid rgba(255,255,255,.08);
-      padding:14px 12px;
-    }
-    .main{flex:1 1 auto}
-    @media(max-width:900px){
-      .layout{display:block}
-      .sidebar{width:auto;border-left:none;border-bottom:1px solid rgba(255,255,255,.08)}
-    }
-    .nav-title{font-weight:900;color:rgba(255,255,255,.65);margin:6px 8px 10px;font-size:12pt}
-    .nav{
-      display:flex;flex-direction:column;gap:8px;
-      padding:6px;
-    }
-    .nav-btn{
       width:100%;
-      display:flex;align-items:center;gap:10px;
-      padding:10px 12px;
+      background:var(--navy);
+      border-bottom:1px solid rgba(255,255,255,.08);
+      padding:6px 12px;
+    }
+    .main{width:100%;min-width:0}
+    .nav-title{display:none}
+    .nav{
+      display:flex;
+      flex-direction:row;
+      flex-wrap:nowrap;
+      align-items:center;
+      gap:6px;
+      padding:2px 0;
+      min-width:min-content;
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:thin;
+    }
+    .nav::-webkit-scrollbar{height:4px}
+    .nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:2px}
+    .nav-btn{
+      width:auto;
+      flex:0 0 auto;
+      white-space:nowrap;
+      display:flex;align-items:center;gap:8px;
+      padding:8px 14px;
       border-radius:var(--radius-sm);
       border:none;
       background:transparent;
@@ -181,7 +195,7 @@
       position:relative;
       transition:background .15s ease,color .15s ease;
     }
-    .nav-btn .ic{width:22px;text-align:center;color:rgba(255,255,255,.5)}
+    .nav-btn .ic{width:20px;text-align:center;color:rgba(255,255,255,.5);flex-shrink:0}
     .nav-btn:hover{background:rgba(255,255,255,.08);color:#fff}
     .nav-btn.active{
       background:rgba(255,255,255,.1);
@@ -191,11 +205,18 @@
     .nav-btn.active::before{
       content:"";
       position:absolute;
-      inset-inline-start:0;
-      top:6px;bottom:6px;
-      width:3px;
+      inset-inline-start:8px;
+      inset-inline-end:8px;
+      top:auto;
+      bottom:0;
+      height:3px;
+      width:auto;
       background:var(--gold);
       border-radius:0;
+    }
+    @media(max-width:900px){
+      .nav-btn{padding:7px 10px;font-size:10.5pt;gap:6px}
+      .nav-btn .ic{width:18px}
     }
     body.mode-login .sidebar{display:none !important;}
 
@@ -220,6 +241,38 @@
       flex-direction:column;
     }
     .modal.modal-wide{width:min(860px,100%)}
+    .modal.modal-tb-schedule{width:min(1100px,96vw);max-height:94vh;display:flex;flex-direction:column}
+    .modal.modal-tb-schedule .modal-bd{overflow:auto;flex:1;max-height:calc(94vh - 118px);padding:12px 14px}
+    .tb-schedule-in-modal{margin:0 !important;box-shadow:none;border:1px solid var(--border)}
+    .tb-schedule-in-modal .schedule-toolbar{position:sticky;top:0;z-index:2;background:#fff;border-radius:var(--radius-md)}
+    .tb-schedule-dock-placeholder{display:none}
+    .tb-inline-sch-wrap{margin-top:4px}
+    .tb-inline-sch-vertical-root > .schedule-toolbar{
+      position:sticky;top:0;z-index:2;margin-bottom:8px;
+    }
+    .tb-inline-sch-wrap .fa-print-wrap{overflow-x:auto;max-width:100%}
+    .tb-inline-sch-wrap .fa-schedule-table{min-width:720px}
+    .tb-inline-sch-wrap .fin-table tbody tr.row-sel td{background:#fff9e6 !important}
+    .tb-inline-sch-wrap .fa-schedule-table th.col-hl,
+    .tb-inline-sch-wrap .fa-schedule-table td.col-hl{background:rgba(232,196,106,.22)}
+    .fin-table.tb-table col.tb-col-stmt{width:7.5%;}
+    .fin-table.tb-table col.tb-col-class{width:8%;}
+    .fin-table.tb-table .tb-th-stmt,
+    .fin-table.tb-table .tb-td-stmt{font-size:7pt;text-align:center;vertical-align:middle}
+    .fin-table.tb-table .tb-th-class,
+    .fin-table.tb-table .tb-td-class{font-size:7pt;text-align:center;vertical-align:middle}
+    .tb-stmt-tag{font-size:7pt;font-weight:700;padding:2px 5px;border-radius:4px;display:inline-block;white-space:nowrap;line-height:1.2}
+    .tb-class-tag{font-size:7pt;font-weight:700;padding:2px 4px;border-radius:4px;display:inline-block;white-space:normal;line-height:1.25}
+    .tb-cls-astfix{background:rgba(26,58,92,.12);color:var(--navy)}
+    .tb-cls-astcur{background:rgba(26,58,92,.08);color:var(--navy)}
+    .tb-cls-lt{background:rgba(100,80,160,.12);color:#3d2e6e}
+    .tb-cls-st{background:rgba(180,120,40,.15);color:#5c4010}
+    .tb-cls-rev{background:rgba(40,120,70,.12);color:#1a5032}
+    .tb-cls-exp{background:rgba(180,60,40,.12);color:#6e2818}
+    .tb-cls-inv{background:rgba(60,120,160,.12);color:#1a4560}
+    .tb-cls-proj{background:rgba(140,80,120,.12);color:#4a2040}
+    .tb-stmt-bal{background:rgba(26,58,92,.1);color:var(--navy)}
+    .tb-stmt-inc{background:rgba(232,196,106,.28);color:#5c4800}
     .modal-hd{
       background:var(--navy);
       color:var(--gold);
@@ -267,6 +320,8 @@
     .btn.modal.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
     .btn.modal.primary:hover{background:#002444}
     .btn.modal.accent{background:var(--gold);color:var(--navy);border-color:transparent}
+    .btn.modal.danger{border-color:#b3261e;color:#b3261e;background:#fff}
+    .btn.modal.danger:hover{background:rgba(179,38,30,.08)}
     .btn.modal.accent:hover{background:#fed97c}
     .card{
       background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
@@ -467,6 +522,7 @@
     .pages > .page[data-fs-order="3"]{order:3;}
     .pages > .page[data-fs-order="4"]{order:4;}
     .pages > .page[data-fs-order="5"]{order:5;}
+    .pages > .page[data-fs-order="6"]{order:6;}
     .page{
       width:min(210mm, 100%);
       background:#fff;
@@ -767,10 +823,84 @@
       letter-spacing:-0.035em;
       line-height:1.15;
     }
+    .fin-table.tb-table .amount-col .amt-compact.amt-mega{
+      font-size:5pt;
+      letter-spacing:-0.05em;
+      line-height:1.1;
+    }
     .fin-table.tb-table col.tb-col-sch{width:5.5%;}
+    .fin-table.tb-table col.tb-col-open{width:4%;}
     .fin-table.tb-table col.tb-col-code{width:6.5%;}
     .fin-table.tb-table col.tb-col-name{width:17%;}
-    .fin-table.tb-table col.tb-col-amt{width:11.5%;}
+    .fin-table.tb-table .tb-th-open,
+    .fin-table.tb-table .tb-td-open{
+      width:4%;
+      text-align:center;
+      vertical-align:middle;
+      white-space:nowrap;
+      padding:2px 3px;
+    }
+    .fin-table.tb-table .tb-td-open .tb-open-linked{
+      font-size:7pt;
+      padding:1px 5px;
+      min-width:0;
+    }
+    .fin-table.tb-table tbody tr.tb-detail-row-linked{
+      cursor:pointer;
+    }
+    .fin-table.tb-table tbody tr.tb-detail-row-linked:hover td{
+      background:#fffef5;
+    }
+    .fin-table.tb-table tbody tr.tb-detail-row-closing td{
+      background:#fffef8;
+      font-style:italic;
+    }
+    .fin-table.tb-table td[data-tb-ro]{
+      opacity:.72;
+      background:var(--surface-container-low);
+      cursor:not-allowed;
+    }
+    .page.page-tb[data-tb-editing="1"] .fin-table.tb-table .tb-inp-code,
+    .page.page-tb[data-tb-editing="1"] .fin-table.tb-table .tb-inp-name,
+    .page.page-tb[data-tb-editing="1"] .fin-table.tb-table .tb-amt-inp{
+      background:#fffef8;
+    }
+    .page.page-tb[data-tb-editing="1"] .fin-table.tb-table tbody tr.tb-detail-row-edit td{
+      box-shadow:inset 0 0 0 1px rgba(232,196,106,.45);
+    }
+    .page.page-tb[data-tb-editing="1"] .fin-table.tb-table .tb-amt-ro{
+      display:block;
+      min-height:1.2em;
+      opacity:.85;
+      font-size:7pt;
+    }
+    .fin-table.tb-table tbody tr.tb-detail-row-edit.row-sel td{
+      background:#fff9e6 !important;
+    }
+    .tb-detail-filters{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:10px 14px;
+      margin:6px 0 8px;
+    }
+    .tb-detail-filters label{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:9pt;
+      font-weight:600;
+      color:var(--navy);
+      margin:0;
+    }
+    .tb-detail-filters .tb-filter-sel{
+      min-width:140px;
+      font-size:9pt;
+      padding:4px 6px;
+      border:1px solid var(--border);
+      border-radius:var(--radius-sm);
+      background:#fff;
+    }
     /* حدود أقسام الميزان: إطار خارجي واضح — بدون خط غامق بين مدين/دائن
        (حدود فيزيائية لأن خلايا المبالغ dir=ltr تعكس inline-start/end) */
     .fin-table.tb-table th.tb-section{
@@ -830,6 +960,260 @@
     .fin-table.tb-table .row-total .amount-col .amt-total-compact{
       font-size:5.5pt;
       letter-spacing:-0.04em;
+    }
+    .fin-table.tb-table .row-total .amount-col .amt-compact.amt-mega,
+    .fin-table.tb-table .row-total .amount-col .amt-total-compact.amt-mega{
+      font-size:4.75pt;
+      letter-spacing:-0.05em;
+    }
+    /* قسم الكشوفات — تسطيح الطبقات وتوسيع العرض على الشاشة (الطباعة A4 كما هي) */
+    .in-pages-fs{
+      padding:0;
+      margin:0;
+      border:none;
+      box-shadow:none;
+      background:transparent;
+    }
+    @media screen {
+      #view-dashboard[data-active-section="schedules"] #view-dashboard-header{
+        display:none;
+      }
+      #view-dashboard[data-active-section="schedules"]{
+        padding:6px 2px 10px;
+        margin:0;
+        border:none;
+        box-shadow:none;
+        background:transparent;
+      }
+      #view-dashboard[data-active-section="schedules"] #section-schedules{
+        padding:0;
+        margin:0;
+        border:none;
+        box-shadow:none;
+        background:transparent;
+      }
+      .wrap:has(#view-dashboard[data-active-section="schedules"]:not(.hidden)){
+        max-width:none;
+        width:100%;
+        padding-inline:8px 10px;
+        margin-top:10px;
+      }
+      .wrap:has(#in-pages-card:not(.hidden)){
+        padding-inline:6px 8px;
+      }
+      #view-dashboard[data-active-section="schedules"]:has(#in-pages-card:not(.hidden)) #section-schedules > h2,
+      #view-dashboard[data-active-section="schedules"]:has(#in-pages-card:not(.hidden)) #section-schedules > .hint{
+        display:none;
+      }
+      #view-dashboard[data-active-section="schedules"]:has(#in-pages-card:not(.hidden)) #section-schedules > .card{
+        padding:8px 10px;
+        margin:0 0 6px;
+      }
+      #in-pages-card.in-pages-host{
+        padding:6px 2px 10px;
+        margin:8px 0 0;
+        border:none;
+        border-top:1px solid var(--border);
+        border-radius:0;
+        box-shadow:none;
+        background:transparent;
+      }
+      #in-pages-card.in-pages-host > .row:first-child{
+        padding-inline:4px;
+        margin-bottom:4px;
+      }
+      #in-pages-card.in-pages-host #in-pages{
+        margin-top:6px;
+      }
+      #in-pages-card.in-pages-host .pages{
+        gap:10px;
+      }
+      #in-pages-card:has([data-tb-pre-page]){
+        padding-top:8px;
+        margin-inline:0;
+      }
+      #in-pages-card:has([data-tb-pre-page]) > .row:first-child{
+        padding-inline:4px;
+      }
+      #in-pages-card:has([data-tb-pre-page]) .pages{
+        gap:12px;
+        margin-top:6px;
+      }
+      /* الكشوفات العمودية (العادية): مخفية على الشاشة — الإدخال من الميزان؛ تظهر في الطباعة فقط */
+      .schedules-vertical-toolbar,
+      .card-schedule-vertical{
+        position:fixed;
+        left:-120vw;
+        top:0;
+        width:210mm;
+        max-width:210mm;
+        opacity:0;
+        pointer-events:none;
+        z-index:-1;
+        overflow:visible;
+      }
+    }
+    .pages > .page[data-tb-pre-page]{
+      align-self:stretch;
+      width:100%;
+      max-width:none;
+      padding:12px 8px 10px;
+      border-inline:none;
+      border-radius:4px;
+      box-shadow:0 1px 8px rgba(0,0,0,.06);
+    }
+    .page[data-tb-pre-page] .doc-subtitle,
+    .page[data-tb-pre-page] .doc-sub2{
+      padding-inline:4px;
+    }
+    .page[data-tb-pre-page] .tb-detail-filters{
+      padding:8px 6px;
+      gap:10px 14px;
+      background:var(--surface-container-low);
+      border:1px solid var(--border);
+      border-radius:var(--radius-sm);
+      margin-bottom:6px;
+    }
+    .page[data-tb-pre-page] .tb-table-wrap{
+      overflow-x:visible;
+      margin:6px 0 8px;
+      width:100%;
+    }
+    .page[data-tb-pre-page] .fin-table.tb-table{
+      min-width:0;
+      width:100%;
+      font-size:10pt;
+    }
+    .page[data-tb-pre-page] .fin-table.tb-table th{
+      font-size:9pt;
+      padding:6px 5px;
+    }
+    .page[data-tb-pre-page] .fin-table.tb-table thead tr.tb-head-sub th{
+      font-size:8.5pt;
+      padding:5px 4px;
+    }
+    .page[data-tb-pre-page] .fin-table.tb-table td{
+      font-size:10pt;
+      padding:5px 6px;
+      line-height:1.4;
+    }
+    .page[data-tb-pre-page] .fin-table.tb-table col.tb-col-sch{width:4.5%;}
+    .page[data-tb-pre-page] .fin-table.tb-table col.tb-col-code{width:5.5%;}
+    .page[data-tb-pre-page] .fin-table.tb-table col.tb-col-name{width:14%;}
+    .page[data-tb-pre-page] #table-trial-balance-live col.tb-col-name{width:14%;}
+    .page[data-tb-pre-page] .fin-table.tb-table col.tb-col-stmt{width:6%;}
+    .page[data-tb-pre-page] .fin-table.tb-table col.tb-col-class{width:6.5%;}
+    .page[data-tb-pre-page] .fin-table.tb-table col.tb-col-open{width:5.5%;}
+    .page[data-tb-pre-page] .fin-table.tb-table col.tb-col-amt{width:9.6%;}
+    .page[data-tb-pre-page] #table-trial-balance-live col.tb-col-amt{width:9.6%;}
+    .page[data-tb-pre-page] .fin-table.tb-table .tb-th-name,
+    .page[data-tb-pre-page] .fin-table.tb-table .tb-td-name{
+      width:auto;
+    }
+    /* نص: يلتف — أرقام المبالغ: سطر واحد */
+    .page[data-tb-pre-page] #table-trial-balance-live .tb-th-name,
+    .page[data-tb-pre-page] #table-trial-balance-live .tb-td-name,
+    .page[data-tb-pre-page] #table-trial-balance-live .tb-th-stmt,
+    .page[data-tb-pre-page] #table-trial-balance-live .tb-td-stmt,
+    .page[data-tb-pre-page] #table-trial-balance-live .tb-th-class,
+    .page[data-tb-pre-page] #table-trial-balance-live .tb-td-class{
+      white-space:normal;
+      word-break:break-word;
+      overflow-wrap:anywhere;
+      vertical-align:top;
+    }
+    .page[data-tb-pre-page] #table-trial-balance-live .tb-td-name{
+      text-align:right;
+    }
+    .page[data-tb-pre-page] #table-trial-balance-live .tb-td-stmt,
+    .page[data-tb-pre-page] #table-trial-balance-live .tb-td-class{
+      text-align:center;
+    }
+    .page[data-tb-pre-page] #table-trial-balance-live .tb-stmt-tag{
+      white-space:normal;
+      line-height:1.3;
+    }
+    .page[data-tb-pre-page] #table-trial-balance-live .tb-class-tag{
+      white-space:normal;
+    }
+    .page[data-tb-pre-page] #table-trial-balance-live .num-col{
+      white-space:nowrap;
+      word-break:keep-all;
+      vertical-align:middle;
+    }
+    .page[data-tb-pre-page] #table-trial-balance-live .amount-col{
+      font-size:9pt;
+      padding:4px 3px;
+      line-height:1.25;
+      letter-spacing:-0.015em;
+      white-space:nowrap;
+      word-break:keep-all;
+      overflow-wrap:normal;
+      vertical-align:middle;
+    }
+    .page[data-tb-pre-page] #table-trial-balance-live .amount-col span[dir="ltr"]{
+      display:inline;
+      max-width:none;
+    }
+    .page[data-tb-pre-page] #table-trial-balance-live .amount-col .amt-compact,
+    .page[data-tb-pre-page] #table-trial-balance-live .amount-col .amt-total-compact{
+      font-size:8pt;
+      letter-spacing:-0.03em;
+      line-height:1.15;
+    }
+    .page[data-tb-pre-page] #table-trial-balance-live .amount-col .amt-compact.amt-mega,
+    .page[data-tb-pre-page] #table-trial-balance-live .amount-col .amt-total-compact.amt-mega{
+      font-size:7.25pt;
+      letter-spacing:-0.035em;
+      line-height:1.1;
+    }
+    .page[data-tb-pre-page] #table-trial-balance-live .row-total td{
+      padding:5px 4px;
+    }
+    .page[data-tb-pre-page] #table-trial-balance-live .row-total .amount-col{
+      font-size:8.5pt;
+    }
+    .page[data-tb-pre-page] #table-trial-balance-live .row-total .amount-col .amt-compact,
+    .page[data-tb-pre-page] #table-trial-balance-live .row-total .amount-col .amt-total-compact{
+      font-size:7.75pt;
+    }
+    .page[data-tb-pre-page] #table-trial-balance-live .row-total .amount-col .amt-compact.amt-mega,
+    .page[data-tb-pre-page] #table-trial-balance-live .row-total .amount-col .amt-total-compact.amt-mega{
+      font-size:7pt;
+    }
+    .page[data-tb-pre-page] .fin-table.tb-table .tb-td-open .tb-open-linked{
+      font-size:9pt;
+      padding:4px 12px;
+      white-space:nowrap;
+    }
+    .page[data-tb-pre-page] .fin-table.tb-table .tb-th-stmt,
+    .page[data-tb-pre-page] .fin-table.tb-table .tb-th-class,
+    .page[data-tb-pre-page] .fin-table.tb-table .tb-td-stmt,
+    .page[data-tb-pre-page] .fin-table.tb-table .tb-td-class{
+      font-size:9pt;
+    }
+    .page[data-tb-pre-page] .schedule-toolbar.tb-detail-toolbar{
+      margin:6px 0 8px;
+      padding:8px 6px;
+      gap:8px;
+    }
+    .page[data-tb-pre-page] .schedule-toolbar{
+      padding:8px 6px;
+      gap:8px;
+    }
+    .page[data-tb-pre-page] .hint{
+      font-size:10.5pt;
+      line-height:1.55;
+      padding-inline:4px;
+    }
+    @media screen and (min-width:1100px){
+      .pages > .page[data-tb-pre-page]{
+        padding-inline:4px;
+      }
+      .page[data-tb-pre-page] .fin-table.tb-table col.tb-col-name{width:13%;}
+      .page[data-tb-pre-page] #table-trial-balance-live col.tb-col-name{width:13%;}
+      .page[data-tb-pre-page] .fin-table.tb-table col.tb-col-amt{width:9.8%;}
+      .page[data-tb-pre-page] #table-trial-balance-live col.tb-col-amt{width:9.8%;}
     }
     @media print {
       .no-print-fs{ display:none !important; }
@@ -894,6 +1278,122 @@
       .fin-table.tb-table .row-total .amount-col .amt-total-compact{
         font-size:5pt !important;
         letter-spacing:-0.045em !important;
+      }
+      /* ميزان قبل الترحيل: إخفاء عمود «كشف» (زر الفتح) — الطباعة A4 */
+      #table-trial-balance-live col.tb-col-open,
+      #table-trial-balance-live .tb-th-open,
+      #table-trial-balance-live .tb-td-open{
+        display:none !important;
+      }
+      .pages > .page[data-tb-pre-page]{
+        align-self:center !important;
+        width:100% !important;
+        max-width:none !important;
+        padding:8mm 6mm 6mm !important;
+      }
+      /* كشوفات التفصيل + حزمة الطباعة — ملاءمة A4 */
+      .print-fs{
+        width:100%;
+        max-width:none;
+        box-sizing:border-box;
+      }
+      .print-fs .in-pages-fs .pages{
+        width:100%;
+        gap:0;
+      }
+      .print-fs .card-schedule{
+        width:100% !important;
+        max-width:none !important;
+        box-sizing:border-box;
+        padding:0 !important;
+        margin:0 0 4mm !important;
+        border:none !important;
+        box-shadow:none !important;
+        background:transparent !important;
+      }
+      .card-schedule .fa-print-wrap,
+      .card-schedule [data-body]{
+        overflow:visible !important;
+        max-width:none !important;
+      }
+      .card-schedule .fin-table:not(.tb-table){
+        width:100% !important;
+        min-width:0 !important;
+        table-layout:fixed;
+        font-size:8pt !important;
+      }
+      .card-schedule-fa .fa-schedule-table{
+        width:100% !important;
+        min-width:0 !important;
+        table-layout:fixed;
+        font-size:6pt !important;
+      }
+      .card-schedule-fa .fa-schedule-table th,
+      .card-schedule-fa .fa-schedule-table td{
+        padding:1px 2px !important;
+        word-wrap:break-word;
+        overflow-wrap:anywhere;
+      }
+      .card-schedule-inv #goods-inv-box-live,
+      .card-schedule-inv #goods-inv-box-live table{
+        font-size:8pt !important;
+      }
+      .card-schedule-inv #goods-inv-box-live{
+        padding:4mm 5mm !important;
+        margin:0 !important;
+      }
+      .card-schedule-equity #table-equity-live{
+        font-size:7.5pt !important;
+      }
+      .card-schedule-equity #table-equity-live th{
+        font-size:7pt !important;
+        padding:2px 3px !important;
+      }
+      .card-schedule-equity #table-equity-live th div{
+        font-size:6.5pt !important;
+      }
+      /* PDF: إطار خارجي كامل — يمنع اختفاء الحد العمودي لبداية/نهاية الجدول (قصّ الحافة) */
+      .card-schedule [data-body],
+      .card-schedule .fa-print-wrap{
+        padding-inline:0.4mm !important;
+        box-sizing:border-box;
+      }
+      .card-schedule .fin-table:not(.tb-table),
+      .card-schedule .fa-schedule-table,
+      .card-schedule .con-table,
+      .card-schedule .contracts-meta-table{
+        border:1px solid var(--fin-table-border) !important;
+      }
+      .card-schedule .fin-table:not(.tb-table) :is(th,td):first-child,
+      .card-schedule .fa-schedule-table :is(th,td):first-child,
+      .card-schedule .con-table :is(th,td):first-child,
+      .card-schedule .contracts-meta-table :is(th,td):first-child{
+        border-inline-start:1px solid var(--fin-table-border) !important;
+      }
+      .card-schedule .fin-table:not(.tb-table) :is(th,td):last-child,
+      .card-schedule .fa-schedule-table :is(th,td):last-child,
+      .card-schedule .con-table :is(th,td):last-child,
+      .card-schedule .contracts-meta-table :is(th,td):last-child{
+        border-inline-end:1px solid var(--fin-table-border) !important;
+      }
+      .card-schedule-vertical,
+      .schedules-vertical-toolbar{
+        position:static !important;
+        left:auto !important;
+        top:auto !important;
+        width:100% !important;
+        max-width:none !important;
+        opacity:1 !important;
+        pointer-events:none !important;
+        z-index:auto !important;
+        overflow:visible !important;
+      }
+      .schedules-vertical-toolbar{
+        display:none !important;
+      }
+      .pages > .page:last-child{
+        page-break-after:auto;
+        break-after:auto;
       }
     }
     .fin-table tr.row-sel td{outline:2px solid #e8c46a!important;background:rgba(232,196,106,.12)!important;}
@@ -1392,7 +1892,7 @@
       body.print-pdf-mode{
         background:#fff !important;
       }
-      body.print-pdf-mode .topbar,
+      body.print-pdf-mode .app-shell-header,
       body.print-pdf-mode .layout,
       body.print-pdf-mode .overlay{
         display:none !important;
@@ -1422,7 +1922,8 @@
       body.print-pdf-mode #print-package-host .schedule-toolbar .hint{
         display:none !important;
       }
-      body.print-pdf-mode #print-package-host .card{
+      body.print-pdf-mode #print-package-host .card:not(.card-schedule),
+      body.print-pdf-mode #print-package-host .in-pages-fs{
         display:block !important;
         border:none !important;
         box-shadow:none !important;
@@ -1551,6 +2052,11 @@
       body.print-pdf-mode #print-package-host .page.page-tb{
         padding:8mm 6mm 6mm !important;
       }
+      body.print-pdf-mode #print-package-host #table-trial-balance-live col.tb-col-open,
+      body.print-pdf-mode #print-package-host #table-trial-balance-live .tb-th-open,
+      body.print-pdf-mode #print-package-host #table-trial-balance-live .tb-td-open{
+        display:none !important;
+      }
       body.print-pdf-mode #print-package-host .page.page-stmt-sigs{
         display:flex;
         flex-direction:column;
@@ -1575,10 +2081,132 @@
       body.print-pdf-mode #print-package-host tfoot{
         display:table-footer-group;
       }
+      body.print-pdf-mode #print-package-host .print-fs{
+        width:100%;
+        max-width:none;
+        box-sizing:border-box;
+      }
+      body.print-pdf-mode #print-package-host .print-fs .in-pages-fs .pages{
+        width:100%;
+        gap:0;
+      }
+      body.print-pdf-mode #print-package-host .print-fs .card-schedule{
+        width:100% !important;
+        max-width:none !important;
+        box-sizing:border-box;
+        padding:0 !important;
+        margin:0 0 4mm !important;
+        border:none !important;
+        box-shadow:none !important;
+        background:transparent !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule .fa-print-wrap,
+      body.print-pdf-mode #print-package-host .card-schedule [data-body]{
+        overflow:visible !important;
+        max-width:none !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule .fin-table:not(.tb-table){
+        width:100% !important;
+        min-width:0 !important;
+        table-layout:fixed;
+        font-size:8pt !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule-fa .fa-schedule-table{
+        width:100% !important;
+        min-width:0 !important;
+        table-layout:fixed;
+        font-size:6pt !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule-fa .fa-schedule-table th,
+      body.print-pdf-mode #print-package-host .card-schedule-fa .fa-schedule-table td{
+        padding:1px 2px !important;
+        word-wrap:break-word;
+        overflow-wrap:anywhere;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule-inv #goods-inv-box-live,
+      body.print-pdf-mode #print-package-host .card-schedule-inv #goods-inv-box-live table{
+        font-size:8pt !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule-equity #table-equity-live{
+        font-size:7.5pt !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule-equity #table-equity-live th{
+        font-size:7pt !important;
+        padding:2px 3px !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule [data-body],
+      body.print-pdf-mode #print-package-host .card-schedule .fa-print-wrap{
+        padding-inline:0.4mm !important;
+        box-sizing:border-box;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule .fin-table:not(.tb-table),
+      body.print-pdf-mode #print-package-host .card-schedule .fa-schedule-table,
+      body.print-pdf-mode #print-package-host .card-schedule .con-table,
+      body.print-pdf-mode #print-package-host .card-schedule .contracts-meta-table{
+        border:1px solid var(--fin-table-border) !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule .fin-table:not(.tb-table) :is(th,td):first-child,
+      body.print-pdf-mode #print-package-host .card-schedule .fa-schedule-table :is(th,td):first-child,
+      body.print-pdf-mode #print-package-host .card-schedule .con-table :is(th,td):first-child,
+      body.print-pdf-mode #print-package-host .card-schedule .contracts-meta-table :is(th,td):first-child{
+        border-inline-start:1px solid var(--fin-table-border) !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule .fin-table:not(.tb-table) :is(th,td):last-child,
+      body.print-pdf-mode #print-package-host .card-schedule .fa-schedule-table :is(th,td):last-child,
+      body.print-pdf-mode #print-package-host .card-schedule .con-table :is(th,td):last-child,
+      body.print-pdf-mode #print-package-host .card-schedule .contracts-meta-table :is(th,td):last-child{
+        border-inline-end:1px solid var(--fin-table-border) !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule-vertical,
+      body.print-pdf-mode #print-package-host .schedules-vertical-toolbar{
+        position:static !important;
+        left:auto !important;
+        top:auto !important;
+        width:100% !important;
+        max-width:none !important;
+        opacity:1 !important;
+        pointer-events:none !important;
+        z-index:auto !important;
+        overflow:visible !important;
+      }
+      body.print-pdf-mode #print-package-host .schedules-vertical-toolbar{
+        display:none !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule.schedule-keep-whole{
+        break-inside:avoid-page !important;
+        page-break-inside:avoid !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-tb .fin-table.tb-table{
+        font-size:7pt !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-tb .fin-table.tb-table th{
+        font-size:6.5pt !important;
+        padding:2px 2px !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-tb .fin-table.tb-table thead tr.tb-head-sub th{
+        font-size:6pt !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-tb .fin-table.tb-table td{
+        font-size:6.5pt !important;
+        padding:2px 2px !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-tb .fin-table.tb-table .amount-col{
+        font-size:6pt !important;
+        padding:2px 1px !important;
+        letter-spacing:-0.03em !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-tb .fin-table.tb-table .amount-col .amt-compact{
+        font-size:5.5pt !important;
+      }
+      body.print-pdf-mode #print-package-host .pages > .page:last-child{
+        page-break-after:auto;
+        break-after:auto;
+      }
     }
   </style>
 </head>
 <body class="app-bg mode-login">
+  <header class="app-shell-header">
   <div class="topbar">
     <div class="topbar-side topbar-side-start">
       <div class="topbar-user hidden" id="topbar-user-wrap" aria-label="معلومات المستخدم">
@@ -1606,9 +2234,8 @@
     </div>
   </div>
 
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="nav-title">الأقسام</div>
+  <aside class="sidebar app-nav-bar" aria-label="أقسام التطبيق">
+      <div class="nav-title" aria-hidden="true">الأقسام</div>
       <div class="nav">
         <button class="nav-btn active" id="nav-dashboard" data-section="dashboard">
           <span class="ic">🏠</span>
@@ -1645,6 +2272,9 @@
         <!-- تم إلغاء قسم التقارير: تقرير المدير المفوض جزء من الكشوفات -->
       </div>
     </aside>
+  </header>
+
+  <div class="layout">
     <main class="main">
       <div class="wrap">
     <!-- Login -->
@@ -1700,8 +2330,10 @@
 
     <!-- Dashboard container -->
     <div class="card hidden" id="view-dashboard">
-      <h2 style="margin-bottom:6px">لوحة التحكم</h2>
-      <p class="hint" style="margin:0 0 12px">نظرة عامة على المكتب؛ معلومات حسابك تظهر في الشريط العلوي. استخدم الشريط الجانبي أو الاختصارات أدناه للانتقال.</p>
+      <div id="view-dashboard-header">
+        <h2 style="margin-bottom:6px">لوحة التحكم</h2>
+        <p class="hint" style="margin:0 0 12px">نظرة عامة على المكتب؛ معلومات حسابك تظهر في الشريط العلوي. استخدم الشريط الجانبي أو الاختصارات أدناه للانتقال.</p>
+      </div>
 
       <div class="card" id="section-dashboard">
         <h2 style="font-size:13pt">إحصائيات سريعة</h2>
@@ -2040,11 +2672,11 @@
           <div class="msg ok" id="year-ok"></div>
         </div>
 
-        <div class="card hidden" style="margin-top:12px" id="in-pages-card">
+        <div class="in-pages-host hidden" style="margin-top:12px" id="in-pages-card">
           <div class="row" style="justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
             <div>
               <h2 style="font-size:12.5pt;margin:0 0 6px">صفحات النموذج (CY / PY)</h2>
-              <div class="hint" style="margin:0">القوائم الأربعة + الكشوفات الافتراضية (1–8) مع أدوات الإضافة/التعديل/الحذف.</div>
+              <div class="hint" style="margin:0">القوائم الأربعة + كشوف (١) و(٨) وبيان د/ج. الكشوف العمودية (٢–٧) تُدخل من <b>ميزان المراجعة — قبل الترحيل</b> وتظهر في الطباعة.</div>
             </div>
             <div class="row" style="gap:8px;flex-wrap:wrap;justify-content:flex-end">
               <button class="tb-btn" type="button" id="btn-pages-print" disabled>🖨️ طباعة / PDF</button>
@@ -2556,6 +3188,27 @@
     </div>
   </div>
 
+  <!-- TB linked schedule edit modal — يعرض الكشف الكامل كما في الصفحة -->
+  <div class="overlay" id="ov-tb-linked-sch" aria-hidden="true">
+    <div class="modal modal-wide modal-tb-schedule" role="dialog" aria-modal="true" aria-label="تعديل كشف مرتبط">
+      <div class="modal-hd">
+        <span id="tb-linked-sch-title">تعديل الكشف</span>
+        <button class="modal-close" type="button" id="btn-x-tb-linked-sch" aria-label="إغلاق">×</button>
+      </div>
+      <div class="modal-bd" id="tb-linked-sch-body">
+        <div id="tb-linked-sch-host"></div>
+        <div id="tb-linked-sch-fallback"></div>
+      </div>
+      <div class="msg err" id="tb-linked-sch-err" style="margin:0 16px"></div>
+      <div class="modal-ft">
+        <button class="btn modal danger hidden" type="button" id="btn-del-tb-linked-sch">🗑 حذف الكشف</button>
+        <span class="hint" style="margin-left:auto;font-size:10px">«💾 حفظ» للحفظ — «🗑 حذف الكشف» للكشوف العمودية فقط</span>
+        <button class="btn modal" type="button" id="btn-cancel-tb-linked-sch">إلغاء</button>
+        <button class="btn modal accent" type="button" id="btn-apply-tb-linked-sch">💾 حفظ</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -2615,6 +3268,14 @@
     function openOverlay(id){
       const ov = $(id);
       if(!ov) return;
+      const baseZ = 50;
+      let maxZ = baseZ - 1;
+      document.querySelectorAll(".overlay.show").forEach((el)=>{
+        if(el === ov) return;
+        const z = parseInt(el.style.zIndex, 10);
+        maxZ = Math.max(maxZ, Number.isFinite(z) ? z : baseZ);
+      });
+      ov.style.zIndex = String(maxZ + 10);
       ov.classList.add("show");
       ov.setAttribute("aria-hidden","false");
     }
@@ -2623,6 +3284,7 @@
       if(!ov) return;
       ov.classList.remove("show");
       ov.setAttribute("aria-hidden","true");
+      ov.style.zIndex = "";
     }
 
     // ===== Schedule modal helpers (like 0.0.1) =====
@@ -2802,7 +3464,11 @@
       /** معرّف المكتب النشط — يُحدَّد من localStorage أو افتراضي */
       activeOfficeId: null,
       /** مدير المنصّة: مستند platform_admins/{uid} */
-      isPlatformSuperAdmin: false
+      isPlatformSuperAdmin: false,
+      /** تصفية ميزان المراجعة التفصيلي قبل الترحيل */
+      tbDetailFilters: { stmt: "", class: "", sch: "" },
+      _lastYearDoc: null,
+      _tbDetailRows: null
     };
 
     function officeId(){
@@ -3246,6 +3912,9 @@
         if(secEl) secEl.classList.toggle("hidden", k !== sec);
         if(navEl) navEl.classList.toggle("active", k === sec);
       }
+      const vd = $("view-dashboard");
+      if(vd) vd.dataset.activeSection = sec;
+      document.body.dataset.activeSection = sec;
     }
 
     async function appendActivityLog(action, detail){
@@ -3619,6 +4288,37 @@
         companyHasFixedAssets: $("yr-hasFixedAssets").value,
         companyHasInventory: $("yr-hasInventory").value
       };
+    }
+
+    function emptyFixedAssetsScheduleData(){
+      return {
+        type: "horizontal_fixedAssets",
+        columns: [
+          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" },
+          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" },
+          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" }
+        ]
+      };
+    }
+    function emptyInventoryBoxData(){
+      return { openInv:"", purchases:"", closeInv:"", prevUsedMaterials:"" };
+    }
+    function emptyContractsScheduleData(){
+      return { type:"contracts", exchangeRate:"", revPyTotalIqd:"", revenueAcctCode:"", rows: [] };
+    }
+    /** عند «لا» في مرجعيات السنة — تصفير بيانات الكشf/البيان في Firestore (لا حذف السجل) */
+    function clearDisabledReferenceScheduleData(dataById, meta){
+      const slot = dataById || {};
+      if(String(meta?.companyHasFixedAssets || "no") !== "yes"){
+        slot["sch-1"] = emptyFixedAssetsScheduleData();
+      }
+      if(String(meta?.companyHasInventory || "no") !== "yes"){
+        slot["_invBox"] = emptyInventoryBoxData();
+      }
+      if(String(meta?.companyHasContracts || "yes") !== "yes"){
+        slot["sch-8"] = emptyContractsScheduleData();
+      }
+      return slot;
     }
 
     async function loadCompanyProfile(companyId){
@@ -6550,6 +7250,24 @@
       if(id === "sch-4") return "st";
       return "assets-current";
     }
+    /** خامات/مواد من كشف مخزون (321) — تُعرض في الميزان من بيان د فقط عند تفعيل المخزون */
+    function isMaterialsVerticalExpenseSch(sch){
+      if(!sch) return false;
+      const code = toWesternDigits(String(sch.acctCode || "").trim());
+      if(code === "321" || /^321[\-.]/.test(code)) return true;
+      const t = String(sch.acctName || sch.baseTitle || sch.title || "");
+      return /الخامات|مواد\s*اول|مواد\s*أول/i.test(t);
+    }
+    function vertExpenseTotalsForIncome(incomeExpenseSchedules, sumVertical, hasInv){
+      return (incomeExpenseSchedules || []).reduce((acc, sch)=>{
+        if(hasInv && isMaterialsVerticalExpenseSch(sch)) return acc;
+        const t = sumVertical(sch.id);
+        return { cy: acc.cy + t.cy, py: acc.py + t.py };
+      }, { cy:0, py:0 });
+    }
+    function tbSkipVerticalSchInTrialBalance(sch, hasInv){
+      return !!(hasInv && isMaterialsVerticalExpenseSch(sch));
+    }
     function trialBalanceDefaultCode(r){
       const c = String(r?.acctCode || "").trim();
       if(c) return c;
@@ -6595,19 +7313,136 @@
       if(!rows.length) return null;
       return rows.reduce((s,r)=> s + n(r?.cy), 0);
     }
-    function finalizeTrialBalanceLines(lines, priorDoc){
+    /** افتتاحي بند عمودي: py المُدخل يعلو على ختامي السنة السابقة */
+    function trialBalanceVerticalOpening(row, priorDoc, schId, code, name, n){
+      const pyStr = String(row?.py ?? "").trim();
+      if(pyStr !== "") return n(row.py);
+      const fromPrior = trialBalancePriorClosing(priorDoc, schId, code, name, n);
+      return fromPrior != null ? fromPrior : 0;
+    }
+    /** سطور إقفال قائمة الدخل — تُضاف في ميزان «بعد الترحيل» فقط */
+    function appendTrialBalanceClosingEntries(lines){
+      let rev = 0, exp = 0;
+      for(const ln of lines || []){
+        if(ln.isBalance) continue;
+        if(ln._meta?.source === "closingEntry") continue;
+        const m = Math.abs(Number(ln.movement || 0));
+        if(m < 1e-9) continue;
+        if(ln.nature === "credit") rev += m;
+        else exp += m;
+      }
+      if(rev > 1e-9){
+        lines.push({
+          scheduleNo: "ترحيل",
+          acctCode: "",
+          acctName: "إقفال — الإيرادات",
+          nature: "debit",
+          isBalance: false,
+          section: "closing-rev",
+          opening: 0, movement: 0, closing: 0,
+          _meta: { source: "closingEntry", kind: "closeRev", amount: rev, editable: false }
+        });
+      }
+      if(exp > 1e-9){
+        lines.push({
+          scheduleNo: "ترحيل",
+          acctCode: "",
+          acctName: "إقفال — المصروفات",
+          nature: "credit",
+          isBalance: false,
+          section: "closing-exp",
+          opening: 0, movement: 0, closing: 0,
+          _meta: { source: "closingEntry", kind: "closeExp", amount: exp, editable: false }
+        });
+      }
+    }
+    function tbPushEquityAndTaxLines(params, pushLine, n){
+      const isPost = params.tbPhase === "post";
+      const eqOpen = params.eqOpen || {};
+      const eqDed = params.eqDed || {};
+      const eqClosing = params.eqClosing || {};
+      const openCap = n(eqOpen.capital);
+      const openRes = n(eqOpen.reserve) + n(eqOpen.surplus) - n(eqOpen.deficit);
+      let closeCap, closeRes;
+      if(isPost){
+        closeCap = n(eqClosing.capital);
+        closeRes = n(eqClosing.reserve) + n(eqClosing.surplus) - n(eqClosing.deficit);
+      }else{
+        closeCap = openCap - n(eqDed.capital);
+        closeRes = (n(eqOpen.reserve) - n(eqDed.reserve))
+          + (n(eqOpen.surplus) - n(eqDed.surplus))
+          - (n(eqOpen.deficit) - n(eqDed.deficit));
+      }
+      const taxOpen = params.taxOpening != null ? Number(params.taxOpening) : n(params.taxPY);
+      /** قبل الترحيل: تخصيص PY في الافتتاحي فقط — الرصيد الختامي صفر حتى يُرحَّل taxCY */
+      const taxClose = isPost ? n(params.taxCY) : 0;
+      const taxMovement = isPost ? (taxClose - taxOpen) : 0;
+      const eqMeta = (field)=> ({ source: "equity", field, editable: false, tbPhase: isPost ? "post" : "pre" });
+      pushLine({
+        scheduleNo: "بيان ج",
+        acctCode: "21",
+        acctName: "راس المال",
+        nature: "credit",
+        isBalance: true,
+        section: "lt",
+        opening: openCap,
+        movement: closeCap - openCap,
+        closing: closeCap,
+        _meta: eqMeta("capital")
+      });
+      pushLine({
+        scheduleNo: "بيان ج",
+        acctCode: "22",
+        acctName: "الاحتياطيات",
+        nature: "credit",
+        isBalance: true,
+        section: "lt",
+        opening: openRes,
+        movement: closeRes - openRes,
+        closing: closeRes,
+        _meta: eqMeta("reserve")
+      });
+      pushLine({
+        scheduleNo: "بيان ب",
+        acctCode: "23",
+        acctName: "تخصيصات قصيرة الاجل",
+        nature: "credit",
+        isBalance: true,
+        section: "st",
+        opening: taxOpen,
+        movement: taxMovement,
+        closing: taxClose,
+        _meta: { source: "tax", editable: false, tbPhase: isPost ? "post" : "pre" }
+      });
+    }
+    function finalizeTrialBalanceLines(lines, priorDoc, opts){
+      const incomeInClosing = !!(opts && opts.incomeInClosing);
       const displayRows = lines.map((ln)=>{
         const op = trialBalanceSignedToDrCr(ln.opening, ln.nature);
         const mv = trialBalanceSignedToDrCr(ln.movement, ln.nature);
-        const cl = trialBalanceSignedToDrCr(ln.isBalance ? ln.closing : 0, ln.nature);
+        /** ميزانية: رصيد تراكمي. قبل الترحيل: قائمة الدخل في الختامي. بعد الترحيل: الختامي لحسابات الميزانية فقط */
+        const meta = ln._meta || {};
+        let closingAmt = 0;
+        if(ln.isBalance){
+          closingAmt = Number(ln.closing || 0);
+        }else if(incomeInClosing){
+          closingAmt = Math.abs(Number(ln.closing || 0)) >= 1e-9 ? Number(ln.closing) : Number(ln.movement || 0);
+        }
+        const cl = trialBalanceSignedToDrCr(closingAmt, ln.nature);
         return {
           scheduleNo: ln.scheduleNo,
           acctCode: ln.acctCode,
           acctName: ln.acctName,
           isBalance: ln.isBalance,
+          section: ln.section || null,
+          nature: ln.nature,
+          opening: ln.opening,
+          movement: ln.movement,
+          closing: closingAmt,
           opDebit: op.debit, opCredit: op.credit,
           mvDebit: mv.debit, mvCredit: mv.credit,
-          clDebit: cl.debit, clCredit: cl.credit
+          clDebit: cl.debit, clCredit: cl.credit,
+          meta: ln._meta || { source: "computed", editable: false }
         };
       });
       displayRows.sort((a,b)=>{
@@ -6641,8 +7476,10 @@
       const pushLine = (line)=>{
         const code = String(line.acctCode || "").trim();
         const name = String(line.acctName || "").trim();
-        if(!code && !name) return;
-        if(Math.abs(line.opening) < 1e-9 && Math.abs(line.movement) < 1e-9 && Math.abs(line.closing) < 1e-9) return;
+        const isClose = line._meta?.source === "closingEntry";
+        if(!code && !name && !isClose) return;
+        if(!isClose && Math.abs(line.opening) < 1e-9 && Math.abs(line.movement) < 1e-9 && Math.abs(line.closing) < 1e-9) return;
+        if(isClose && Math.abs(Number(line._meta?.amount || 0)) < 1e-9) return;
         lines.push({
           scheduleNo: line.scheduleNo == null ? "" : String(line.scheduleNo),
           acctCode: code,
@@ -6651,7 +7488,9 @@
           isBalance: !!line.isBalance,
           opening: Number(line.opening || 0),
           movement: Number(line.movement || 0),
-          closing: Number(line.closing || 0)
+          closing: Number(line.closing || 0),
+          section: line.section || null,
+          ...(line._meta ? { _meta: line._meta } : {})
         });
       };
       const sumSchRows = (schId)=>{
@@ -6660,6 +7499,7 @@
       };
 
       for(const sch of reg.filter((s)=> s && s.active !== false && s.type === "vertical")){
+        if(tbSkipVerticalSchInTrialBalance(sch, params.hasInv)) continue;
         const target = effectiveVerticalTarget(sch);
         const section = effectiveVerticalSection(sch, target);
         const nature = trialBalanceAccountNature(target, section);
@@ -6681,6 +7521,7 @@
           acctName: name,
           nature,
           isBalance,
+          section,
           opening: isBalance ? openingBal : 0,
           movement,
           closing: isBalance ? closingBal : 0
@@ -6694,6 +7535,7 @@
           acctName: "الموجودات الثابتة (بالقيمة الدفترية)",
           nature: "debit",
           isBalance: true,
+          section: "assets-fixed",
           opening: params.faTotals?.nbvPY || 0,
           movement: (params.faTotals?.nbvCY || 0) - (params.faTotals?.nbvPY || 0),
           closing: params.faTotals?.nbvCY || 0
@@ -6706,7 +7548,8 @@
           isBalance: false,
           opening: 0,
           movement: params.faTotals?.depCY || 0,
-          closing: 0
+          closing: 0,
+          section: "expense"
         });
       }
 
@@ -6721,6 +7564,7 @@
           acctName: "المخزون",
           nature: "debit",
           isBalance: true,
+          section: "assets-current",
           opening: openInv,
           movement: closeInv - openInv,
           closing: closeInv
@@ -6731,62 +7575,24 @@
           acctName: "الخامات و المواد الاولية",
           nature: "debit",
           isBalance: false,
+          section: "inv-materials",
           opening: 0,
           movement: used,
           closing: 0
         });
       }
 
-      const eqOpen = params.eqOpen || {};
-      const eqClosing = params.eqClosing || {};
-      const openCap = n(eqOpen.capital);
-      const closeCap = n(eqClosing.capital);
-      const openRes = n(eqOpen.reserve) + n(eqOpen.surplus) - n(eqOpen.deficit);
-      const closeRes = n(eqClosing.reserve) + n(eqClosing.surplus) - n(eqClosing.deficit);
-      pushLine({
-        scheduleNo: "بيان ج",
-        acctCode: "21",
-        acctName: "راس المال",
-        nature: "credit",
-        isBalance: true,
-        opening: openCap,
-        movement: closeCap - openCap,
-        closing: closeCap
-      });
-      pushLine({
-        scheduleNo: "بيان ج",
-        acctCode: "22",
-        acctName: "الاحتياطيات",
-        nature: "credit",
-        isBalance: true,
-        opening: openRes,
-        movement: closeRes - openRes,
-        closing: closeRes
-      });
-
-      const taxOpen = params.taxOpening != null ? Number(params.taxOpening) : n(params.taxPY);
-      const taxClose = n(params.taxCY);
-      pushLine({
-        scheduleNo: "بيان ب",
-        acctCode: "23",
-        acctName: "تخصيصات قصيرة الاجل",
-        nature: "credit",
-        isBalance: true,
-        opening: taxOpen,
-        movement: taxClose - taxOpen,
-        closing: taxClose
-      });
+      tbPushEquityAndTaxLines(params, pushLine, n);
 
       if(params.hasContracts){
         const contracts = params.contracts || {};
         const revCode = toWesternDigits(String(contracts.revenueAcctCode || "").trim()) || "41-45";
         const conRows = Array.isArray(contracts.rows) ? contracts.rows : [];
         const exRate = Number.isFinite(n(contracts.exchangeRate)) && n(contracts.exchangeRate) > 0 ? n(contracts.exchangeRate) : 0;
-        let revTotal = 0, expTotal = 0;
+        let revTotal = 0;
         for(const r of conRows){
           const rate = exRate || n(r?.exchangeRate) || 0;
           revTotal += n(r?.revIqd) || (rate ? n(r?.revUsd) * rate : 0);
-          expTotal += n(r?.expensesIqd);
         }
         if(revTotal){
           pushLine({
@@ -6795,26 +7601,16 @@
             acctName: "ايراد النشاط التشغيلي (عقود)",
             nature: "credit",
             isBalance: false,
+            section: "revenue",
             opening: 0,
             movement: revTotal,
             closing: 0
           });
         }
-        if(expTotal){
-          pushLine({
-            scheduleNo: params.contractsSchNo,
-            acctCode: "41",
-            acctName: "مصاريف العقود",
-            nature: "debit",
-            isBalance: false,
-            opening: 0,
-            movement: expTotal,
-            closing: 0
-          });
-        }
       }
 
-      return finalizeTrialBalanceLines(lines, priorDoc);
+      if(params.tbPhase === "post") appendTrialBalanceClosingEntries(lines);
+      return finalizeTrialBalanceLines(lines, priorDoc, { incomeInClosing: false });
     }
     /**
      * ميزان مراجعة من البنود الفرعية للكشوفات.
@@ -6830,21 +7626,26 @@
       const pushLine = (line)=>{
         const code = String(line.acctCode || "").trim();
         const name = String(line.acctName || "").trim();
-        if(!code && !name) return;
-        if(Math.abs(line.opening) < 1e-9 && Math.abs(line.movement) < 1e-9 && Math.abs(line.closing) < 1e-9) return;
+        const isClose = line._meta?.source === "closingEntry";
+        const allZero = Math.abs(line.opening) < 1e-9 && Math.abs(line.movement) < 1e-9 && Math.abs(line.closing) < 1e-9;
+        if(!code && !name && allZero && !line._meta?.editable && !isClose) return;
+        if(isClose && Math.abs(Number(line._meta?.amount || 0)) < 1e-9) return;
         lines.push({
           scheduleNo: line.scheduleNo == null ? "" : String(line.scheduleNo),
           acctCode: code,
           acctName: name,
           nature: line.nature,
           isBalance: !!line.isBalance,
+          section: line.section || null,
           opening: Number(line.opening || 0),
           movement: Number(line.movement || 0),
-          closing: Number(line.closing || 0)
+          closing: Number(line.closing || 0),
+          _meta: line._meta
         });
       };
 
       for(const sch of reg.filter((s)=> s && s.active !== false && s.type === "vertical")){
+        if(tbSkipVerticalSchInTrialBalance(sch, params.hasInv)) continue;
         const target = effectiveVerticalTarget(sch);
         const section = effectiveVerticalSection(sch, target);
         const nature = trialBalanceAccountNature(target, section);
@@ -6852,14 +7653,14 @@
         const schedNo = sch.scheduleNo;
         const fallbackCode = trialBalanceDefaultCode({ scheduleNo: schedNo, acctCode: sch.acctCode || "" });
         const rows = dataById[sch.id]?.rows || [];
-        for(const row of rows){
+        for(let rowIdx = 0; rowIdx < rows.length; rowIdx++){
+          const row = rows[rowIdx];
           const code = toWesternDigits(String(row?.code || "").trim()) || fallbackCode;
           const name = String(row?.name || "").trim() || String(sch.acctName || sch.baseTitle || sch.title || "").trim();
           const closingBal = n(row?.cy);
           let openingBal = 0;
           if(isBalance){
-            const fromPrior = trialBalancePriorClosing(priorDoc, sch.id, code, name, n);
-            openingBal = fromPrior != null ? fromPrior : n(row?.py);
+            openingBal = trialBalanceVerticalOpening(row, priorDoc, sch.id, code, name, n);
           }
           const movement = isBalance ? (closingBal - openingBal) : closingBal;
           pushLine({
@@ -6868,9 +7669,11 @@
             acctName: name,
             nature,
             isBalance,
+            section,
             opening: isBalance ? openingBal : 0,
             movement,
-            closing: isBalance ? closingBal : 0
+            closing: isBalance ? closingBal : 0,
+            _meta: { source: "vertical", schId: sch.id, rowIndex: rowIdx, editable: true }
           });
         }
       }
@@ -6879,7 +7682,8 @@
         const fa = dataById["sch-1"] || {};
         const cols = Array.isArray(fa.columns) ? fa.columns : [];
         let nbvCY = 0, nbvPY = 0, depCY = 0;
-        for(const c of cols){
+        for(let colIdx = 0; colIdx < cols.length; colIdx++){
+          const c = cols[colIdx];
           const openCostPY = n(c.openCostPY);
           const addCY = n(c.addCY);
           const dispCY = n(c.dispCY);
@@ -6900,9 +7704,11 @@
             acctName: colName,
             nature: "debit",
             isBalance: true,
+            section: "assets-fixed",
             opening: colNbvPY,
             movement: colNbvCY - colNbvPY,
-            closing: colNbvCY
+            closing: colNbvCY,
+            _meta: { source: "fixedAssets", schId: "sch-1", colIndex: colIdx, editable: false }
           });
         }
         if(!cols.length){
@@ -6912,9 +7718,11 @@
             acctName: "الموجودات الثابتة (بالقيمة الدفترية)",
             nature: "debit",
             isBalance: true,
+            section: "assets-fixed",
             opening: params.faTotals?.nbvPY || 0,
             movement: (params.faTotals?.nbvCY || 0) - (params.faTotals?.nbvPY || 0),
-            closing: params.faTotals?.nbvCY || 0
+            closing: params.faTotals?.nbvCY || 0,
+            _meta: { source: "fixedAssets", schId: "sch-1", editable: false }
           });
         }
         pushLine({
@@ -6923,9 +7731,11 @@
           acctName: "الاندثارات والاطفاءات",
           nature: "debit",
           isBalance: false,
+          section: "expense",
           opening: 0,
           movement: depCY || params.faTotals?.depCY || 0,
-          closing: 0
+          closing: 0,
+          _meta: { source: "fixedAssets", schId: "sch-1", kind: "dep", editable: false }
         });
       }
 
@@ -6940,9 +7750,11 @@
           acctName: "المخزون",
           nature: "debit",
           isBalance: true,
+          section: "assets-current",
           opening: openInv,
           movement: closeInv - openInv,
-          closing: closeInv
+          closing: closeInv,
+          _meta: { source: "invBox", field: "inventory", editable: false }
         });
         pushLine({
           scheduleNo: "بيان د",
@@ -6950,90 +7762,47 @@
           acctName: "الخامات و المواد الاولية",
           nature: "debit",
           isBalance: false,
+          section: "inv-materials",
           opening: 0,
           movement: used,
-          closing: 0
+          closing: 0,
+          _meta: { source: "invBox", field: "materials", editable: false, invMaterials: true }
         });
       }
 
-      const eqOpen = params.eqOpen || {};
-      const eqClosing = params.eqClosing || {};
-      const openCap = n(eqOpen.capital);
-      const closeCap = n(eqClosing.capital);
-      const openRes = n(eqOpen.reserve) + n(eqOpen.surplus) - n(eqOpen.deficit);
-      const closeRes = n(eqClosing.reserve) + n(eqClosing.surplus) - n(eqClosing.deficit);
-      pushLine({
-        scheduleNo: "بيان ج",
-        acctCode: "21",
-        acctName: "راس المال",
-        nature: "credit",
-        isBalance: true,
-        opening: openCap,
-        movement: closeCap - openCap,
-        closing: closeCap
-      });
-      pushLine({
-        scheduleNo: "بيان ج",
-        acctCode: "22",
-        acctName: "الاحتياطيات",
-        nature: "credit",
-        isBalance: true,
-        opening: openRes,
-        movement: closeRes - openRes,
-        closing: closeRes
-      });
-
-      const taxOpen = params.taxOpening != null ? Number(params.taxOpening) : n(params.taxPY);
-      const taxClose = n(params.taxCY);
-      pushLine({
-        scheduleNo: "بيان ب",
-        acctCode: "23",
-        acctName: "تخصيصات قصيرة الاجل",
-        nature: "credit",
-        isBalance: true,
-        opening: taxOpen,
-        movement: taxClose - taxOpen,
-        closing: taxClose
-      });
+      tbPushEquityAndTaxLines(params, pushLine, n);
 
       if(params.hasContracts){
         const contracts = params.contracts || {};
         const revCode = toWesternDigits(String(contracts.revenueAcctCode || "").trim()) || "41-45";
         const conRows = Array.isArray(contracts.rows) ? contracts.rows : [];
         const exRate = Number.isFinite(n(contracts.exchangeRate)) && n(contracts.exchangeRate) > 0 ? n(contracts.exchangeRate) : 0;
-        for(const r of conRows){
+        const conSchId = reg.find((s)=> s?.active !== false && (s?.id === "sch-8" || s?.type === "contracts"))?.id || "sch-8";
+        for(let rowIdx = 0; rowIdx < conRows.length; rowIdx++){
+          const r = conRows[rowIdx];
           const rate = exRate || n(r?.exchangeRate) || 0;
           const revIqd = n(r?.revIqd) || (rate ? n(r?.revUsd) * rate : 0);
-          const expIqd = n(r?.expensesIqd);
-          const label = String(r?.name || r?.contractName || "").trim() || "عقد";
+          const label = String(r?.projectName || r?.name || r?.contractName || "").trim() || "مشروع";
           if(revIqd){
             pushLine({
               scheduleNo: params.contractsSchNo,
               acctCode: revCode,
-              acctName: `ايراد عقد — ${label}`,
+              acctName: label,
               nature: "credit",
               isBalance: false,
+              section: "revenue",
               opening: 0,
               movement: revIqd,
-              closing: 0
-            });
-          }
-          if(expIqd){
-            pushLine({
-              scheduleNo: params.contractsSchNo,
-              acctCode: "41",
-              acctName: `مصروف عقد — ${label}`,
-              nature: "debit",
-              isBalance: false,
-              opening: 0,
-              movement: expIqd,
-              closing: 0
+              closing: 0,
+              _meta: { source: "contracts", schId: conSchId, rowIndex: rowIdx, kind: "rev", editable: false }
             });
           }
         }
       }
 
-      return finalizeTrialBalanceLines(lines, priorDoc);
+      if(params.tbPhase === "post") appendTrialBalanceClosingEntries(lines);
+      const incomeInClosing = params.tbPhase !== "post";
+      return finalizeTrialBalanceLines(lines, priorDoc, { incomeInClosing });
     }
 
     function buildFsStmtSigRowHtml(meta){
@@ -7078,14 +7847,1160 @@
     function buildTbSigsScreenHtml(meta){
       return `<div class="fs-balance-sigs fs-tb-sigs fs-sigs-screen">${buildTbSigRowHtml(meta)}</div>`;
     }
-    function buildTbSigsTfootHtml(meta){
-      return `<tfoot class="fs-sigs-tfoot"><tr><td colspan="8" class="fs-sigs-tfoot-cell"><div class="fs-balance-sigs fs-tb-sigs fs-sigs-tfoot-block">${buildTbSigRowHtml(meta)}</div></td></tr></tfoot>`;
+    function buildTbSigsTfootHtml(meta, colSpan=11){
+      return `<tfoot class="fs-sigs-tfoot"><tr><td colspan="${colSpan}" class="fs-sigs-tfoot-cell"><div class="fs-balance-sigs fs-tb-sigs fs-sigs-tfoot-block">${buildTbSigRowHtml(meta)}</div></td></tr></tfoot>`;
+    }
+
+    function cloneDynamicSchedules(ds){
+      try{ return JSON.parse(JSON.stringify(ds || {})); }catch(_){ return { registry: [], dataById: {} }; }
+    }
+    function activeVerticalSchedules(reg){
+      return (reg || []).filter((s)=> s && s.active !== false && s.type === "vertical")
+        .sort((a,b)=> Number(a.scheduleNo||0) - Number(b.scheduleNo||0));
+    }
+    /** يضمن صفاً واحداً على الأقل لكل كشف عمودي عند التحرير من الميزان */
+    function ensureVerticalScheduleRowsForEdit(dataById, reg){
+      for(const sch of activeVerticalSchedules(reg)){
+        if(!dataById[sch.id]) dataById[sch.id] = { type: "vertical", rows: [] };
+        const slot = dataById[sch.id];
+        if(!Array.isArray(slot.rows)) slot.rows = [];
+        if(!slot.rows.length){
+          slot.rows.push({
+            code: String(sch.acctCode || "").trim(),
+            name: String(sch.acctName || sch.baseTitle || sch.title || "").trim(),
+            cy: "",
+            py: ""
+          });
+        }
+      }
+    }
+    function trialBalanceDrCrToSigned(debit, credit, nature){
+      const d = Number(debit || 0), c = Number(credit || 0);
+      if(nature === "credit") return c - d;
+      return d - c;
+    }
+    function moveVerticalScheduleRow(dataById, fromSchId, fromIdx, toSchId){
+      if(!fromSchId || !toSchId || fromSchId === toSchId) return false;
+      const fromRows = dataById?.[fromSchId]?.rows;
+      if(!Array.isArray(fromRows) || fromIdx < 0 || fromIdx >= fromRows.length) return false;
+      const [row] = fromRows.splice(fromIdx, 1);
+      if(!dataById[toSchId]) dataById[toSchId] = { type: "vertical", rows: [] };
+      if(!Array.isArray(dataById[toSchId].rows)) dataById[toSchId].rows = [];
+      dataById[toSchId].rows.push(row);
+      return true;
+    }
+    function applyTbVerticalBalanceFromRow(dataRow, nature, opD, opC, clD, clC, n, fmtAmt){
+      const hasOp = n(opD) || n(opC);
+      const hasCl = n(clD) || n(clC);
+      if(hasOp){
+        dataRow.py = fmtAmt(trialBalanceDrCrToSigned(n(opD), n(opC), nature));
+      }else{
+        dataRow.py = "";
+      }
+      if(hasCl){
+        dataRow.cy = fmtAmt(trialBalanceDrCrToSigned(n(clD), n(clC), nature));
+      }else{
+        dataRow.cy = "";
+      }
+    }
+    function applyTbVerticalIncomeMovement(dataRow, nature, mvD, mvC, n, fmtAmt){
+      const signed = trialBalanceDrCrToSigned(n(mvD), n(mvC), nature);
+      dataRow.cy = signed ? fmtAmt(signed) : "";
+    }
+    function tbLinkedScheduleTitle(meta, tbRow){
+      const src = meta?.source || "";
+      if(src === "fixedAssets") return "كشف (١) — الموجودات الثابتة";
+      if(src === "invBox") return "بيان د — حركة المخزون";
+      if(src === "equity") return "بيان ج — حقوق الملكية";
+      if(src === "contracts") return "كشف (٨) — العقود ومصاريف المشاريع";
+      if(src === "tax") return "بيان ب — ضريبة الدخل";
+      if(src === "vertical"){
+        const sch = (tbLinkedModalCtxRef?.reg || []).find((s)=> s?.id === meta?.schId);
+        if(sch) return `كشف (${toWesternDigits(String(sch.scheduleNo ?? ""))}) — ${sch.baseTitle || sch.title || ""}`;
+        return "كشف عمودي";
+      }
+      return tbRow?.acctName || "تعديل الكشف";
+    }
+    function tbLinkedSaveLogDetail(meta, reg){
+      const src = meta?.source || "";
+      if(src === "fixedAssets") return "كشف 1 — الموجودات الثابتة";
+      if(src === "invBox") return "بيان د — حركة المخزون";
+      if(src === "equity") return "بيان ج — تغيرات حقوق الملكية";
+      if(src === "contracts"){
+        const sch = (reg || []).find((s)=> s?.id === (meta?.schId || "sch-8"));
+        return `كشف العقود — ${sch?.title || sch?.baseTitle || "sch-8"}`;
+      }
+      if(src === "vertical"){
+        const sch = (reg || []).find((s)=> s?.id === meta?.schId);
+        return sch ? `رقم ${sch.scheduleNo} — ${sch.baseTitle || sch.title || sch.id}` : "كشف عمودي";
+      }
+      return "كشف مرتبط بالميزان";
+    }
+    function tbLinkedCanDeleteVerticalSchedule(meta, reg){
+      if((meta?.source || "") !== "vertical") return false;
+      const schId = String(meta?.schId || "").trim();
+      if(!schId) return false;
+      const sch = (reg || []).find((s)=> s?.id === schId);
+      return !!(sch && sch.type === "vertical" && sch.active !== false);
+    }
+    function scheduleTypeFromMeta(meta, reg){
+      const src = meta?.source || "";
+      if(src === "fixedAssets") return "horizontal_fixedAssets";
+      if(src === "vertical") return "vertical";
+      const panelKey = schedulePanelKeyFromMeta(meta);
+      const sch = (reg || []).find((s)=> s?.id === panelKey);
+      return sch?.type || "";
+    }
+    function faColCalcValues(c, n){
+      const openCostPY = n(c.openCostPY);
+      const addCY = n(c.addCY);
+      const dispCY = n(c.dispCY);
+      const closeCostCY = openCostPY + addCY - dispCY;
+      const rate = n(c.ratePct) / 100;
+      const openAccPY = n(c.openAccDepPY);
+      const depCY = closeCostCY * rate;
+      const closeAccCY = openAccPY + depCY;
+      const nbvCY = closeCostCY - closeAccCY;
+      return { closeCostCY, depCY, closeAccCY, nbvCY };
+    }
+    function mountTbInlineVerticalSchedule(host, meta, c){
+      const n = c.n || ((v)=> Number(String(v||"").replaceAll(",",""))||0);
+      const fmt = fmtAmount;
+      const CY = c.CY || "CY";
+      const PY = c.PY || "PY";
+      const schId = meta?.schId || schedulePanelKeyFromMeta(meta);
+      const sch = (c.reg || []).find((s)=> s?.id === schId);
+      const dataById = c.getWorkingDataById?.() || {};
+      if(!dataById[schId]) dataById[schId] = { type: "vertical", rows: [] };
+      const slot = dataById[schId];
+      if(!Array.isArray(slot.rows)) slot.rows = [];
+      const saved = slot.rows;
+      let selectedRow = Number.isFinite(Number(meta?.rowIndex)) ? Number(meta.rowIndex) : -1;
+      const root = document.createElement("div");
+      root.className = "tb-inline-sch-vertical-root";
+      const toolbar = document.createElement("div");
+      toolbar.className = "schedule-toolbar";
+      const schLabel = sch
+        ? `كشف (${toWesternDigits(String(sch.scheduleNo ?? ""))}) — ${sch.baseTitle || sch.title || ""}`
+        : "كشف عمودي";
+      toolbar.innerHTML = `
+        <span style="font-weight:900;color:var(--navy)">${escHtml(schLabel)}</span>
+        <span class="hint" style="margin-right:auto">${escHtml(String(CY))} / ${escHtml(String(PY))}</span>
+        <button type="button" class="tb-btn secondary" data-tb-inline-cfg title="إعداد ربط هذا الكشف بالحسابات الختامية">⚙️ إعداد</button>`;
+      toolbar.querySelector("[data-tb-inline-cfg]")?.addEventListener("click", ()=>{
+        if(!sch) return;
+        openScheduleModal("cfg", {
+          id: sch.id,
+          scheduleNo: sch.scheduleNo,
+          title: sch.title || "",
+          acctCode: sch.acctCode || "",
+          acctName: sch.acctName || "",
+          target: sch.target || "income",
+          section: sch.section || (sch.target === "balance" ? "assets-current" : "expense")
+        });
+      });
+      const wrap = document.createElement("div");
+      wrap.className = "tb-inline-sch-wrap tb-inline-sch-vertical";
+      const render = ()=>{
+        if(!saved.length) saved.push({ code:"", name:"", cy:"", py:"" });
+        const rows = saved;
+        const table = document.createElement("table");
+        table.className = "fin-table";
+        table.innerHTML = `
+          <thead><tr>
+            <th style="width:16%">رمز</th>
+            <th>اسم الحساب</th>
+            <th style="width:18%">${CY}</th>
+            <th style="width:18%">${PY}</th>
+            <th style="width:8%">-</th>
+          </tr></thead>
+          <tbody></tbody>
+          <tfoot><tr class="row-total">
+            <td colspan="2" style="font-weight:900">الإجمالي</td>
+            <td dir="ltr" data-tcy>-</td>
+            <td dir="ltr" data-tpy>-</td>
+            <td></td>
+          </tr></tfoot>`;
+        const tb = table.querySelector("tbody");
+        let sumCY = 0, sumPY = 0;
+        rows.forEach((r, idx)=>{
+          const tr = document.createElement("tr");
+          const cy = n(r.cy), py = n(r.py);
+          sumCY += cy; sumPY += py;
+          if(idx === selectedRow) tr.classList.add("row-sel");
+          tr.innerHTML = `
+            <td class="num-col"><div class="coa-ac-wrap"><input type="text" class="coa-inp" dir="ltr" data-k="code" data-i="${idx}" value="${escAttr(r.code||"")}" autocomplete="off"/></div></td>
+            <td><div class="coa-ac-wrap"><input type="text" class="coa-inp" data-k="name" data-i="${idx}" value="${escAttr(r.name||"")}" autocomplete="off"/></div></td>
+            <td class="amount-col" dir="ltr" contenteditable="true" data-k="cy" data-i="${idx}">${r.cy||""}</td>
+            <td class="amount-col" dir="ltr" contenteditable="true" data-k="py" data-i="${idx}">${r.py||""}</td>
+            <td><button type="button" class="tb-btn" data-rm="${idx}">×</button></td>`;
+          tb.appendChild(tr);
+          tr.addEventListener("click", (ev)=>{
+            const tag = String(ev?.target?.tagName || "").toUpperCase();
+            if(tag === "INPUT" || tag === "BUTTON") return;
+            if(ev?.target?.getAttribute?.("contenteditable") === "true") return;
+            selectedRow = idx;
+            render();
+          });
+        });
+        table.querySelector("[data-tcy]").textContent = fmt(sumCY);
+        table.querySelector("[data-tpy]").textContent = fmt(sumPY);
+        wrap.innerHTML = "";
+        wrap.appendChild(table);
+        const btns = document.createElement("div");
+        btns.className = "row";
+        btns.style.marginTop = "8px";
+        btns.innerHTML = `
+          <button type="button" class="tb-btn" data-add-col>➕ إضافة صف</button>
+          <button type="button" class="tb-btn" data-delrow>🗑 حذف السطر المحدد</button>
+          <span class="hint">كشف عمودي — كل صف = حساب (رمز، اسم، ${CY}، ${PY}). انقر على سطر لتحديده.</span>`;
+        wrap.appendChild(btns);
+        btns.querySelector("[data-add-col]").addEventListener("click", ()=>{
+          saved.push({ code:"", name:"", cy:"", py:"" });
+          selectedRow = saved.length - 1;
+          render();
+        });
+        btns.querySelector("[data-delrow]").addEventListener("click", ()=>{
+          if(selectedRow < 0 || selectedRow >= saved.length) return;
+          saved.splice(selectedRow, 1);
+          selectedRow = Math.min(selectedRow, saved.length - 1);
+          render();
+        });
+        wrap.querySelectorAll("button[data-rm]").forEach((b)=>{
+          b.addEventListener("click", ()=>{
+            const i = Number(b.getAttribute("data-rm"));
+            saved.splice(i, 1);
+            if(selectedRow === i) selectedRow = -1;
+            render();
+          });
+        });
+        wrap.querySelectorAll("td[contenteditable='true'][data-i]").forEach((cell)=>{
+          ["mousedown","click"].forEach((t)=> cell.addEventListener(t, (e)=> e.stopPropagation()));
+          cell.addEventListener("paste", (ev)=>{
+            const i = Number(cell.getAttribute("data-i"));
+            const k = cell.getAttribute("data-k");
+            const clip = ev.clipboardData?.getData("text") ?? "";
+            const raw = clip.trim();
+            saved[i] = saved[i] || {};
+            if(!raw){ plainPaste(ev, ""); saved[i][k] = ""; return; }
+            const formatted = fmt(n(raw));
+            plainPaste(ev, formatted);
+            saved[i][k] = formatted;
+          });
+          cell.addEventListener("focus", ()=>{
+            const i = Number(cell.getAttribute("data-i"));
+            if(!Number.isNaN(i) && selectedRow !== i) selectedRow = i;
+          });
+          cell.addEventListener("input", ()=>{
+            const i = Number(cell.getAttribute("data-i"));
+            const k = cell.getAttribute("data-k");
+            saved[i] = saved[i] || {};
+            saved[i][k] = cell.textContent || "";
+          });
+          cell.addEventListener("blur", ()=>{
+            const i = Number(cell.getAttribute("data-i"));
+            const k = cell.getAttribute("data-k");
+            const raw = String(cell.textContent||"").trim();
+            saved[i] = saved[i] || {};
+            if(raw === "") saved[i][k] = "";
+            else{
+              const formatted = fmt(n(raw));
+              cell.textContent = formatted;
+              saved[i][k] = formatted;
+            }
+            render();
+          });
+        });
+        wrap.querySelectorAll(".coa-inp").forEach((inp)=>{
+          const i = Number(inp.getAttribute("data-i"));
+          const k = inp.getAttribute("data-k");
+          const row = inp.closest("tr");
+          attachCoaAutocomplete(inp, {
+            onPick: (acc)=>{
+              saved[i] = saved[i] || {};
+              saved[i].code = acc.code;
+              saved[i].name = acc.name;
+              const codeInp = row?.querySelector('.coa-inp[data-k="code"]');
+              const nameInp = row?.querySelector('.coa-inp[data-k="name"]');
+              if(codeInp) codeInp.value = acc.code;
+              if(nameInp) nameInp.value = acc.name;
+            }
+          });
+          inp.addEventListener("input", ()=>{
+            saved[i] = saved[i] || {};
+            saved[i][k] = inp.value;
+          });
+          inp.addEventListener("blur", ()=>{
+            saved[i] = saved[i] || {};
+            saved[i][k] = String(inp.value || "").trim();
+          });
+          inp.addEventListener("focus", ()=>{
+            if(!Number.isNaN(i) && selectedRow !== i) selectedRow = i;
+          });
+          ["mousedown","click"].forEach((t)=> inp.addEventListener(t, (e)=> e.stopPropagation()));
+        });
+      };
+      render();
+      root.appendChild(toolbar);
+      root.appendChild(wrap);
+      host.innerHTML = "";
+      host.appendChild(root);
+    }
+    function mountTbInlineHorizontalFA(host, meta, c){
+      const n = c.n || ((v)=> Number(String(v||"").replaceAll(",",""))||0);
+      const fmt = fmtAmount;
+      const CY = c.CY || "CY";
+      const schId = meta?.schId || "sch-1";
+      const dataById = c.getWorkingDataById?.() || {};
+      if(!dataById[schId]) dataById[schId] = { type:"horizontal_fixedAssets", columns: [] };
+      const saved = dataById[schId];
+      if(!Array.isArray(saved.columns)) saved.columns = [];
+      const cols = saved.columns;
+      const hlCol = Number.isFinite(Number(meta?.colIndex)) ? Number(meta.colIndex) : -1;
+      if(cols.length === 0){
+        cols.push(
+          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" },
+          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" },
+          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" }
+        );
+      }
+      const wrap = document.createElement("div");
+      wrap.className = "tb-inline-sch-wrap tb-inline-sch-horizontal";
+      const render = ()=>{
+        const table = document.createElement("table");
+        table.className = "fin-table fa-schedule-table";
+        const head = `
+          <thead><tr>
+            <th style="width:20%">اسم الحساب</th>
+            ${cols.map((col, idx)=>`<th class="${idx === hlCol ? "col-hl" : ""}">
+              <div style="display:flex;gap:6px;align-items:center;justify-content:space-between">
+                <div class="fa-col-head">
+                  <input dir="ltr" placeholder="رمز" value="${escAttr(String(col.code||""))}" data-fa-head="${idx}" data-k="code"/>
+                  <input placeholder="اسم الحساب" value="${escAttr(String(col.name||""))}" data-fa-head="${idx}" data-k="name"/>
+                </div>
+                <button type="button" class="tb-btn" data-delcol="${idx}" title="حذف عمود">×</button>
+              </div>
+            </th>`).join("")}
+            <th>المجموع دينار</th>
+          </tr></thead>`;
+        const rows = [
+          { k:"openCostPY", label:`الكلفة كما في ١ كانون الثاني ${CY}` },
+          { k:"addCY", label:"الاضافات خلال السنة" },
+          { k:"dispCY", label:"التنزيلات خلال السنة" },
+          { k:"closeCostCY", label:`الكلفة كما في ٣١ كانون الاول ${CY}`, computed:true, rowTotal:true },
+          { k:"ratePct", label:"نسبة الاندثار / قسط ثابت" },
+          { k:"openAccDepPY", label:`المخصص كما في ١ كانون الثاني ${CY}` },
+          { k:"depCY", label:"اندثار السنة الحالية", computed:true },
+          { k:"closeAccDepCY", label:`المخصص كما في ٣١ كانون الاول ${CY}`, computed:true, rowTotal:true },
+          { k:"nbvCY", label:`القيمة الدفترية كما في ٣١ كانون الاول ${CY}`, computed:true, rowTotal:true }
+        ];
+        table.innerHTML = `${head}<tbody></tbody>`;
+        const tbod = table.querySelector("tbody");
+        rows.forEach((r)=>{
+          const tr = document.createElement("tr");
+          let total = 0;
+          const tds = cols.map((col, idx)=>{
+            const c2 = faColCalcValues(col, n);
+            const val = r.computed ? (
+              r.k === "closeCostCY" ? fmt(c2.closeCostCY) :
+              r.k === "closeAccDepCY" ? fmt(c2.closeAccCY) :
+              r.k === "nbvCY" ? fmt(c2.nbvCY) :
+              r.k === "depCY" ? fmt(c2.depCY) : ""
+            ) : (col?.[r.k] ?? "");
+            const hl = idx === hlCol ? " col-hl" : "";
+            if(r.computed){
+              const num =
+                r.k === "closeCostCY" ? c2.closeCostCY :
+                r.k === "closeAccDepCY" ? c2.closeAccCY :
+                r.k === "nbvCY" ? c2.nbvCY :
+                r.k === "depCY" ? c2.depCY : 0;
+              total += n(num);
+              return `<td dir="ltr" class="amount-col${hl}">${val}</td>`;
+            }
+            if(r.k === "ratePct"){
+              const vv = String(val||"").trim();
+              const shown = vv ? `${Math.round(n(vv))}%` : "";
+              return `<td class="amount-col${hl}"><input dir="ltr" value="${escAttr(shown)}" data-fa="${idx}" data-k="${r.k}"/></td>`;
+            }
+            total += n(val);
+            return `<td class="amount-col${hl}"><input dir="ltr" value="${escAttr(String(val||""))}" data-fa="${idx}" data-k="${r.k}"/></td>`;
+          }).join("");
+          const totalCell = (r.k === "ratePct") ? "" : fmt(total);
+          tr.innerHTML = `<td style="font-weight:900">${r.label}</td>${tds}<td dir="ltr" class="amount-col" style="font-weight:900">${totalCell}</td>`;
+          tbod.appendChild(tr);
+        });
+        wrap.innerHTML = "";
+        const faWrap = document.createElement("div");
+        faWrap.className = "fa-print-wrap";
+        faWrap.appendChild(table);
+        let depCY = 0, accCY = 0, nbvCY = 0;
+        cols.forEach((col)=>{ const c2 = faColCalcValues(col, n); depCY += c2.depCY; accCY += c2.closeAccCY; nbvCY += c2.nbvCY; });
+        const sumBox = document.createElement("div");
+        sumBox.className = "fa-summary";
+        sumBox.innerHTML = `إجمالي اهتلاك CY: <b dir="ltr">${fmt(depCY)}</b> — مجمع CY: <b dir="ltr">${fmt(accCY)}</b> — صافي موجودات ثابتة CY: <b dir="ltr">${fmt(nbvCY)}</b>`;
+        faWrap.appendChild(sumBox);
+        wrap.appendChild(faWrap);
+        const addCol = document.createElement("button");
+        addCol.type = "button";
+        addCol.className = "tb-btn";
+        addCol.textContent = "➕ إضافة عمود";
+        addCol.style.marginTop = "10px";
+        addCol.addEventListener("click", ()=>{
+          cols.push({ code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" });
+          render();
+        });
+        wrap.appendChild(addCol);
+        wrap.querySelectorAll("input[data-fa]").forEach((inp)=>{
+          inp.addEventListener("paste", (ev)=>{
+            const i = Number(inp.getAttribute("data-fa"));
+            const k = inp.getAttribute("data-k");
+            const clip = ev.clipboardData?.getData("text") ?? "";
+            cols[i] = cols[i] || {};
+            if(k === "ratePct"){
+              const pct = clip.trim() ? n(clip) : 0;
+              plainPaste(ev, clip.trim() ? `${pct}%` : "");
+              cols[i][k] = clip.trim() ? String(pct) : "";
+            }else{
+              const raw = clip.trim();
+              if(!raw){ plainPaste(ev, ""); cols[i][k] = ""; return; }
+              const formatted = fmt(n(raw));
+              plainPaste(ev, formatted);
+              cols[i][k] = formatted;
+            }
+          });
+          inp.addEventListener("blur", ()=>{
+            const i = Number(inp.getAttribute("data-fa"));
+            const k = inp.getAttribute("data-k");
+            const raw = String(inp.value||"").trim();
+            cols[i] = cols[i] || {};
+            if(k === "ratePct"){
+              const pct = raw ? n(raw) : 0;
+              inp.value = raw ? `${pct}%` : "";
+              cols[i][k] = raw ? String(pct) : "";
+            }else if(raw === "") cols[i][k] = "";
+            else{
+              const formatted = fmt(n(raw));
+              inp.value = formatted;
+              cols[i][k] = formatted;
+            }
+            render();
+          });
+          inp.addEventListener("input", ()=>{
+            const i = Number(inp.getAttribute("data-fa"));
+            const k = inp.getAttribute("data-k");
+            cols[i] = cols[i] || {};
+            cols[i][k] = inp.value;
+          });
+        });
+        wrap.querySelectorAll("input[data-fa-head]").forEach((inp)=>{
+          inp.addEventListener("paste", (ev)=>{
+            const clip = ev.clipboardData?.getData("text") ?? "";
+            plainPaste(ev, clip.replace(/\s+/g," ").trim());
+          });
+          inp.addEventListener("input", ()=>{
+            const i = Number(inp.getAttribute("data-fa-head"));
+            const k = inp.getAttribute("data-k");
+            cols[i] = cols[i] || {};
+            cols[i][k] = inp.value;
+          });
+          inp.addEventListener("blur", ()=> render());
+        });
+        wrap.querySelectorAll("button[data-delcol]").forEach((b)=>{
+          b.addEventListener("click", ()=>{
+            const i = Number(b.getAttribute("data-delcol"));
+            cols.splice(i, 1);
+            render();
+          });
+        });
+      };
+      render();
+      host.innerHTML = "";
+      host.appendChild(wrap);
+    }
+    function tbStatementLabel(r){
+      if(r?.meta?.source === "closingEntry") return "إقفال";
+      return r?.isBalance ? "الميزانية" : "قائمة الدخل";
+    }
+    function tbStatementCellHtml(r){
+      const lbl = tbStatementLabel(r);
+      const cls = r?.isBalance ? "tb-stmt-bal" : "tb-stmt-inc";
+      return `<td class="tb-td-stmt num-col" contenteditable="false"><span class="tb-stmt-tag ${cls}">${lbl}</span></td>`;
+    }
+    function tbSectionLabel(sectionId){
+      const id = String(sectionId || "").trim();
+      if(!id) return "—";
+      const extra = {
+        "inv-materials": "بيان د — مواد",
+        "project-expense": "مصروفات — مشروع"
+      };
+      if(extra[id]) return extra[id];
+      for(const list of Object.values(SECTION_OPTS)){
+        const hit = list.find((o)=> o.id === id);
+        if(hit) return hit.label;
+      }
+      return id;
+    }
+    function tbResolveSection(r, reg){
+      if(r?.section) return r.section;
+      const meta = r?.meta || {};
+      if(meta.source === "vertical" && meta.schId){
+        const sch = (reg || []).find((s)=> s?.id === meta.schId);
+        if(sch){
+          const target = effectiveVerticalTarget(sch);
+          return effectiveVerticalSection(sch, target);
+        }
+      }
+      const src = meta.source || "";
+      if(src === "closingEntry") return meta.kind === "closeRev" ? "revenue" : "expense";
+      if(src === "fixedAssets") return meta.kind === "dep" ? "expense" : "assets-fixed";
+      if(src === "invBox"){
+        if(meta.field === "materials" || meta.invMaterials) return "inv-materials";
+        return r?.isBalance ? "assets-current" : "expense";
+      }
+      if(src === "equity") return "lt";
+      if(src === "tax") return "st";
+      if(src === "contracts"){
+        if(meta.kind === "rev") return "revenue";
+        if(meta.projectExpense) return "project-expense";
+        return "expense";
+      }
+      return r?.isBalance ? "assets-current" : "expense";
+    }
+    function tbClassTagCss(sectionId){
+      const map = {
+        "assets-fixed": "tb-cls-astfix",
+        "assets-current": "tb-cls-astcur",
+        "lt": "tb-cls-lt",
+        "st": "tb-cls-st",
+        "revenue": "tb-cls-rev",
+        "expense": "tb-cls-exp",
+        "inv-materials": "tb-cls-inv",
+        "project-expense": "tb-cls-proj"
+      };
+      return map[String(sectionId || "").trim()] || "tb-cls-other";
+    }
+    function tbClassificationCellHtml(r, reg){
+      const sec = tbResolveSection(r, reg);
+      const lbl = tbSectionLabel(sec);
+      const cls = tbClassTagCss(sec);
+      return `<td class="tb-td-class num-col" contenteditable="false"><span class="tb-class-tag ${cls}">${escHtml(lbl)}</span></td>`;
+    }
+    function registerSchedulePanelEl(panelKey, el){
+      if(!panelKey || !el) return;
+      state._schedulePanelEls = state._schedulePanelEls || {};
+      state._schedulePanelEls[panelKey] = el;
+    }
+    function findSchedulePanelCard(panelKey){
+      if(!panelKey) return null;
+      const reg = state._schedulePanelEls?.[panelKey];
+      if(reg && document.body.contains(reg)) return reg;
+      return document.querySelector(`#in-pages [data-schedule-panel="${panelKey}"]`)
+        || document.querySelector(`[data-schedule-panel="${panelKey}"]`);
+    }
+    function schedulePanelKeyFromMeta(meta){
+      const src = meta?.source || "";
+      if(src === "fixedAssets") return "sch-1";
+      if(src === "invBox") return "_invBox";
+      if(src === "equity") return "_equityStmt";
+      if(src === "contracts") return meta?.schId || "sch-8";
+      if(src === "vertical") return meta?.schId || "";
+      return "";
+    }
+    function restoreTbLinkedScheduleDock(modalState){
+      if(!modalState?.dock) return;
+      const { placeholder, card } = modalState.dock;
+      if(placeholder?.parentNode && card){
+        placeholder.parentNode.insertBefore(card, placeholder);
+        placeholder.remove();
+      }
+      card?.classList?.remove("tb-schedule-in-modal");
+      modalState.dock = null;
+    }
+    let tbLinkedModalCtrl = null;
+    let tbLinkedModalCtxRef = null;
+    function ensureTbLinkedScheduleModal(){
+      if(tbLinkedModalCtrl) return tbLinkedModalCtrl;
+      const ov = $("ov-tb-linked-sch");
+      const body = $("tb-linked-sch-body");
+      const errEl = $("tb-linked-sch-err");
+      const titleEl = $("tb-linked-sch-title");
+      if(!ov || !body) return { open(){}, close(){} };
+      let modalState = null;
+      const ctx = ()=> tbLinkedModalCtxRef || {};
+      const setErr = (m)=>{ if(errEl) errEl.textContent = m || ""; };
+      const syncDeleteBtn = ()=>{
+        const delBtnEl = $("btn-del-tb-linked-sch");
+        if(!delBtnEl) return;
+        const show = tbLinkedCanDeleteVerticalSchedule(modalState?.meta, ctx().reg);
+        delBtnEl.classList.toggle("hidden", !show);
+        delBtnEl.disabled = false;
+      };
+      const showTbLinkedOverlay = ()=>{
+        syncDeleteBtn();
+        openOverlay("ov-tb-linked-sch");
+      };
+      const close = ()=>{
+        if(modalState?.unmount) modalState.unmount();
+        if(modalState) restoreTbLinkedScheduleDock(modalState);
+        const host = $("tb-linked-sch-host");
+        const fallback = $("tb-linked-sch-fallback");
+        if(host) host.innerHTML = "";
+        if(fallback){ fallback.innerHTML = ""; fallback.classList.add("hidden"); }
+        modalState = null;
+        closeOverlay("ov-tb-linked-sch");
+      };
+      const bindNumInput = (inp, onBlur)=>{
+        inp.addEventListener("paste", (ev)=>{
+          const clip = ev.clipboardData?.getData("text") ?? "";
+          const raw = clip.trim();
+          plainPaste(ev, raw ? fmtAmount(ctx().n(raw)) : "");
+        });
+        inp.addEventListener("blur", ()=>{
+          const raw = String(inp.value || "").trim();
+          inp.value = raw ? fmtAmount(ctx().n(raw)) : "";
+          onBlur?.(inp);
+        });
+      };
+      const open = (meta, tbRow)=>{
+        modalState = { meta, tbRow, dock: null, usedFallback: false };
+        setErr("");
+        $("btn-del-tb-linked-sch")?.classList.add("hidden");
+        if(titleEl) titleEl.textContent = tbLinkedScheduleTitle(meta, tbRow);
+        const host = $("tb-linked-sch-host");
+        const fallback = $("tb-linked-sch-fallback");
+        if(host) host.innerHTML = "";
+        if(fallback){ fallback.innerHTML = ""; fallback.classList.add("hidden"); }
+        const src = meta?.source || "";
+        const schType = scheduleTypeFromMeta(meta, ctx().reg);
+        const tryInlineEditor = ()=>{
+          if(!host) return false;
+          if(schType === "vertical"){
+            mountTbInlineVerticalSchedule(host, meta, ctx());
+            modalState.usedInline = true;
+            modalState.unmount = ()=>{ if(host) host.innerHTML = ""; };
+            return true;
+          }
+          if(schType === "horizontal_fixedAssets"){
+            mountTbInlineHorizontalFA(host, meta, ctx());
+            modalState.usedInline = true;
+            modalState.unmount = ()=>{ if(host) host.innerHTML = ""; };
+            return true;
+          }
+          return false;
+        };
+        const tryPanelMountTo = ()=>{
+          if(!host) return false;
+          const panelKey = schedulePanelKeyFromMeta(meta);
+          const card = findSchedulePanelCard(panelKey);
+          const mountTo = card?._schedulePanel?.mountTo;
+          if(typeof mountTo !== "function") return false;
+          mountTo(host, meta);
+          modalState.usedInline = true;
+          modalState.unmount = ()=>{ if(host) host.innerHTML = ""; card?._schedulePanel?.remount?.(); };
+          return true;
+        };
+        const tryDockPanel = ()=>{
+          if(src === "tax") return false;
+          const panelKey = schedulePanelKeyFromMeta(meta);
+          const card = findSchedulePanelCard(panelKey);
+          if(panelKey && card) registerSchedulePanelEl(panelKey, card);
+          if(!card || !host) return false;
+          if(card.classList.contains("tb-schedule-in-modal") && card.parentElement === host) return true;
+          const placeholder = document.createElement("div");
+          placeholder.className = "tb-schedule-dock-placeholder";
+          placeholder.dataset.panelKey = panelKey;
+          card.parentNode.insertBefore(placeholder, card);
+          modalState.dock = { placeholder, card };
+          host.appendChild(card);
+          card.classList.add("tb-schedule-in-modal");
+          const cardTitle = card.querySelector(".schedule-toolbar span[style*='font-weight:900']");
+          if(cardTitle && titleEl) titleEl.textContent = cardTitle.textContent?.trim() || titleEl.textContent;
+          card.querySelector("button[data-act='edit']")?.click();
+          if(card._schedulePanel?.highlightRow && meta.rowIndex != null){
+            setTimeout(()=> card._schedulePanel.highlightRow(meta.rowIndex), 80);
+          }
+          return true;
+        };
+        if(src === "tax"){
+          if(fallback){
+            fallback.classList.remove("hidden");
+            fallback.innerHTML = `<div class="hint">تخصيصات ضريبة الدخل (23) تُحسب تلقائياً من <b>بيان ب</b>. لا يمكن تعديلها من الميزان.</div>`;
+          }
+          modalState.usedFallback = true;
+          showTbLinkedOverlay();
+          return;
+        }
+        const openModalContent = ()=>{
+          if(src === "invBox" || src === "equity" || src === "contracts"){
+            if(tryDockPanel()) return true;
+            if(tryPanelMountTo()) return true;
+            return false;
+          }
+          if(schType === "vertical" || schType === "horizontal_fixedAssets"){
+            if(tryInlineEditor()) return true;
+          }
+          if(tryDockPanel()) return true;
+          return false;
+        };
+        const finishOpen = ()=>{
+          if(openModalContent()){
+            showTbLinkedOverlay();
+            return true;
+          }
+          return false;
+        };
+        if(finishOpen()) return;
+        setTimeout(()=>{
+          if(finishOpen()) return;
+          if(src === "invBox" || src === "equity" || src === "contracts"){
+            ctx().rerenderLocal?.();
+            setTimeout(()=>{
+              if(finishOpen()) return;
+              if(fallback){
+                fallback.classList.remove("hidden");
+                fallback.innerHTML = `<div class="hint">تعذّر فتح الكشف الكامل. مرّر لأسفل الصفحة لتحميل الكشوفات ثم أعد الضغط على <b>📋 كشف</b>.</div>`;
+                modalState.usedFallback = true;
+                showTbLinkedOverlay();
+              }
+            }, 180);
+            return;
+          }
+          if(fallback){
+            fallback.classList.remove("hidden");
+            fallback.innerHTML = `<div class="hint">أعد المحاولة بعد تحميل الكشوفات، أو مرّر لأسفل الصفحة.</div>`;
+            modalState.usedFallback = true;
+            showTbLinkedOverlay();
+          }
+        }, 150);
+        return;
+      };
+      const apply = async ()=>{
+        if(!modalState) return close();
+        setErr("");
+        const applyBtn = $("btn-apply-tb-linked-sch");
+        if(applyBtn) applyBtn.disabled = true;
+        try{
+          if(!state.selectedCompanyId || !state.selectedYearId){
+            throw new Error("اختر شركة وسنة أولاً.");
+          }
+          const persistTbLinkedSchedule = async (meta)=>{
+            const base = ctx().baseDynamicSchedules || {};
+            const dataById = ctx().getWorkingDataById?.() || base.dataById || {};
+            await setDoc(yearRef(state.selectedCompanyId, state.selectedYearId), {
+              dynamicSchedules: { ...base, registry: ctx().reg || base.registry || [], dataById },
+              updatedAt: serverTimestamp()
+            }, { merge:true });
+            await appendScheduleActivityLog("حفظ كشف", tbLinkedSaveLogDetail(meta, ctx().reg));
+            await ctx().rerenderFromServer?.();
+          };
+          if(modalState.dock || modalState.usedInline){
+            const { meta } = modalState;
+            const dockState = modalState.dock;
+            const unmountFn = modalState.unmount;
+            await persistTbLinkedSchedule(meta);
+            if(dockState) restoreTbLinkedScheduleDock({ dock: dockState });
+            if(unmountFn) unmountFn();
+            modalState = null;
+            closeOverlay("ov-tb-linked-sch");
+            return;
+          }
+        const { meta } = modalState;
+        const base = ctx().baseDynamicSchedules || {};
+        const dataById = cloneDynamicSchedules(base).dataById || {};
+        const src = meta?.source || "";
+          if(src === "invBox"){
+            const inv = dataById["_invBox"] || {};
+            dataById["_invBox"] = inv;
+            const setV = (id, k)=>{
+              const el = $(id);
+              if(el) inv[k] = String(el.value||"").trim() ? fmtAmount(ctx().n(el.value)) : "";
+            };
+            setV("tb-mod-inv-open", "openInv");
+            setV("tb-mod-inv-purch", "purchases");
+            setV("tb-mod-inv-close", "closeInv");
+          }else if(src === "equity"){
+            const eq = dataById["_equityStmt"] || { opening:{}, deductions:{} };
+            dataById["_equityStmt"] = eq;
+            eq.opening = eq.opening || {};
+            eq.deductions = eq.deductions || {};
+            const fld = meta.field === "capital" ? "capital" : "reserve";
+            const setV = (id, obj, k)=>{
+              const el = $(id);
+              if(el) obj[k] = String(el.value||"").trim() ? fmtAmount(ctx().n(el.value)) : "";
+            };
+            setV("tb-mod-eq-open", eq.opening, fld);
+            setV("tb-mod-eq-ded", eq.deductions, fld);
+            if(fld === "reserve"){
+              setV("tb-mod-eq-surplus", eq.opening, "surplus");
+              setV("tb-mod-eq-deficit", eq.opening, "deficit");
+            }
+          }else if(src === "fixedAssets"){
+            const fa = dataById["sch-1"] || { columns: [] };
+            dataById["sch-1"] = fa;
+            if(!Array.isArray(fa.columns)) fa.columns = [];
+            if(meta.kind === "dep"){
+              body.querySelectorAll("input[data-fa-i]").forEach((inp)=>{
+                const i = Number(inp.getAttribute("data-fa-i"));
+                const k = inp.getAttribute("data-fa-k");
+                fa.columns[i] = fa.columns[i] || {};
+                fa.columns[i][k] = String(inp.value||"").trim();
+                if(k !== "ratePct" && inp.value.trim()) fa.columns[i][k] = fmtAmount(ctx().n(inp.value));
+              });
+            }else{
+              const colIdx = Number(meta.colIndex);
+              fa.columns[colIdx] = fa.columns[colIdx] || {};
+              const c = fa.columns[colIdx];
+              c.name = String($("tb-mod-fa-name")?.value||"").trim();
+              [["tb-mod-fa-cost","openCostPY"],["tb-mod-fa-add","addCY"],["tb-mod-fa-disp","dispCY"],["tb-mod-fa-rate","ratePct"],["tb-mod-fa-acc","openAccDepPY"]].forEach(([id,k])=>{
+                const el = $(id);
+                if(!el) return;
+                c[k] = String(el.value||"").trim() ? (k==="ratePct" ? String(ctx().n(el.value)) : fmtAmount(ctx().n(el.value))) : "";
+              });
+            }
+          }else if(src === "contracts"){
+            const con = dataById[meta.schId || "sch-8"] || { rows: [] };
+            dataById[meta.schId || "sch-8"] = con;
+            const rows = Array.isArray(con.rows) ? con.rows : (con.rows = []);
+            const r = rows[meta.rowIndex] || (rows[meta.rowIndex] = {});
+            r.projectName = String($("tb-mod-con-name")?.value||"").trim();
+            if(!r.name) r.name = r.projectName;
+            const amt = $("tb-mod-con-amt");
+            const v = amt && String(amt.value||"").trim() ? fmtAmount(ctx().n(amt.value)) : "";
+            if(meta.kind === "rev") r.revIqd = v; else r.expensesIqd = v;
+          }else if(src === "tax"){
+            close();
+            return;
+          }
+          close();
+          await setDoc(yearRef(state.selectedCompanyId, state.selectedYearId), {
+            dynamicSchedules: { ...base, registry: ctx().reg || base.registry || [], dataById },
+            updatedAt: serverTimestamp()
+          }, { merge:true });
+          await appendScheduleActivityLog("حفظ كشف", tbLinkedSaveLogDetail(meta, ctx().reg));
+          modalState = null;
+          await ctx().rerenderFromServer?.();
+        }catch(e){
+          setErr(e?.message || String(e));
+        }finally{
+          if(applyBtn) applyBtn.disabled = false;
+        }
+      };
+      const onDelete = async ()=>{
+        if(!modalState?.meta) return;
+        const meta = modalState.meta;
+        if(!tbLinkedCanDeleteVerticalSchedule(meta, ctx().reg)) return;
+        const label = tbLinkedSaveLogDetail(meta, ctx().reg);
+        if(!confirm(`حذف ${label}؟\nسيُزال من الميزان والقوائم.`)) return;
+        setErr("");
+        const delBtnEl = $("btn-del-tb-linked-sch");
+        const applyBtn = $("btn-apply-tb-linked-sch");
+        if(delBtnEl) delBtnEl.disabled = true;
+        if(applyBtn) applyBtn.disabled = true;
+        try{
+          if(!state.selectedCompanyId || !state.selectedYearId){
+            throw new Error("اختر شركة وسنة أولاً.");
+          }
+          const base = ctx().baseDynamicSchedules || {};
+          const reg = ctx().reg || base.registry || [];
+          const sch = reg.find((s)=> s?.id === meta.schId);
+          if(!sch) throw new Error("تعذّر العثور على الكشف.");
+          sch.active = false;
+          const dataById = ctx().getWorkingDataById?.() || base.dataById || {};
+          const dockState = modalState.dock;
+          const unmountFn = modalState.unmount;
+          await setDoc(yearRef(state.selectedCompanyId, state.selectedYearId), {
+            dynamicSchedules: { ...base, registry: reg, dataById },
+            updatedAt: serverTimestamp()
+          }, { merge:true });
+          await appendScheduleActivityLog("حذف كشف", label);
+          if(dockState) restoreTbLinkedScheduleDock({ dock: dockState });
+          if(unmountFn) unmountFn();
+          modalState = null;
+          closeOverlay("ov-tb-linked-sch");
+          await ctx().rerenderFromServer?.();
+        }catch(e){
+          setErr(e?.message || String(e));
+        }finally{
+          if(delBtnEl) delBtnEl.disabled = false;
+          if(applyBtn) applyBtn.disabled = false;
+        }
+      };
+      $("btn-x-tb-linked-sch")?.addEventListener("click", close);
+      $("btn-cancel-tb-linked-sch")?.addEventListener("click", close);
+      $("btn-apply-tb-linked-sch")?.addEventListener("click", apply);
+      $("btn-del-tb-linked-sch")?.addEventListener("click", ()=> void onDelete());
+      tbLinkedModalCtrl = { open, close };
+      return tbLinkedModalCtrl;
+    }
+    function tbAmtInputHtml(k, val, disabled){
+      if(disabled){
+        const t = val ? escHtml(val) : "-";
+        return `<span dir="ltr" class="tb-amt-ro" data-k="${k}">${t}</span>`;
+      }
+      return `<input type="text" class="tb-amt-inp" dir="ltr" data-k="${k}" value="${escAttr(val)}" style="width:100%;min-width:0;text-align:center;font-size:7pt;padding:2px 1px;border:1px solid var(--border);border-radius:3px;background:#fff"/>`;
+    }
+    function tbVerticalRowIsEditable(r, editing){
+      return !!(editing && r?.meta?.source === "vertical");
+    }
+    function refreshTbEditRowDerivedAmounts(tr, ctx){
+      if(!tr || !ctx) return;
+      const fromSchId = tr.getAttribute("data-sch-id");
+      const fromIdx = Number(tr.getAttribute("data-row-idx"));
+      const isBalance = tr.getAttribute("data-tb-is-balance") === "1";
+      if(!fromSchId || !Number.isFinite(fromIdx)) return;
+      const sch = (ctx.reg || []).find((s)=> s?.id === fromSchId);
+      const dataById = ctx.getWorkingDataById?.() || {};
+      const row = dataById?.[fromSchId]?.rows?.[fromIdx];
+      if(!sch || !row) return;
+      const n = ctx.n;
+      const priorDoc = ctx.priorDoc || null;
+      const target = effectiveVerticalTarget(sch);
+      const section = effectiveVerticalSection(sch, target);
+      const nature = trialBalanceAccountNature(target, section);
+      const code = toWesternDigits(String(row?.code || "").trim()) || trialBalanceDefaultCode({ scheduleNo: sch.scheduleNo, acctCode: sch.acctCode || "" });
+      const closingBal = n(row?.cy);
+      let openingBal = 0;
+      if(isBalance){
+        openingBal = trialBalanceVerticalOpening(row, priorDoc, fromSchId, code, row?.name, n);
+      }
+      const movement = isBalance ? (closingBal - openingBal) : closingBal;
+      const op = trialBalanceSignedToDrCr(isBalance ? openingBal : 0, nature);
+      const mv = trialBalanceSignedToDrCr(movement, nature);
+      const cl = trialBalanceSignedToDrCr(isBalance ? closingBal : 0, nature);
+      const setAmt = (k, val)=>{
+        const nVal = Number(val || 0);
+        const txt = nVal ? fmtAmount(nVal) : "";
+        const inp = tr.querySelector(`.tb-amt-inp[data-k="${k}"]`);
+        if(inp){
+          if(document.activeElement !== inp) inp.value = txt;
+          return;
+        }
+        const span = tr.querySelector(`.tb-amt-ro[data-k="${k}"]`);
+        if(span) span.textContent = txt || "-";
+      };
+      if(isBalance){
+        setAmt("opD", op.debit); setAmt("opC", op.credit);
+        setAmt("clD", cl.debit); setAmt("clC", cl.credit);
+      }
+      setAmt("mvD", mv.debit); setAmt("mvC", mv.credit);
+    }
+    function syncTbVerticalRowFromInputs(tr, dataRow, tbRow, n){
+      if(!tr || !dataRow || !tbRow) return;
+      const g = (k)=> n(tr.querySelector(`.tb-amt-inp[data-k="${k}"]`)?.value);
+      if(tbRow.isBalance){
+        applyTbVerticalBalanceFromRow(dataRow, tbRow.nature || "debit", g("opD"), g("opC"), g("clD"), g("clC"), n, fmtAmount);
+      }else{
+        applyTbVerticalIncomeMovement(dataRow, tbRow.nature || "debit", g("mvD"), g("mvC"), n, fmtAmount);
+      }
+    }
+    function buildTbScheduleSelectHtml(reg, selectedSchId, disabled){
+      const opts = activeVerticalSchedules(reg).map((sch)=>{
+        const sel = sch.id === selectedSchId ? " selected" : "";
+        const label = `${toWesternDigits(String(sch.scheduleNo ?? ""))} — ${sch.baseTitle || sch.title || sch.id}`;
+        return `<option value="${escAttr(sch.id)}"${sel}>${escHtml(label)}</option>`;
+      }).join("");
+      const addOpt = disabled ? "" : `<option value="__add_sch__">➕ كشف جديد…</option>`;
+      return `<select class="tb-sch-sel" dir="ltr" ${disabled ? "disabled" : ""} style="width:100%;max-width:120px;font-size:8pt">${opts}${addOpt}</select>`;
+    }
+    function tbOpenScheduleBtnHtml(r, idx){
+      const meta = r.meta || {};
+      const isLinked = meta.source && !["vertical","computed"].includes(meta.source);
+      const showVerticalSch = meta.source === "vertical" && meta.schId;
+      if(!isLinked && !showVerticalSch) return "";
+      const title = isLinked ? "فتح الكشف للتعديل" : "فتح الكشف العمودي كاملاً";
+      return `<button type="button" class="tb-btn secondary tb-open-linked" data-tb-i="${idx}" title="${title}">📋 كشف</button>`;
+    }
+    function tbOpenScheduleCellHtml(r, idx){
+      return `<td class="tb-td-open" contenteditable="false">${tbOpenScheduleBtnHtml(r, idx)}</td>`;
+    }
+    const TB_CLASS_FILTER_ORDER = ["assets-fixed","assets-current","lt","st","revenue","expense","inv-materials","project-expense"];
+    function tbScheduleFilterKey(r){
+      const meta = r?.meta || {};
+      if(meta.schId) return `id:${meta.schId}`;
+      const no = String(r?.scheduleNo ?? "").trim();
+      if(no) return `no:${no}`;
+      return "";
+    }
+    function tbScheduleFilterLabel(r, reg){
+      const meta = r?.meta || {};
+      const no = String(r?.scheduleNo ?? "").trim();
+      if(meta.schId){
+        const sch = (reg || []).find((s)=> s?.id === meta.schId);
+        const noTxt = toWesternDigits(String(sch?.scheduleNo ?? no));
+        let title = String(sch?.baseTitle || sch?.title || "").trim();
+        title = title.replace(/^كشف\s*\([^)]+\)\s*[–-]\s*/u, "").trim();
+        return title ? `${noTxt} — ${title}` : `كشف (${noTxt})`;
+      }
+      return no || "—";
+    }
+    function tbDetailScheduleFilterOptions(rows, reg){
+      const map = new Map();
+      for(const r of rows || []){
+        const key = tbScheduleFilterKey(r);
+        if(!key || map.has(key)) continue;
+        map.set(key, tbScheduleFilterLabel(r, reg));
+      }
+      const opts = [...map.entries()].map(([id, label])=>({ id, label }));
+      opts.sort((a,b)=>{
+        const na = Number(String(a.label).replace(/[^\d]/g, "")) || 99999;
+        const nb = Number(String(b.label).replace(/[^\d]/g, "")) || 99999;
+        if(na !== nb) return na - nb;
+        return String(a.label).localeCompare(String(b.label), "ar");
+      });
+      return opts;
+    }
+    function tbRowMatchesDetailFilter(r, reg, filters){
+      const stmt = String(filters?.stmt || "").trim();
+      const cls = String(filters?.class || "").trim();
+      const sch = String(filters?.sch || "").trim();
+      if(stmt){
+        const key = r?.isBalance ? "balance" : "income";
+        if(key !== stmt) return false;
+      }
+      if(cls && tbResolveSection(r, reg) !== cls) return false;
+      if(sch && tbScheduleFilterKey(r) !== sch) return false;
+      return true;
+    }
+    function tbSumDetailRowTotals(rows){
+      const sum = (key)=> (rows || []).reduce((s,r)=> s + Number(r[key] || 0), 0);
+      return {
+        opDebit: sum("opDebit"), opCredit: sum("opCredit"),
+        mvDebit: sum("mvDebit"), mvCredit: sum("mvCredit"),
+        clDebit: sum("clDebit"), clCredit: sum("clCredit")
+      };
+    }
+    /** بعد الترحيل: عرض/تحقق الرصيد الختامي لحسابات الميزانية فقط */
+    function tbRowsBalanceSheetOnly(rows){
+      return (rows || []).filter((r)=> r.isBalance === true);
+    }
+    function tbDetailClassFilterOptions(rows, reg){
+      const seen = new Set();
+      const found = [];
+      for(const r of rows || []){
+        const sec = tbResolveSection(r, reg);
+        if(!sec || seen.has(sec)) continue;
+        seen.add(sec);
+        found.push({ id: sec, label: tbSectionLabel(sec) });
+      }
+      found.sort((a,b)=>{
+        const ia = TB_CLASS_FILTER_ORDER.indexOf(a.id);
+        const ib = TB_CLASS_FILTER_ORDER.indexOf(b.id);
+        return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib);
+      });
+      return found;
+    }
+    function buildTbDetailRowsHtml(rows, ctx){
+      const {
+        editing, selectedRow, reg, tbFmtDrCr, emptyMsg, filters, showOpenCol = true
+      } = ctx;
+      const f = filters || { stmt:"", class:"", sch:"" };
+      const visible = [];
+      (rows || []).forEach((r, idx)=>{
+        if(tbRowMatchesDetailFilter(r, reg, f)) visible.push({ r, idx });
+      });
+      if(!visible.length){
+        const anyRows = (rows || []).length;
+        const msg = anyRows ? "لا توجد بنود مطابقة للتصفية." : emptyMsg;
+        const colSpan = showOpenCol ? 12 : 11;
+        return `<tr><td colspan="${colSpan}" class="hint" contenteditable="false">${msg}</td></tr>`;
+      }
+      return visible.map(({ r, idx })=>{
+        const meta = r.meta || {};
+        const isClosing = meta.source === "closingEntry";
+        const isLinked = meta.source && !["vertical","computed","closingEntry"].includes(meta.source);
+        const selCls = (editing && idx === selectedRow) ? " row-sel" : "";
+        return `<tr class="tb-detail-row${isLinked ? " tb-detail-row-linked" : ""}${isClosing ? " tb-detail-row-closing" : ""}${selCls}" data-tb-i="${idx}" data-tb-editable="${meta.editable ? "1" : "0"}" data-tb-source="${escAttr(meta.source||"")}" data-sch-id="${escAttr(meta.schId||"")}" data-row-idx="${meta.rowIndex ?? ""}">
+                  <td class="num-col tb-td-sch" dir="ltr" contenteditable="false">${escHtml(toWesternDigits(String(r.scheduleNo ?? "")))}</td>
+                  <td class="num-col tb-td-code" dir="ltr" contenteditable="false">${escHtml(toWesternDigits(String(r.acctCode || "")))}</td>
+                  <td class="tb-td-name" contenteditable="false">${escHtml(r.acctName || "")}</td>
+                  ${tbStatementCellHtml(r)}
+                  ${tbClassificationCellHtml(r, reg)}
+                  <td class="amount-col tb-sec-op tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.opDebit)}</td>
+                  <td class="amount-col tb-sec-op tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.opCredit)}</td>
+                  <td class="amount-col tb-sec-mv tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.mvDebit)}</td>
+                  <td class="amount-col tb-sec-mv tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.mvCredit)}</td>
+                  <td class="amount-col tb-sec-cl tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.clDebit)}</td>
+                  <td class="amount-col tb-sec-cl tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.clCredit)}</td>
+                  ${showOpenCol ? tbOpenScheduleCellHtml(r, idx) : ""}
+                </tr>`;
+      }).join("");
+    }
+    function wireDetailedTrialBalanceEditor(host, ctx){
+      tbLinkedModalCtxRef = ctx;
+      const linkedModal = ensureTbLinkedScheduleModal();
+      const page = host?.querySelector?.("[data-tb-pre-page]");
+      if(!page) return;
+      const addSchBtn = page.querySelector("[data-tb-act=add-sch]");
+
+      const stmtFilter = page.querySelector("[data-tb-filter=stmt]");
+      const classFilter = page.querySelector("[data-tb-filter=class]");
+      const schFilter = page.querySelector("[data-tb-filter=sch]");
+      const filterCountEl = page.querySelector("[data-tb-filter-count]");
+      const resetFilterBtn = page.querySelector("[data-tb-filter=reset]");
+      const applyTbDetailFilters = ()=>{
+        state.tbDetailFilters = {
+          stmt: String(stmtFilter?.value || "").trim(),
+          class: String(classFilter?.value || "").trim(),
+          sch: String(schFilter?.value || "").trim()
+        };
+        ctx.rerenderLocal();
+      };
+      stmtFilter?.addEventListener("change", applyTbDetailFilters);
+      classFilter?.addEventListener("change", applyTbDetailFilters);
+      schFilter?.addEventListener("change", applyTbDetailFilters);
+      resetFilterBtn?.addEventListener("click", ()=>{
+        state.tbDetailFilters = { stmt:"", class:"", sch:"" };
+        if(stmtFilter) stmtFilter.value = "";
+        if(classFilter) classFilter.value = "";
+        if(schFilter) schFilter.value = "";
+        ctx.rerenderLocal();
+      });
+      if(filterCountEl){
+        const f = state.tbDetailFilters || { stmt:"", class:"", sch:"" };
+        const all = ctx.getTbRows();
+        const shown = all.filter((r)=> tbRowMatchesDetailFilter(r, ctx.reg, f)).length;
+        filterCountEl.textContent = (f.stmt || f.class || f.sch) && all.length
+          ? `عرض ${shown} من ${all.length} سطر`
+          : "";
+      }
+
+      addSchBtn?.addEventListener("click", ()=>{
+        const nextNo = (ctx.reg || []).reduce((m,x)=>Math.max(m, Number(x.scheduleNo||0)), 0) + 1;
+        openScheduleModal("add", { scheduleNo: nextNo, title: `كشف (${nextNo})`, target:"income", section:"expense" });
+      });
+
+      const tbody = page.querySelector("#table-trial-balance-live tbody");
+      const openLinkedRow = (idx)=>{
+        const rows = ctx.getTbRows();
+        const r = rows[idx];
+        if(!r?.meta?.source || r.meta.source === "computed") return;
+        linkedModal.open(r.meta, r);
+      };
+      tbody?.querySelectorAll(".tb-open-linked").forEach((btn)=>{
+        btn.addEventListener("click", (ev)=>{
+          ev.stopPropagation();
+          openLinkedRow(Number(btn.getAttribute("data-tb-i")));
+        });
+      });
+      page.querySelectorAll(".tb-open-linked").forEach((btn)=>{
+        btn.addEventListener("click", (ev)=>{
+          ev.stopPropagation();
+          openLinkedRow(Number(btn.getAttribute("data-tb-i")));
+        });
+      });
+      tbody?.querySelectorAll(".tb-detail-row-linked").forEach((tr)=>{
+        tr.addEventListener("dblclick", (ev)=>{
+          if(String(ev?.target?.tagName||"").toUpperCase()==="BUTTON") return;
+          openLinkedRow(Number(tr.getAttribute("data-tb-i")));
+        });
+      });
     }
 
     function renderInPages(yearDoc){
       const wrap = $("in-pages");
       if(!wrap) return;
       wrap.innerHTML = "";
+      state._lastYearDoc = yearDoc;
       const ds = yearDoc?.dynamicSchedules || {};
       const reg = enforceReservedScheduleNos(Array.isArray(ds.registry) ? ds.registry : []);
       const dataById = ds.dataById || {};
@@ -7157,6 +9072,7 @@
       const meta = getMeta();
       const hasFA = String(meta.companyHasFixedAssets || "no") === "yes";
       const hasContracts = String(meta.companyHasContracts || "yes") === "yes";
+      const hasInv = String(meta.companyHasInventory || "no") === "yes";
       const faTotals = hasFA ? computeFixedAssets() : { depCY:0, depPY:0, accCY:0, accPY:0, nbvCY:0, nbvPY:0, addCYTotal:0, dispCYTotal:0 };
       const CY = String(meta.fiscalYear || state.selectedYearId || "").trim();
       const CYn = parseInt(CY, 10);
@@ -7181,6 +9097,7 @@
       const revenueFromContractsCY = (hasContracts ? conRows.reduce((s,r)=>s + contractRowComputed(r).revIqd, 0) : 0);
       const revenueCY = revenueFromContractsCY + (revenueVertTotals.cy || 0);
       const contractsExpCY = (hasContracts ? conRows.reduce((s,r)=>s + contractRowComputed(r).expensesIqd, 0) : 0);
+      const vertExpForIncome = vertExpenseTotalsForIncome(incomeExpenseSchedules, sumVertical, hasInv);
       // PY contracts revenue is a single manual field on schedule (8)
       const revenuePY = (hasContracts ? (n(contracts.revPyTotalIqd) || 0) : 0) + (revenueVertTotals.py || 0);
       /** رمز/رموز الدليل لصف الإيرادات الواحد: كشف العقود + كشوف مصنّفة إيرادات، بدون تكرار */
@@ -7205,7 +9122,6 @@
         }
         return out.join("، ");
       })();
-      const hasInv = String(meta.companyHasInventory || "no") === "yes";
       const invBox = hasInv ? (dataById?.["_invBox"] || {}) : {};
       const openInv = n(invBox.openInv);
       const purchases = n(invBox.purchases);
@@ -7214,8 +9130,8 @@
       // Schedule (6) remains a normal schedule always
       // Inventory movement adds an extra expense line (321) when enabled
       const usedMaterialsPY = hasInv ? n(invBox.prevUsedMaterials) : 0;
-      const expCY = (expenseVertTotals.cy || 0) + (hasFA ? (faTotals.depCY||0) : 0) + (hasInv ? usedMaterialsCY : 0);
-      const expPY = (expenseVertTotals.py || 0) + (hasFA ? (faTotals.depPY||0) : 0) + (hasInv ? usedMaterialsPY : 0);
+      const expCY = vertExpForIncome.cy + (hasFA ? (faTotals.depCY||0) : 0) + (hasInv ? usedMaterialsCY : 0);
+      const expPY = vertExpForIncome.py + (hasFA ? (faTotals.depPY||0) : 0) + (hasInv ? usedMaterialsPY : 0);
       const expMismatch = hasContracts && Math.round(contractsExpCY) !== Math.round(expCY);
       const pbtCY = revenueCY - expCY;
       const pbtPY = revenuePY - expPY;
@@ -7403,9 +9319,10 @@
         if(!num) return "-";
         const s = fmt(num);
         const digits = s.replace(/[^\d]/g, "").length;
-        const compact = digits > 9 || s.length > 11;
+        const mega = digits >= 10 || s.length >= 13;
+        const compact = mega || digits >= 9 || s.length >= 11;
         if(!compact) return `<span dir="ltr">${s}</span>`;
-        const cls = total ? "amt-total-compact" : "amt-compact";
+        const cls = (total ? "amt-total-compact" : "amt-compact") + (mega ? " amt-mega" : "");
         return `<span class="${cls}" dir="ltr">${s}</span>`;
       };
       const tbFmtDrCr = (v)=> tbFmtAmt(v);
@@ -7429,52 +9346,65 @@
         contracts,
         contractsSchNo,
         eqOpen,
+        eqDed,
         eqClosing,
         taxCY,
         taxPY,
         taxOpening: taxOpeningFromPrior
       };
-      const tbSummaryResult = buildTrialBalanceBySchedule(tbBaseParams);
-      const tbResult = buildTrialBalanceFromSubItems(tbBaseParams);
+      const tbPreParams = { ...tbBaseParams, tbPhase: "pre" };
+      const tbPostParams = { ...tbBaseParams, tbPhase: "post" };
+      const tbSummaryPostResult = buildTrialBalanceBySchedule(tbPostParams);
+      const tbPreResult = buildTrialBalanceFromSubItems(tbPreParams);
+      const tbPostResult = buildTrialBalanceFromSubItems(tbPostParams);
       const tbMapRowsHtml = (rows, emptyMsg)=> rows.length ? rows.map(r=>`
                 <tr>
                   <td class="num-col tb-td-sch" dir="ltr" contenteditable="false">${escHtml(toWesternDigits(String(r.scheduleNo ?? "")))}</td>
                   <td class="num-col tb-td-code" dir="ltr" contenteditable="false">${escHtml(toWesternDigits(String(r.acctCode || "")))}</td>
                   <td class="tb-td-name" contenteditable="false">${escHtml(r.acctName || "")}</td>
+                  ${tbStatementCellHtml(r)}
+                  ${tbClassificationCellHtml(r, reg)}
                   <td class="amount-col tb-sec-op tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.opDebit)}</td>
                   <td class="amount-col tb-sec-op tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.opCredit)}</td>
                   <td class="amount-col tb-sec-mv tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.mvDebit)}</td>
                   <td class="amount-col tb-sec-mv tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.mvCredit)}</td>
                   <td class="amount-col tb-sec-cl tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.clDebit)}</td>
                   <td class="amount-col tb-sec-cl tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtDrCr(r.clCredit)}</td>
-                </tr>`).join("") : `<tr><td colspan="9" class="hint" contenteditable="false">${emptyMsg}</td></tr>`;
-      const tbBuildTotalRow = (totals)=> `
+                </tr>`).join("") : `<tr><td colspan="11" class="hint" contenteditable="false">${emptyMsg}</td></tr>`;
+      const tbBuildTotalRow = (totals, withOpenCol=false)=> `
                 <tr class="row-total">
-                  <td colspan="3" class="tb-td-name" contenteditable="false" style="font-weight:700;text-align:center">المجموع</td>
+                  <td colspan="5" class="tb-td-name" contenteditable="false" style="font-weight:700;text-align:center">المجموع</td>
                   <td class="amount-col tb-sec-op tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtAmt(totals.opDebit, { total:true })}</td>
                   <td class="amount-col tb-sec-op tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtAmt(totals.opCredit, { total:true })}</td>
                   <td class="amount-col tb-sec-mv tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtAmt(totals.mvDebit, { total:true })}</td>
                   <td class="amount-col tb-sec-mv tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtAmt(totals.mvCredit, { total:true })}</td>
                   <td class="amount-col tb-sec-cl tb-sec-debit" dir="ltr" contenteditable="false">${tbFmtAmt(totals.clDebit, { total:true })}</td>
                   <td class="amount-col tb-sec-cl tb-sec-credit" dir="ltr" contenteditable="false">${tbFmtAmt(totals.clCredit, { total:true })}</td>
+                  ${withOpenCol ? `<td class="tb-td-open" contenteditable="false"></td>` : ""}
                 </tr>`;
-      const tbTableHeadHtml = `
+      const buildTbTableHeadHtml = (withOpenCol=false)=> `
               <colgroup>
                 <col class="tb-col-sch" />
                 <col class="tb-col-code" />
                 <col class="tb-col-name" />
+                <col class="tb-col-stmt" />
+                <col class="tb-col-class" />
                 <col class="tb-col-amt" /><col class="tb-col-amt" />
                 <col class="tb-col-amt" /><col class="tb-col-amt" />
                 <col class="tb-col-amt" /><col class="tb-col-amt" />
+                ${withOpenCol ? `<col class="tb-col-open" />` : ""}
               </colgroup>
               <thead>
                 <tr class="tb-head-group">
                   <th rowspan="2" class="tb-th-sch">رقم<br/>الكشف</th>
                   <th rowspan="2" class="tb-th-code">رقم<br/>الدليل</th>
                   <th rowspan="2" class="tb-th-name">اسم الحساب</th>
+                  <th rowspan="2" class="tb-th-stmt">القائمة<br/>الختامية</th>
+                  <th rowspan="2" class="tb-th-class">التصنيف</th>
                   <th colspan="2" class="tb-section tb-sec-op">رصيد افتتاحي<br/><span dir="ltr">${PY}</span></th>
                   <th colspan="2" class="tb-section tb-sec-mv">حركة السنة<br/><span dir="ltr">${CY}</span></th>
                   <th colspan="2" class="tb-section tb-sec-cl">رصيد ختامي<br/><span dir="ltr">${CY}</span></th>
+                  ${withOpenCol ? `<th rowspan="2" class="tb-th-open">كشف</th>` : ""}
                 </tr>
                 <tr class="tb-head-sub">
                   <th class="tb-th-amt tb-sec-op tb-sec-debit">مدين</th>
@@ -7485,17 +9415,64 @@
                   <th class="tb-th-amt tb-sec-cl tb-sec-credit">دائن</th>
                 </tr>
               </thead>`;
+      const tbTableHeadHtml = buildTbTableHeadHtml(false);
+      const tbTableHeadHtmlDetail = buildTbTableHeadHtml(true);
       const tbSigsHtml = buildTbSigsScreenHtml(meta);
       const tbSigsTfoot = buildTbSigsTfootHtml(meta);
-      const tbSummaryRows = tbSummaryResult.rows;
-      const tbSummaryTotals = tbSummaryResult.totals;
-      const tbSummaryClosingDiff = tbSummaryResult.closingDiff;
-      const tbSummaryRowsHtml = tbMapRowsHtml(tbSummaryRows, "لا توجد كشوفات لعرضها في الميزان التجميعي.");
-      const tbMergedRows = tbResult.rows;
-      const tbTotals = tbResult.totals;
-      const tbClosingDiff = tbResult.closingDiff;
+      const tbSigsTfootDetail = buildTbSigsTfootHtml(meta, 12);
+      const tbSummaryPostBalRows = tbRowsBalanceSheetOnly(tbSummaryPostResult.rows);
+      const tbSummaryPostRows = tbSummaryPostBalRows;
+      const tbSummaryPostTotals = tbSumDetailRowTotals(tbSummaryPostBalRows);
+      const tbSummaryClosingDiff = tbSummaryPostTotals.clDebit - tbSummaryPostTotals.clCredit;
+      const tbSummaryPostRowsHtml = tbMapRowsHtml(tbSummaryPostRows, "لا توجد حسابات ميزانية.");
+      const tbPreRows = tbPreResult.rows;
+      const tbPostBalRows = tbRowsBalanceSheetOnly(tbPostResult.rows);
+      const tbPostRows = tbPostBalRows;
+      state._tbDetailRows = tbPreRows;
+      state._tbPostCloseRows = tbPostBalRows;
+      const tbPreTotals = tbPreResult.totals;
+      const tbPostTotals = tbSumDetailRowTotals(tbPostBalRows);
+      const tbClosingDiff = tbPostTotals.clDebit - tbPostTotals.clCredit;
+      const tbPreClosingDiff = tbPreResult.closingDiff;
       const tbTol = 0.99;
-      const tbRowsHtml = tbMapRowsHtml(tbMergedRows, "لا توجد بنود فرعية في الكشوفات. أدخل سطور الكشوف العمودية (رمز/اسم/قيم) أولاً.");
+      if(!state.tbDetailFilters) state.tbDetailFilters = { stmt:"", class:"", sch:"" };
+      else if(state.tbDetailFilters.sch === undefined) state.tbDetailFilters.sch = "";
+      const tbFilters = state.tbDetailFilters;
+      const tbFilteredRows = tbPreRows.filter((r)=> tbRowMatchesDetailFilter(r, reg, tbFilters));
+      const tbFiltersActive = !!(tbFilters.stmt || tbFilters.class || tbFilters.sch);
+      const tbDisplayTotals = tbFiltersActive ? tbSumDetailRowTotals(tbFilteredRows) : tbPreTotals;
+      const tbPostFilteredRows = tbPostBalRows.filter((r)=> tbRowMatchesDetailFilter(r, reg, tbFilters));
+      const tbPostDisplayTotals = tbFiltersActive ? tbSumDetailRowTotals(tbPostFilteredRows) : tbPostTotals;
+      const tbClassFilterOpts = tbDetailClassFilterOptions(tbPreRows, reg);
+      const tbSchFilterOpts = tbDetailScheduleFilterOptions(tbPreRows, reg);
+      const tbFilterClassOptionsHtml = `<option value="">كل التصنيفات</option>${tbClassFilterOpts.map((o)=>{
+        const sel = tbFilters.class === o.id ? " selected" : "";
+        return `<option value="${escAttr(o.id)}"${sel}>${escHtml(o.label)}</option>`;
+      }).join("")}`;
+      const tbFilterSchOptionsHtml = `<option value="">كل الكشوف</option>${tbSchFilterOpts.map((o)=>{
+        const sel = tbFilters.sch === o.id ? " selected" : "";
+        return `<option value="${escAttr(o.id)}"${sel}>${escHtml(o.label)}</option>`;
+      }).join("")}`;
+      const tbPreRowsHtml = buildTbDetailRowsHtml(tbPreRows, {
+        editing: false,
+        selectedRow: -1,
+        reg,
+        tbFmtDrCr,
+        filters: tbFilters,
+        showOpenCol: true,
+        emptyMsg: "لا توجد بنود. أدخل البيانات عبر «📋 كشف» أو «➕ كشف».",
+        n
+      });
+      const tbPostRowsHtml = buildTbDetailRowsHtml(tbPostRows, {
+        editing: false,
+        selectedRow: -1,
+        reg,
+        tbFmtDrCr,
+        filters: tbFilters,
+        showOpenCol: false,
+        emptyMsg: "لا توجد حسابات ميزانية بعد الترحيل.",
+        n
+      });
       const expenseRowsHtml = incomeExpenseSchedules.length ? incomeExpenseSchedules.map(sch=>{
         const tot = sumVertical(sch.id);
         const no = escHtml(toWesternDigits(String(sch.scheduleNo ?? "")));
@@ -7511,11 +9488,11 @@
       }).join("") : `<tr><td colspan="5" class="hint" contenteditable="false">لا توجد كشوفات عمودية مصنّفة كمصروفات في قائمة الدخل. استخدم «➕ إضافة كشف» أو «⚙️ إعداد» واختر: قائمة الدخل ← مصروفات.</td></tr>`;
 
       const fsCard = document.createElement("div");
-      fsCard.className = "card";
+      fsCard.className = "in-pages-fs";
       fsCard.innerHTML = `
         <div class="no-print-fs">
         <div style="font-weight:900;color:var(--navy)">القوائم التلقائية (إجمالي الكشوفات فقط)</div>
-        <div class="hint" style="margin-top:6px">أي حفظ لكشف عمودي/موجودات ثابتة/عقود ينعكس هنا مباشرة (${CY}/${PY}). <b>بيان أ وبيان ب</b> ما زالا يُبنيان من إجماليات الكشوفات؛ <b>ميزان المراجعة</b> يُبنى منفصلاً من <b>البنود الفرعية</b> مع افتتاحي من سنة ${PY} للتحقق. صفوف مصروفات «بيان ب» تُبنى من الكشوفات النشطة المصنّفة قائمة دخل ← مصروفات؛ صف الإيرادات واحد ويُجمع إيراد العقود مع كشوف مصنّفة إيرادات، وعمود «رقم الدليل» يُبنى تلقائياً من رمز الإيرادات في كشف العقود (أو 41-45 إن تُرك فارغاً) ثم رموز دليل الكشوف المصنّفة إيرادات.</div>
+        <div class="hint" style="margin-top:6px">أي حفظ لكشف عمودي/موجودات ثابتة/عقود ينعكس هنا مباشرة (${CY}/${PY}). <b>الإدخال</b> من <b>ميزان المراجعة — قبل الترحيل</b> (📋 كشف / ➕ كشف). <b>التحقق من التوازن</b> من <b>ميزان المراجعة — بعد الترحيل</b>. بيان أ وب يُبنيان من إجماليات الكشوفات.</div>
         </div>
         ${!balOk ? `
           <div class="msg err" style="margin-top:10px">
@@ -7526,24 +9503,38 @@
         ` : ``}
         ${expMismatch ? `
           <div class="msg err" style="margin-top:10px">
-            تنبيه: مجموع مصاريف العقود (${fmt(contractsExpCY)}) لا يطابق مجموع المصاريف في قائمة الدخل (${fmt(expCY)}).
-            يرجى مراجعة كشف العقود والكشوفات المصنّفة كمصروفات والاهتلاك.
+            تنبيه: مجموع عمود «المصاريف» في كشف العقود (${fmt(contractsExpCY)}) لا يطابق مجموع المصاريف في بيان ب (${fmt(expCY)}).
+            عمود المصاريف للعرض وتوزيع المشاريع فقط — لا يظهر في ميزان المراجعة. عدّل التوزيع أو الكشوف حتى يتطابق المجموع.
           </div>
         ` : ``}
         ${Math.abs(tbSummaryClosingDiff) >= tbTol ? `
           <div class="msg err" style="margin-top:10px">
-            تنبيه توازن الميزان التجميعي (أرصدة ختامية):
+            تنبيه توازن الميزان التجميعي بعد الترحيل (أرصدة ختامية):
             فرق المدين − الدائن = <b dir="ltr">${fmt(tbSummaryClosingDiff)}</b>
           </div>
-        ` : ``}
+        ` : `
+          <div class="msg ok" style="margin-top:10px">
+            ✓ الميزان التجميعي بعد الترحيل متوازن (أرصدة ختامية).
+          </div>
+        `}
         ${Math.abs(tbClosingDiff) >= tbTol ? `
           <div class="msg err" style="margin-top:10px">
-            تنبيه توازن الميزان التفصيلي (أرصدة ختامية):
+            تنبيه توازن الميزان التفصيلي بعد الترحيل (أرصدة ختامية):
             فرق المدين − الدائن = <b dir="ltr">${fmt(tbClosingDiff)}</b>
-            — راجع البنود الفرعية والافتتاحي من سنة ${PY}.
+            — راجع البنود والافتتاحي من سنة ${PY}.
+          </div>
+        ` : `
+          <div class="msg ok" style="margin-top:10px">
+            ✓ الميزان التفصيلي بعد الترحيل متوازن (أرصدة ختامية).
+          </div>
+        `}
+        ${Math.abs(tbPreClosingDiff) >= tbTol ? `
+          <div class="msg" style="margin-top:10px;border-color:rgba(176,196,216,.9);background:#fffef8">
+            <b>قبل الترحيل:</b> فرق الختامي في الميزان التفصيلي = <b dir="ltr">${fmt(tbPreClosingDiff)}</b>
+            (متوقع ≈ فائض العمليات <b dir="ltr">${fmt(pbtCY)}</b> — طبيعي قبل إقفال قائمة الدخل).
           </div>
         ` : ``}
-        ${!tbResult.usedPriorDoc ? `
+        ${!tbPreResult.usedPriorDoc ? `
           <div class="msg" style="margin-top:10px;border-color:rgba(176,196,216,.9);background:#fffef8">
             لم تُحمَّل وثيقة سنة ${PY}: الافتتاحي يعتمد على عمود ${PY} في الكشوفات حيث وُجد.
           </div>
@@ -7730,39 +9721,86 @@
           </div>
 
           <div class="page page-tb" data-fs-order="4">
-            <div class="page-label">ميزان المراجعة — تجميعي</div>
+            <div class="page-label">ميزان المراجعة — تجميعي (بعد الترحيل)</div>
             <div class="doc-subtitle">${state.selectedCompanyName || ""}</div>
-            <div class="doc-sub2 doc-underline" style="margin:6px 0">${meta.fyEndDate ? `ميزان المراجعة (تجميعي على مستوى الكشوفات) كما في ${formatFyEndArabic(meta.fyEndDate)}` : "ميزان المراجعة — تجميعي على مستوى الكشوفات"}</div>
+            <div class="doc-sub2 doc-underline" style="margin:6px 0">${meta.fyEndDate ? `ميزان مراجعة تجميعي بعد إقفال قائمة الدخل — ${formatFyEndArabic(meta.fyEndDate)}` : "ميزان مراجعة — تجميعي بعد الترحيل"}</div>
             <div class="tb-table-wrap">
             <table class="fin-table tb-table" id="table-trial-balance-summary">
               ${tbTableHeadHtml}
               <tbody>
-                ${tbSummaryRowsHtml}
-                ${tbBuildTotalRow(tbSummaryTotals)}
+                ${tbSummaryPostRowsHtml}
+                ${tbBuildTotalRow(tbSummaryPostTotals)}
               </tbody>
               ${tbSigsTfoot}
             </table>
             </div>
             ${tbSigsHtml}
+            <div class="hint" style="margin-top:8px">يُعرض بعد إقفال قائمة الدخل — <b>حسابات الميزانية فقط</b> في الرصيد الختامي (بما فيها 21 و22 و23 بعد الترحيل). للتعديل استخدم الميزان التفصيلي <b>قبل الترحيل</b>.</div>
           </div>
 
-          <div class="page page-tb" data-fs-order="5">
-            <div class="page-label">ميزان المراجعة — تفصيلي</div>
+          <div class="page page-tb" data-fs-order="5" data-tb-post-page>
+            <div class="page-label">ميزان المراجعة — تفصيلي (بعد الترحيل)</div>
             <div class="doc-subtitle">${state.selectedCompanyName || ""}</div>
-            <div class="doc-sub2 doc-underline" style="margin:6px 0">${meta.fyEndDate ? `ميزان المراجعة (تفصيلي — البنود الفرعية) كما في ${formatFyEndArabic(meta.fyEndDate)}` : "ميزان المراجعة — تفصيلي (البنود الفرعية)"}</div>
+            <div class="doc-sub2 doc-underline" style="margin:6px 0">${meta.fyEndDate ? `ميزان مراجعة بعد إقفال قائمة الدخل — ${formatFyEndArabic(meta.fyEndDate)}` : "ميزان مراجعة — تفصيلي بعد الترحيل"}</div>
             <div class="tb-table-wrap">
-            <table class="fin-table tb-table" id="table-trial-balance-live">
+            <table class="fin-table tb-table" id="table-trial-balance-post">
               ${tbTableHeadHtml}
               <tbody>
-                ${tbRowsHtml}
-                ${tbBuildTotalRow(tbTotals)}
+                ${tbPostRowsHtml}
+                ${tbBuildTotalRow(tbPostDisplayTotals, false)}
               </tbody>
               ${tbSigsTfoot}
             </table>
             </div>
             ${tbSigsHtml}
             <div class="hint" style="margin-top:8px">
-              يُبنى من <b>البنود الفرعية</b> لكل كشف (رمز/اسم/قيم). الافتتاحي من ختامية سنة ${PY} عند توفر وثيقتها، وإلا من عمود ${PY} في الكشف. حسابات قائمة الدخل تظهر في عمود الحركة فقط.
+              <b>بعد الترحيل:</b> للعرض والتحقق فقط — لا تعديل. <b>عمود الرصيد الختامي</b> يعرض أرصدة <b>حسابات الميزانية</b> فقط (بعد إقفال الإيرادات والمصروفات وترحيل الربح إلى 22 والضريبة إلى 23). يجب أن يتساوى مجموع المدين والدائن في الرصيد الختامي.
+            </div>
+          </div>
+
+          <div class="page page-tb" data-fs-order="6" data-tb-pre-page>
+            <div class="page-label">ميزان المراجعة — تفصيلي (قبل الترحيل)</div>
+            <div class="doc-subtitle">${state.selectedCompanyName || ""}</div>
+            <div class="doc-sub2 doc-underline" style="margin:6px 0">${meta.fyEndDate ? `ميزان مراجعة تفصيلي — إدخال ومراجعة الكشوفات — ${formatFyEndArabic(meta.fyEndDate)}` : "ميزان مراجعة — تفصيلي قبل الترحيل"}</div>
+            <div class="no-print-fs schedule-toolbar tb-detail-toolbar" style="flex-wrap:wrap">
+              <button type="button" class="tb-btn" data-tb-act="add-sch">➕ كشف</button>
+              <span class="hint" style="margin-right:auto">الإدخال عبر «📋 كشف» — الحفظ بزر «💾 حفظ» داخل النافذة</span>
+            </div>
+            <div class="no-print-fs tb-detail-filters">
+              <span style="font-weight:700;color:var(--navy)">تصفية</span>
+              <label>القائمة الختامية
+                <select class="tb-filter-sel" data-tb-filter="stmt" aria-label="تصفية القائمة الختامية">
+                  <option value=""${!tbFilters.stmt ? " selected" : ""}>الكل</option>
+                  <option value="balance"${tbFilters.stmt === "balance" ? " selected" : ""}>الميزانية</option>
+                  <option value="income"${tbFilters.stmt === "income" ? " selected" : ""}>قائمة الدخل</option>
+                </select>
+              </label>
+              <label>التصنيف
+                <select class="tb-filter-sel" data-tb-filter="class" aria-label="تصفية التصنيف">
+                  ${tbFilterClassOptionsHtml}
+                </select>
+              </label>
+              <label>الكشف
+                <select class="tb-filter-sel" data-tb-filter="sch" aria-label="تصفية الكشف">
+                  ${tbFilterSchOptionsHtml}
+                </select>
+              </label>
+              <button type="button" class="tb-btn secondary" data-tb-filter="reset" style="font-size:8pt;padding:3px 8px">↺ إظهار الكل</button>
+              <span class="hint" data-tb-filter-count style="margin-right:auto"></span>
+            </div>
+            <div class="tb-table-wrap">
+            <table class="fin-table tb-table" id="table-trial-balance-live">
+              ${tbTableHeadHtmlDetail}
+              <tbody>
+                ${tbPreRowsHtml}
+                ${tbBuildTotalRow(tbDisplayTotals, true)}
+              </tbody>
+              ${tbSigsTfootDetail}
+            </table>
+            </div>
+            ${tbSigsHtml}
+            <div class="hint" style="margin-top:8px">
+                            <b>قبل الترحيل:</b> <b>📋 كشف</b> لفتح الكشf أو <b>➕ كشف</b> لإضافة كشف. الإيرادات والمصروفات في <b>رصيد ختامي</b> السنة. (22) بالافتتاحي فقط؛ (23) افتتاحي = تخصيص PY فقط — <b>لا يُدرج في الرصيد الختامي</b> قبل ترحيل ضريبة CY. للتوازن راجع «بعد الترحيل».
             </div>
           </div>
 
@@ -7943,6 +9981,23 @@
       `;
       wrap.appendChild(fsCard);
 
+      const baseDynamicSchedules = yearDoc?.dynamicSchedules || {};
+      wireDetailedTrialBalanceEditor(fsCard, {
+        baseDynamicSchedules,
+        reg,
+        n,
+        priorDoc,
+        CY,
+        PY,
+        getWorkingDataById: ()=> baseDynamicSchedules.dataById || {},
+        getTbRows: ()=> state._tbDetailRows || tbPreRows,
+        rerenderLocal: ()=> renderInPages(state._lastYearDoc),
+        rerenderFromServer: async ()=>{
+          const snap = await getDoc(yearRef(state.selectedCompanyId, state.selectedYearId));
+          await renderYearPagesFresh(snap.data() || {});
+        }
+      });
+
       // ===== Inventory movement schedule (standalone, manual) =====
       if(hasInv){
         const inv = dataById["_invBox"] || { openInv:"", purchases:"", closeInv:"", prevUsedMaterials:"" };
@@ -7954,7 +10009,8 @@
         const used = avail - closeInv;
 
         const invCard = document.createElement("div");
-        invCard.className = "card";
+        invCard.className = "card card-schedule card-schedule-inv";
+        invCard.dataset.schedulePanel = "_invBox";
         invCard.style.marginTop = "12px";
         invCard.innerHTML = `
           <div class="schedule-toolbar">
@@ -7977,13 +10033,13 @@
         let editing = false;
         const setMsg = (ok, err)=>{ okEl.textContent = ok||""; errEl.textContent = err||""; };
 
-        const renderInv = ()=>{
+        const renderInv = (mountEl = body)=>{
           const openInv = n(inv.openInv);
           const purchases = n(inv.purchases);
           const closeInv = n(inv.closeInv);
           const avail = openInv + purchases;
           const used = avail - closeInv;
-          body.innerHTML = `
+          mountEl.innerHTML = `
             <div id="goods-inv-box-live" style="background:var(--blue-ultra);border:1px solid var(--border);border-right:3px solid var(--blue-light);border-radius:5px;padding:10px 14px;margin:0 0 0;font-size:9pt;direction:rtl;">
               <span style="font-weight:700;color:var(--navy);">حركة المخزون خلال سنة ${toArabicIndicDigits(CY)}:</span>
               <table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:9pt;">
@@ -8025,7 +10081,7 @@
           `;
 
           if(editing){
-            body.querySelectorAll("input[data-inv]").forEach((inp)=>{
+            mountEl.querySelectorAll("input[data-inv]").forEach((inp)=>{
               inp.addEventListener("paste", (ev)=>{
                 const clip = ev.clipboardData?.getData("text") ?? "";
                 const raw = clip.trim();
@@ -8066,6 +10122,15 @@
         });
 
         renderInv();
+        invCard._schedulePanel = {
+          highlightRow(){},
+          mountTo(host){
+            editing = true;
+            renderInv(host);
+          },
+          remount(){ editing = false; renderInv(body); }
+        };
+        registerSchedulePanelEl("_invBox", invCard);
       }
 
       // ===== Equity changes statement (بيان ج) — standalone, partly manual =====
@@ -8103,7 +10168,8 @@
         }
 
         const eqCard = document.createElement("div");
-        eqCard.className = "card";
+        eqCard.className = "card card-schedule card-schedule-equity";
+        eqCard.dataset.schedulePanel = "_equityStmt";
         eqCard.style.marginTop = "12px";
         eqCard.innerHTML = `
           <div class="schedule-toolbar">
@@ -8127,7 +10193,9 @@
         let editing = false;
         const setMsg = (ok, err)=>{ okEl.textContent = ok||""; errEl.textContent = err||""; };
 
-        const renderEq = ()=>{
+        let eqActiveMount = body;
+        const renderEq = (mountEl = eqActiveMount)=>{
+          eqActiveMount = mountEl || body;
           const mkCell = (val, editable, path)=> {
             const txt = String(val||"");
             return editable
@@ -8158,7 +10226,7 @@
 
           const closingObj = closing;
 
-          body.innerHTML = `
+          mountEl.innerHTML = `
             <table class="fin-table" id="table-equity-live">
               <thead><tr>
                 <th>التفاصيل</th>
@@ -8211,7 +10279,7 @@
           `;
 
           if(editing){
-            body.querySelectorAll("td[contenteditable='true'][data-eq]").forEach((cell)=>{
+            mountEl.querySelectorAll("td[contenteditable='true'][data-eq]").forEach((cell)=>{
               cell.addEventListener("paste", (ev)=>{
                 const clip = ev.clipboardData?.getData("text") ?? "";
                 const raw = clip.trim();
@@ -8225,8 +10293,7 @@
                 const [root, key] = path.split(".");
                 eq[root] = eq[root] || {};
                 eq[root][key] = formatted;
-                // recompute by re-render
-                renderEq();
+                renderEq(eqActiveMount);
               });
             });
           }
@@ -8255,15 +10322,24 @@
         });
 
         renderEq();
+        eqCard._schedulePanel = {
+          highlightRow(){},
+          mountTo(host){
+            editing = true;
+            renderEq(host);
+          },
+          remount(){ editing = false; renderEq(body); }
+        };
+        registerSchedulePanelEl("_equityStmt", eqCard);
       }
 
-      // Toolbar (add schedule)
+      // Toolbar (add schedule) — مخفي على الشاشة؛ الإضافة من الميزان (➕ كشف)
       const tb = document.createElement("div");
-      tb.className = "row";
+      tb.className = "row schedules-vertical-toolbar";
       tb.style.margin = "8px 0";
       tb.innerHTML = `
         <button class="tb-btn" id="btn-add-vertical">➕ إضافة كشف</button>
-        <span class="hint">الكشوفات الافتراضية قابلة للتعديل/الحذف. الحفظ يتم لكل كشف بشكل مستقل.</span>
+        <span class="hint">الكشوف العمودية تُدار من ميزان المراجعة — قبل الترحيل.</span>
       `;
       wrap.appendChild(tb);
 
@@ -8282,8 +10358,10 @@
         const card = document.createElement("div");
         const kind = sch.type;
         card.className = "card card-schedule"
+          + (kind === "vertical" ? " card-schedule-vertical" : "")
           + (kind === "contracts" ? " card-schedule-contracts" : "")
           + (kind === "horizontal_fixedAssets" ? " card-schedule-fa" : "");
+        card.dataset.schedulePanel = sch.id;
         card.style.marginTop = "12px";
         const canEdit = (kind === "vertical" || kind === "horizontal_fixedAssets" || kind === "contracts");
         card.innerHTML = `
@@ -8557,6 +10635,8 @@
           });
 
           renderFA();
+          card._schedulePanel = { highlightRow(){} };
+          registerSchedulePanelEl(sch.id, card);
         } else if(kind === "vertical"){
           const saved = (dataById[sch.id]?.rows) || [];
           let editing = false;
@@ -8629,7 +10709,7 @@
               btns.className = "row";
               btns.style.marginTop = "8px";
               btns.innerHTML = `
-                <button class="tb-btn" data-add>➕ إضافة سطر</button>
+                <button class="tb-btn" data-add>➕ إضافة صف</button>
                 <button class="tb-btn" data-delrow>🗑 حذف السطر المحدد</button>
                 <span class="hint">انقر على سطر لتحديده ثم «حذف». عند كتابة الرمز أو الاسم يظهر اقتراح من دليل الحسابات (اختياري).</span>
               `;
@@ -8787,6 +10867,8 @@
           });
 
           renderTable();
+          card._schedulePanel = { highlightRow(idx){ selectedRow = idx; renderTable(); } };
+          registerSchedulePanelEl(sch.id, card);
         } else if(kind === "contracts"){
           const saved = dataById[sch.id] || { type:"contracts", exchangeRate:"", revPyTotalIqd:"", revenueAcctCode:"", rows: [] };
           if(saved.revenueAcctCode == null) saved.revenueAcctCode = "";
@@ -8794,7 +10876,9 @@
           let editing = false;
           let selectedRow = -1;
 
-          const renderContracts = ()=>{
+          let conActiveMount = body;
+          const renderContracts = (mountEl = conActiveMount)=>{
+            conActiveMount = mountEl || body;
             const rows = Array.isArray(saved.rows) ? saved.rows : (saved.rows = []);
             const rate = saved.exchangeRate != null ? String(saved.exchangeRate) : "";
             const revPyTotal = saved.revPyTotalIqd != null ? String(saved.revPyTotalIqd) : "";
@@ -8823,7 +10907,7 @@
                 <span class="pill"><b>رمز الدليل للإيرادات (قائمة الدخل)</b>
                   <input id="contracts-rev-acct" dir="ltr" ${editing ? "" : "disabled"} value="${escHtml(revAcct)}" placeholder="مثال: 41-45" style="min-width:160px" title="يُدمج مع رموز دليل الكشوف المصنّفة «إيرادات» في عمود الدليل ببيان ب دون فصل الصفوف"/>
                 </span>
-                <span class="hint">يمكن إدخال الدولار أو الدينار مباشرة. نسبة الإنجاز تُحسب تلقائياً.</span>
+                <span class="hint">يمكن إدخال الدولار أو الدينار مباشرة. نسبة الإنجاز تُحسب تلقائياً. عمود «المصاريف» للعرض: توزيع مصاريف السنة على المشاريع (يجب أن يساوي مجموع بيان ب) — لا يُدرج في ميزان المراجعة.</span>
               </div>
               <div class="contracts-meta-print">
                 <table class="contracts-meta-table">
@@ -8935,13 +11019,13 @@
             `;
             tb.appendChild(trTot);
 
-            body.innerHTML = "";
-            body.appendChild(header);
-            body.appendChild(table);
+            conActiveMount.innerHTML = "";
+            conActiveMount.appendChild(header);
+            conActiveMount.appendChild(table);
 
             if(editing){
               // exchange rate field
-              const exInp = body.querySelector("#contracts-exrate");
+              const exInp = conActiveMount.querySelector("#contracts-exrate");
               if(exInp){
                 exInp.addEventListener("paste", (ev)=>{
                   const clip = ev.clipboardData?.getData("text") ?? "";
@@ -8960,7 +11044,7 @@
                 });
               }
 
-              const revPyInp = body.querySelector("#contracts-revpy");
+              const revPyInp = conActiveMount.querySelector("#contracts-revpy");
               if(revPyInp){
                 revPyInp.addEventListener("paste", (ev)=>{
                   const clip = ev.clipboardData?.getData("text") ?? "";
@@ -8978,7 +11062,7 @@
                 });
               }
 
-              const revAcctInp = body.querySelector("#contracts-rev-acct");
+              const revAcctInp = conActiveMount.querySelector("#contracts-rev-acct");
               if(revAcctInp){
                 revAcctInp.addEventListener("input", ()=>{
                   saved.revenueAcctCode = revAcctInp.value;
@@ -8998,7 +11082,7 @@
                 <button class="tb-btn" data-recalc>🔁 إعادة حساب</button>
                 <span class="hint">نسبة الإنجاز تُحسب تلقائياً.</span>
               `;
-              body.appendChild(btns);
+              conActiveMount.appendChild(btns);
               btns.querySelector("button[data-add]").addEventListener("click", ()=>{
                 rows.push({ projectName:"", contractUsd:"", contractIqd:"", revUsd:"", revIqd:"", prevCumIqd:"", expensesIqd:"" });
                 selectedRow = rows.length - 1;
@@ -9015,7 +11099,7 @@
               });
 
               // bind edits + paste
-              body.querySelectorAll("[contenteditable='true'][data-k]").forEach((cell)=>{
+              conActiveMount.querySelectorAll("[contenteditable='true'][data-k]").forEach((cell)=>{
                 ["mousedown","click"].forEach((t)=> cell.addEventListener(t, (e)=> e.stopPropagation()));
                 cell.addEventListener("paste", (ev)=>{
                   const k = cell.getAttribute("data-k");
@@ -9102,6 +11186,16 @@
           });
 
           renderContracts();
+          card._schedulePanel = {
+            highlightRow(idx){ selectedRow = idx; renderContracts(conActiveMount); },
+            mountTo(host, meta){
+              editing = true;
+              if(meta?.rowIndex != null) selectedRow = Number(meta.rowIndex);
+              renderContracts(host);
+            },
+            remount(){ editing = false; renderContracts(body); }
+          };
+          registerSchedulePanelEl(sch.id, card);
         } else {
           body.innerHTML = `<div class="hint">هذا النوع سيتم تنفيذه لاحقاً (حالياً: عرض فقط).</div>`;
           delBtn.addEventListener("click", async ()=>{
@@ -9330,27 +11424,40 @@
 
     function getA4PrintableHeightPx(){
       const probe = document.createElement("div");
-      probe.style.cssText = "position:absolute;visibility:hidden;height:280mm;width:1px;pointer-events:none;";
+      probe.style.cssText = "position:absolute;visibility:hidden;height:279mm;width:1px;pointer-events:none;";
       document.body.appendChild(probe);
       const h = probe.offsetHeight;
       probe.remove();
       return h > 0 ? h : 1050;
     }
 
+    function measureScheduleCardPrintHeight(card){
+      const pageH = getA4PrintableHeightPx();
+      const prevW = card.style.width;
+      const prevBox = card.style.boxSizing;
+      card.style.width = "210mm";
+      card.style.boxSizing = "border-box";
+      const measureEl = card.querySelector(".fa-print-wrap") || card.querySelector("[data-body]") || card;
+      const toolbarH = card.querySelector(".schedule-toolbar")?.offsetHeight || 0;
+      let skipH = 0;
+      card.querySelectorAll(".hint, .msg").forEach((el)=> { skipH += el.offsetHeight || 0; });
+      const h = Math.max(0, measureEl.scrollHeight + toolbarH + 8 - skipH);
+      card.style.width = prevW;
+      card.style.boxSizing = prevBox;
+      return { h, pageH };
+    }
+
     /** يحدد لكل كشف: كتلة واحدة (لا تقسيم) أو تقسيم مع تكرار الرأس إن تجاوز ارتفاع صفحة A4 */
     function prepareSchedulesForPrint(root){
       const scope = root || document;
-      const pageH = getA4PrintableHeightPx();
       scope.querySelectorAll(".card-schedule").forEach((card)=>{
         card.classList.remove("schedule-keep-whole", "schedule-allow-split");
         if(card.classList.contains("card-schedule-contracts")){
           card.classList.add("schedule-allow-split");
           return;
         }
-        const measureEl = card.querySelector(".fa-print-wrap") || card.querySelector("[data-body]") || card;
-        const toolbarH = card.querySelector(".schedule-toolbar")?.offsetHeight || 0;
-        const h = measureEl.scrollHeight + toolbarH + 16;
-        if(h > pageH * 0.92){
+        const { h, pageH } = measureScheduleCardPrintHeight(card);
+        if(h > pageH * 0.88){
           card.classList.add("schedule-allow-split");
         }else{
           card.classList.add("schedule-keep-whole");
@@ -9461,7 +11568,64 @@
           }
           .fin-table.tb-table thead{ display:table-header-group !important; }
           .tb-table-wrap{ overflow:visible !important; }
-          .fin-table.tb-table{ min-width:0 !important; width:100% !important; }
+          .fin-table.tb-table{ min-width:0 !important; width:100% !important; font-size:7pt !important; }
+          .fin-table.tb-table th{ font-size:6.5pt !important; padding:2px 2px !important; }
+          .fin-table.tb-table thead tr.tb-head-sub th{ font-size:6pt !important; }
+          .fin-table.tb-table td{ font-size:6.5pt !important; padding:2px 2px !important; }
+          .fin-table.tb-table .amount-col{ font-size:6pt !important; padding:2px 1px !important; letter-spacing:-0.03em !important; }
+          .fin-table.tb-table .amount-col .amt-compact{ font-size:5.5pt !important; }
+          #table-trial-balance-live col.tb-col-open,
+          #table-trial-balance-live .tb-th-open,
+          #table-trial-balance-live .tb-td-open{ display:none !important; }
+          .print-fs{ width:100%; max-width:none; box-sizing:border-box; }
+          .print-fs .in-pages-fs .pages{ width:100%; gap:0; }
+          .print-fs .card-schedule{
+            width:100% !important; max-width:none !important; box-sizing:border-box;
+            padding:0 !important; margin:0 0 4mm !important;
+            border:none !important; box-shadow:none !important; background:transparent !important;
+          }
+          .card-schedule .fa-print-wrap,
+          .card-schedule [data-body]{ overflow:visible !important; max-width:none !important; }
+          .card-schedule .fin-table:not(.tb-table){
+            width:100% !important; min-width:0 !important; table-layout:fixed; font-size:8pt !important;
+          }
+          .card-schedule-fa .fa-schedule-table{
+            width:100% !important; min-width:0 !important; table-layout:fixed; font-size:6pt !important;
+          }
+          .card-schedule-fa .fa-schedule-table th,
+          .card-schedule-fa .fa-schedule-table td{
+            padding:1px 2px !important; word-wrap:break-word; overflow-wrap:anywhere;
+          }
+          .card-schedule [data-body],
+          .card-schedule .fa-print-wrap{
+            padding-inline:0.4mm !important; box-sizing:border-box;
+          }
+          .card-schedule .fin-table:not(.tb-table),
+          .card-schedule .fa-schedule-table,
+          .card-schedule .con-table,
+          .card-schedule .contracts-meta-table{
+            border:1px solid var(--fin-table-border) !important;
+          }
+          .card-schedule .fin-table:not(.tb-table) :is(th,td):first-child,
+          .card-schedule .fa-schedule-table :is(th,td):first-child,
+          .card-schedule .con-table :is(th,td):first-child,
+          .card-schedule .contracts-meta-table :is(th,td):first-child{
+            border-inline-start:1px solid var(--fin-table-border) !important;
+          }
+          .card-schedule .fin-table:not(.tb-table) :is(th,td):last-child,
+          .card-schedule .fa-schedule-table :is(th,td):last-child,
+          .card-schedule .con-table :is(th,td):last-child,
+          .card-schedule .contracts-meta-table :is(th,td):last-child{
+            border-inline-end:1px solid var(--fin-table-border) !important;
+          }
+          .card-schedule-vertical,
+          .schedules-vertical-toolbar{
+            position:static !important; left:auto !important; top:auto !important;
+            width:100% !important; max-width:none !important; opacity:1 !important;
+            pointer-events:none !important; z-index:auto !important; overflow:visible !important;
+          }
+          .schedules-vertical-toolbar{ display:none !important; }
+          .pages > .page:last-child{ page-break-after:auto; break-after:auto; }
           thead{ display:table-header-group; }
           tfoot{ display:table-footer-group; }
         }
@@ -9473,7 +11637,8 @@
         .schedule-toolbar{ display:flex !important; align-items:center; gap:8px; margin:0 0 6mm; }
         .schedule-toolbar button{ display:none !important; }
         .schedule-toolbar .hint{ display:none !important; }
-        .card{
+        .card:not(.card-schedule),
+        .in-pages-fs{
           display:block !important;
           border:none !important;
           box-shadow:none !important;
@@ -9553,6 +11718,7 @@
         const inner = buildPrintPackageInnerHtml();
         resetSchedulesPrintClasses(inPages);
         host.innerHTML = inner;
+        prepareSchedulesForPrint(host);
         host.setAttribute("aria-hidden", "false");
         document.body.classList.add("print-pdf-mode");
         const cleanup = ()=>{
@@ -9768,7 +11934,8 @@
         );
         closeOverlay("ov-schedule");
         const snap2 = await getDoc(yref);
-        await renderYearPagesFresh(snap2.data()||{});
+        const fresh = snap2.data()||{};
+        await renderYearPagesFresh(fresh);
       }catch(e){
         setText("sch-msg", e?.message || String(e));
       }
@@ -9978,34 +12145,44 @@
         if(!nextFA && hasFAData) warnings.push("الموجودات الثابتة");
         if(!nextInv && hasInvData) warnings.push("المخزون / بيان د");
         if(!nextCon && hasContractsData) warnings.push("العقود");
-        // generic: turning off contracts/inv/fa doesn't delete vertical data, but user asked about الكشوفات أيضاً
-        // We warn only when user is turning something off and there is data.
-        if(!nextFA && prevFA && hasFAData){} // keep for clarity
+        const willClear = (!nextFA && hasFAData) || (!nextInv && hasInvData) || (!nextCon && hasContractsData);
         if(warnings.length){
           const msg =
             "تنبيه مهم:\n\n" +
             "قمت بتغيير (نعم/لا) إلى (لا) مع وجود بيانات مدخلة في:\n" +
             warnings.map(x=>`- ${x}`).join("\n") +
             "\n\n" +
-            "لن يتم حذف أي بيانات من قاعدة البيانات.\n" +
-            "لكن سيتم إخفاء هذه الكشوفات/الأجزاء من الواجهة وقد تُستبعد من الحسابات التلقائية.\n\n" +
+            (willClear
+              ? "عند الحفظ سيتم تصفير قيم هذه الكشوفات في قاعدة البيانات (لا حذف للسجل).\n" +
+                "ستُخفى من الواجهة ولن تدخل في الحسابات التلقائية.\n\n"
+              : "") +
             "هل تريد المتابعة بالحفظ؟";
           if(!window.confirm(msg)) return;
         } else if((!nextFA && prevFA) || (!nextInv && prevInv) || (!nextCon && prevCon)){
-          // Optional lightweight confirm when turning off, even without detectable data
           const msg =
             "تنبيه:\n\n" +
-            "أنت تغيّر بعض الخيارات إلى (لا)، وهذا سيخفي أقساماً من الواجهة وقد يستبعدها من الحسابات التلقائية.\n\n" +
+            "أنت تغيّر بعض الخيارات إلى (لا).\n" +
+            "عند الحفظ سيتم تصفير بيانات الكشوف/البيان المعطّلة في قاعدة البيانات، " +
+            "وستُخفى من الواجهة ولن تدخل في الحسابات التلقائية.\n\n" +
             "هل تريد المتابعة بالحفظ؟";
           if(!window.confirm(msg)) return;
         }
 
-        await setDoc(yearRef(state.selectedCompanyId, state.selectedYearId), {
+        await setDoc(yref, {
           meta: { ...defaultYearMeta(state.selectedYearId), ...m },
+          dynamicSchedules: {
+            ...ds0,
+            registry: reg0,
+            dataById: clearDisabledReferenceScheduleData({ ...dataById0 }, m)
+          },
           updatedAt: serverTimestamp()
         }, { merge: true });
         await appendActivityLog("حفظ مرجعيات السنة", `شركة: ${state.selectedCompanyId || ""} — CY: ${state.selectedYearId || ""}`);
         setText("year-ok","تم حفظ مرجعيات السنة.");
+        if(!$("in-pages-card")?.classList.contains("hidden")){
+          const snap1 = await getDoc(yref);
+          if(snap1.exists()) await renderYearPagesFresh(snap1.data() || {});
+        }
       }catch(e){
         setText("year-msg", e?.message || String(e));
       }
