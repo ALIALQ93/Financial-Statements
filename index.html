@@ -410,6 +410,50 @@
     }
     .users-info-title{font-weight:900;color:var(--navy);margin-bottom:6px;font-size:11pt}
     .users-info ol{margin:6px 0 0;padding-inline-start:20px}
+
+    /* ===== Help section ===== */
+    .help-doc{max-width:960px;line-height:1.85;font-size:10.5pt;color:var(--text)}
+    .help-doc > .help-lead{font-size:11pt;color:var(--text-muted);margin:0 0 16px}
+    .help-doc h3{font-size:12pt;color:var(--navy);margin:22px 0 8px;font-weight:900;scroll-margin-top:80px}
+    .help-doc h3:first-of-type{margin-top:8px}
+    .help-doc h4{font-size:11pt;color:var(--navy);margin:14px 0 6px;font-weight:800}
+    .help-doc p{margin:0 0 8px}
+    .help-doc ul,.help-doc ol{padding-inline-start:22px;margin:0 0 12px}
+    .help-doc li{margin:0 0 6px}
+    .help-toc{
+      background:var(--surface-container-low);
+      border:1px solid var(--border);
+      border-radius:var(--radius-md);
+      padding:12px 16px;
+      margin:0 0 18px;
+    }
+    .help-toc-title{font-weight:900;color:var(--navy);margin-bottom:8px;font-size:11pt}
+    .help-toc ul{list-style:none;padding:0;margin:0;display:grid;gap:6px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+    .help-toc a{color:var(--navy);text-decoration:none;font-weight:600;font-size:10.5pt}
+    .help-toc a:hover{text-decoration:underline}
+    .help-note{
+      background:rgba(232,196,106,.12);
+      border:1px solid rgba(232,196,106,.45);
+      border-radius:var(--radius-sm);
+      padding:10px 12px;
+      margin:12px 0;
+      font-size:10.5pt;
+    }
+    .help-table-wrap{overflow-x:auto;margin:10px 0 14px}
+    .help-table{width:100%;border-collapse:collapse;font-size:10pt;min-width:480px}
+    .help-table th,.help-table td{border:1px solid var(--border);padding:6px 8px;text-align:right;vertical-align:top}
+    .help-table th{background:var(--surface-table-head);color:var(--navy);font-weight:700;white-space:nowrap}
+    .help-flow{
+      display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+      margin:10px 0 14px;font-size:10pt;color:var(--navy);font-weight:600;
+    }
+    .help-flow span{
+      background:var(--surface-container-low);
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:4px 10px;
+    }
+    .help-flow .arr{color:var(--muted);font-weight:400}
     .users-info li{margin:4px 0}
     .users-info code{
       font-size:10pt;background:rgba(255,255,255,.7);
@@ -2253,6 +2297,10 @@
           <span class="ic">📒</span>
           دليل الحسابات الموحّد
         </button>
+        <button class="nav-btn" id="nav-help" data-section="help">
+          <span class="ic">❓</span>
+          المساعدة
+        </button>
         <button class="nav-btn" id="nav-schedules" data-section="schedules">
           <span class="ic">🧾</span>
           الكشوفات
@@ -2363,6 +2411,7 @@
             <button type="button" class="linkbtn" id="dash-go-schedules">الكشوفات</button>
             <button type="button" class="linkbtn" id="dash-go-directory">المحاسبون والمراقبون</button>
             <button type="button" class="linkbtn" id="dash-go-coa">دليل الحسابات</button>
+            <button type="button" class="linkbtn" id="dash-go-help">المساعدة</button>
             <button type="button" class="linkbtn hidden" id="dash-go-users">المستخدمين</button>
             <button type="button" class="linkbtn hidden" id="dash-go-movements">مسجل الحركات</button>
             <button type="button" class="linkbtn hidden" id="dash-go-platform">مكاتب المنصّة</button>
@@ -2468,6 +2517,148 @@
           </table>
         </div>
         <div class="msg err" id="coa-msg" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card hidden" id="section-help">
+        <h2 style="font-size:13pt">المساعدة — شرح البرنامج</h2>
+        <div class="help-doc">
+          <p class="help-lead">
+            <b>Financial Statements</b> نظام لإعداد القوائم المالية والكشوفات التفصيلية للمكاتب المحاسبية (العراق).
+            البيانات تُخزَّن في السحابة (Firebase) لكل <b>مكتب</b> → <b>شركة</b> → <b>سنة مالية (CY)</b>.
+            السنة السابقة (PY) تُستخدم للمقارنة والافتتاحي حيث ينطبق ذلك.
+          </p>
+
+          <nav class="help-toc" aria-label="فهرس المساعدة">
+            <div class="help-toc-title">محتويات</div>
+            <ul>
+              <li><a href="#help-start">البداية السريعة</a></li>
+              <li><a href="#help-sections">أقسام البرنامج</a></li>
+              <li><a href="#help-year-meta">مرجعيات السنة</a></li>
+              <li><a href="#help-tb">ميزان المراجعة</a></li>
+              <li><a href="#help-schedules">الكشوفات والبيانات</a></li>
+              <li><a href="#help-statements">القوائم التلقائية</a></li>
+              <li><a href="#help-print">الطباعة</a></li>
+              <li><a href="#help-md">تقرير المدير</a></li>
+              <li><a href="#help-roles">الصلاحيات</a></li>
+            </ul>
+          </nav>
+
+          <h3 id="help-start">البداية السريعة</h3>
+          <div class="help-flow">
+            <span>إنشاء شركة</span><span class="arr">←</span>
+            <span>سنة جديدة (CY)</span><span class="arr">←</span>
+            <span>مرجعيات السنة</span><span class="arr">←</span>
+            <span>فتح السنة</span><span class="arr">←</span>
+            <span>إدخال من الميزان</span><span class="arr">←</span>
+            <span>طباعة / PDF</span>
+          </div>
+          <ol>
+            <li>من <b>الشركات</b>: أنشئ شركة أو عدّل بياناتها (الاسم، النشاط، رأس المال…).</li>
+            <li>من <b>الكشوفات</b>: اختر الشركة و<b>CY</b> ثم <b>➕ سنة جديدة</b> أو <b>فتح</b> سنة موجودة.</li>
+            <li>عبّئ <b>مرجعيات السنة</b> (تاريخ نهاية السنة، المحاسب، المراقب، الضريبة، خيارات العقود/الموجودات/المخزون…) ثم <b>حفظ مرجعيات السنة</b>.</li>
+            <li>بعد <b>فتح</b> السنة تظهر صفحات القوائم والميزان والكشوفات.</li>
+            <li>أدخل البيانات من <b>ميزان المراجعة — تفصيلي قبل الترحيل</b> عبر <b>📋 كشف</b>.</li>
+            <li>راجع التوازن في <b>ميزان المراجعة — بعد الترحيل</b>.</li>
+            <li>اطبع الغلاف والقوائم والكشوفات وتقرير المدير من <b>🖨️ طباعة / PDF</b> أو <b>🗂️ A4</b>.</li>
+          </ol>
+
+          <h3 id="help-sections">أقسام البرنامج</h3>
+          <div class="help-table-wrap">
+            <table class="help-table">
+              <thead><tr><th>القسم</th><th>الغرض</th></tr></thead>
+              <tbody>
+                <tr><td>لوحة التحكم</td><td>إحصائيات سريعة واختصارات للانتقال.</td></tr>
+                <tr><td>الشركات</td><td>تعريف الشركات وبياناتها القانونية؛ إدارة سنوات كل شركة.</td></tr>
+                <tr><td>دليل المحاسبين والمراقبين</td><td>قائمة مرجعية لملء مرجعيات السنة (اسم المحاسب/المراقب).</td></tr>
+                <tr><td>دليل الحسابات الموحّد</td><td>رموز وأسماء شائعة — اقتراح تلقائي عند إدخال الكشوف (اختياري).</td></tr>
+                <tr><td>المساعدة</td><td>شرح البرنامج وسير العمل — هذا القسم.</td></tr>
+                <tr><td>الكشوفات</td><td>اختيار الشركة/السنة، المرجعيات، صفحات CY/PY، الإدخال والطباعة.</td></tr>
+                <tr><td>المستخدمين / مسجل الحركات</td><td>لمدير النظام (Admin) فقط.</td></tr>
+                <tr><td>مكاتب المنصّة</td><td>لمدير المنصّة فقط — إنشاء مكاتب متعددة.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 id="help-year-meta">مرجعيات السنة</h3>
+          <p>تظهر بعد فتح سنة. تحدّد إعدادات <b>هذه السنة فقط</b> (قد تختلف عن سنة أخرى):</p>
+          <ul>
+            <li><b>تاريخ نهاية السنة المالية</b> — يظهر في عناوين القوائم والكشوفات.</li>
+            <li><b>المحاسب ومراقب الحسابات</b> — للتوقيعات والغلاف.</li>
+            <li><b>نسبة ضريبة الدخل %</b> و<b>الاحتياطي القانوني %</b> — لحساب بيان ب تلقائياً.</li>
+            <li><b>هل لدى الشركة عقود؟</b> — يفعّل كشف (٨) والإيراد من العقود.</li>
+            <li><b>هل لدى الشركة موجودات ثابتة؟</b> — يفعّل كشف (١) والاندثار في قائمة الدخل.</li>
+            <li><b>هل يوجد مخزون؟</b> — يفعّل <b>بيان د</b> (حركة المخزون) وسطر المواد 321.</li>
+          </ul>
+          <div class="help-note">
+            عند تغيير أي خيار إلى <b>«لا»</b> ثم <b>حفظ مرجعيات السنة</b>: تُصفَّر قيم ذلك الكشف/البيان في قاعدة البيانات
+            (كشف ١، كشف ٨، بيان د) ويُخفى من الواجهة ولا يدخل في الحسابات التلقائية.
+            <b>بيان ج</b> (حقوق الملكية) يبقى دائماً — لا يُربط بخيار نعم/لا حالياً.
+          </div>
+
+          <h3 id="help-tb">ميزان المراجعة</h3>
+          <p>ثلاث صفحات في نهاية القوائم (ترتيب العرض):</p>
+          <div class="help-table-wrap">
+            <table class="help-table">
+              <thead><tr><th>الصفحة</th><th>الاستخدام</th></tr></thead>
+              <tbody>
+                <tr><td>تجميعي — بعد الترحيل</td><td>صف واحد لكل كشف؛ للتحقق السريع. الرصيد الختامي لحسابات الميزانية فقط.</td></tr>
+                <tr><td>تفصيلي — بعد الترحيل</td><td>عرض فقط بعد إقفال قائمة الدخل؛ للتحقق من التوازن.</td></tr>
+                <tr><td>تفصيلي — قبل الترحيل</td><td><b>واجهة الإدخال الرئيسية</b> — افتح الكشف من عمود «كشف».</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h4>الإدخال من الميزان (قبل الترحيل)</h4>
+          <ul>
+            <li><b>📋 كشف</b> — يفتح نافذة لتعديل الكشف كاملاً (عمودي، موجودات ثابتة، عقود، بيان د/ج…).</li>
+            <li><b>➕ كشف</b> — إضافة كشف عمودي جديد.</li>
+            <li><b>💾 حفظ</b> داخل النافذة — يحفظ في Firebase ويحدّث الميزان والقوائم.</li>
+            <li><b>🗑 حذف الكشف</b> — للكشوف العمودية فقط؛ يلغي تفعيل الكشف ويحفظ.</li>
+            <li><b>⚙️ إعداد</b> — ربط الكشف العمودي بالقائمة الختامية (ميزانية/دخل، تصنيف، رمز الحساب).</li>
+            <li><b>إلغاء</b> — يغلق النافذة دون حفظ (التعديلات غير المحفوظة قد تبقى على الشاشة حتى التحديث).</li>
+          </ul>
+          <p>عمود <b>«كشف»</b> في آخر جدول الميزان التفصيلي — ليس للتحرير المباشر في الخلايا.</p>
+
+          <h3 id="help-schedules">الكشوفات والبيانات</h3>
+          <ul>
+            <li><b>كشوف ٢–٧ (عمودية)</b> — تُدخل من الميزان فقط؛ مخفية من الصفحة الرئيسية لكنها <b>تُطبَع</b> في PDF.</li>
+            <li><b>كشف (١) موجودات ثابتة</b> — أفقي (أعمدة = أصول)؛ يظهر إذا «موجودات ثابتة = نعم».</li>
+            <li><b>كشف (٨) عقود</b> — يظهر إذا «عقود = نعم».</li>
+            <li><b>بيان د</b> — حركة المخزون؛ يظهر إذا «مخزون = نعم».</li>
+            <li><b>بيان ج</b> — التغيرات في حقوق الملكية؛ يُعدّل من 📋 كشف أو بطاقته.</li>
+          </ul>
+          <p>الكشف العمودي: كل <b>صف</b> = حساب (رمز، اسم، CY، PY). الكشف الأفقي للموجودات: كل <b>عمود</b> = أصل.</p>
+
+          <h3 id="help-statements">القوائم التلقائية</h3>
+          <p>بيان أ (المركز المالي)، بيان ب (الدخل)، بيان ج (التدفقات النقدية) يُبنون <b>تلقائياً</b> من إجماليات الكشوفات والمرجعيات — لا تُعدَّل يدوياً في جدول القائمة.</p>
+          <ul>
+            <li>أي <b>💾 حفظ</b> لكشف يعيد حساب القوائم والميزان.</li>
+            <li>ضريبة الدخل (23) تُحسب من بيان ب — لا تُعدَّل من الميزان مباشرة.</li>
+            <li>جدولا «تفاصيل الترحيل» أسفل بيان أ/ب للعرض والمراجعة (لا يُطبَعان في PDF الرئيسي).</li>
+          </ul>
+
+          <h3 id="help-print">الطباعة</h3>
+          <ul>
+            <li><b>🖨️ طباعة / PDF</b> — معاينة الطباعة من المتصفح (حفظ PDF من نافذة الطباعة).</li>
+            <li><b>🗂️ A4</b> — تبويب منفصل مُحسَّن لورق A4.</li>
+            <li>تُطبَع: الغلاف، القوائم، الميزان، الكشوف (بما فيها العمودية)، تقرير المدير.</li>
+            <li>الكشوف القصيرة تُحاول البقاء في صفحة واحدة؛ الطويلة تُقسَّم مع تكرار رأس الجدول.</li>
+          </ul>
+
+          <h3 id="help-md">تقرير المدير المندوب</h3>
+          <p>يظهر أسفل صفحات السنة بعد فتحها. التعديل من داخل المعاينة (✏️ تعديل، 💾 حفظ لكل مجموعة فقرات). يُضمَّن في حزمة الطباعة.</p>
+
+          <h3 id="help-roles">الصلاحيات والمكتب</h3>
+          <ul>
+            <li>كل مستخدم ينتمي إلى <b>مكتب</b>؛ البيانات معزولة بين المكاتب.</li>
+            <li><b>Admin</b> — إدارة المستخدمين ومسجل الحركات.</li>
+            <li><b>مدير المنصّة</b> — إنشاء مكاتب جديدة على المنصّة.</li>
+            <li>الحساب <b>seed</b> — الإعداد الأولي للمكتب (مرة واحدة).</li>
+          </ul>
+          <div class="help-note">
+            للدعم الفني: تحقق من اتصال Firebase، صلاحيات Firestore، واختيار الشركة والسنة قبل الإدخال.
+            استخدم <b>مسجل الحركات</b> (Admin) لمراجعة آخر عمليات الحفظ.
+          </div>
+        </div>
       </div>
 
       <div class="card hidden" id="section-companies">
@@ -3905,7 +4096,7 @@
     }
 
     function setSection(sec){
-      const ids = ["dashboard","companies","directory","coa","schedules","users","movements","platform"];
+      const ids = ["dashboard","companies","directory","coa","schedules","help","users","movements","platform"];
       for(const k of ids){
         const secEl = $("section-"+k);
         const navEl = $("nav-"+k);
@@ -4015,7 +4206,7 @@
       if(sec === "platform") void loadPlatformOfficesSection();
     }
 
-    ["nav-dashboard","nav-companies","nav-directory","nav-coa","nav-schedules","nav-users","nav-movements","nav-platform"].forEach((id)=>{
+    ["nav-dashboard","nav-companies","nav-directory","nav-coa","nav-schedules","nav-help","nav-users","nav-movements","nav-platform"].forEach((id)=>{
       $(id).addEventListener("click", ()=>{
         const sec = $(id).getAttribute("data-section");
         goToSection(sec);
@@ -4026,6 +4217,7 @@
     $("dash-go-schedules")?.addEventListener("click", ()=> goToSection("schedules"));
     $("dash-go-directory")?.addEventListener("click", ()=> goToSection("directory"));
     $("dash-go-coa")?.addEventListener("click", ()=> goToSection("coa"));
+    $("dash-go-help")?.addEventListener("click", ()=> goToSection("help"));
     $("dash-go-users")?.addEventListener("click", ()=> goToSection("users"));
     $("dash-go-movements")?.addEventListener("click", ()=> goToSection("movements"));
     $("dash-go-platform")?.addEventListener("click", ()=> goToSection("platform"));
@@ -4306,7 +4498,7 @@
     function emptyContractsScheduleData(){
       return { type:"contracts", exchangeRate:"", revPyTotalIqd:"", revenueAcctCode:"", rows: [] };
     }
-    /** عند «لا» في مرجعيات السنة — تصفير بيانات الكشf/البيان في Firestore (لا حذف السجل) */
+    /** عند «لا» في مرجعيات السنة — تصفير بيانات الكشف/البيان في Firestore (لا حذف السجل) */
     function clearDisabledReferenceScheduleData(dataById, meta){
       const slot = dataById || {};
       if(String(meta?.companyHasFixedAssets || "no") !== "yes"){
@@ -9800,7 +9992,7 @@
             </div>
             ${tbSigsHtml}
             <div class="hint" style="margin-top:8px">
-                            <b>قبل الترحيل:</b> <b>📋 كشف</b> لفتح الكشf أو <b>➕ كشف</b> لإضافة كشف. الإيرادات والمصروفات في <b>رصيد ختامي</b> السنة. (22) بالافتتاحي فقط؛ (23) افتتاحي = تخصيص PY فقط — <b>لا يُدرج في الرصيد الختامي</b> قبل ترحيل ضريبة CY. للتوازن راجع «بعد الترحيل».
+                            <b>قبل الترحيل:</b> <b>📋 كشف</b> لفتح الكشف أو <b>➕ كشف</b> لإضافة كشف. الإيرادات والمصروفات في <b>رصيد ختامي</b> السنة. (22) بالافتتاحي فقط؛ (23) افتتاحي = تخصيص PY فقط — <b>لا يُدرج في الرصيد الختامي</b> قبل ترحيل ضريبة CY. للتوازن راجع «بعد الترحيل».
             </div>
           </div>
 
