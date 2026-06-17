@@ -1826,6 +1826,68 @@
         padding-top:3mm !important;
         border-top:1px solid rgba(176,196,216,.95);
       }
+      /* القوائم المالية: صفحة جديدة لكل بيان؛ صفحة واحدة إن أمكن */
+      .page.page-fs-stmt{
+        break-before:page;
+        page-break-before:always;
+      }
+      .page.page-fs-stmt.stmt-keep-whole{
+        break-inside:avoid-page !important;
+        page-break-inside:avoid !important;
+        padding:6mm 8mm 5mm !important;
+      }
+      .page.page-fs-stmt.stmt-keep-whole.page-stmt-sigs{
+        display:flex !important;
+        flex-direction:column !important;
+      }
+      .page.page-fs-stmt.stmt-keep-whole .doc-subtitle,
+      .page.page-fs-stmt.stmt-keep-whole .doc-sub2{
+        margin-bottom:2px !important;
+      }
+      .page.page-fs-stmt.stmt-keep-whole .stmt-code{
+        margin-bottom:2px !important;
+      }
+      .page.page-fs-stmt.stmt-keep-whole .fin-table{
+        font-size:8pt !important;
+        margin:2px 0 !important;
+      }
+      .page.page-fs-stmt.stmt-keep-whole .fin-table th,
+      .page.page-fs-stmt.stmt-keep-whole .fin-table td{
+        padding:2px 4px !important;
+      }
+      .page.page-fs-stmt.stmt-keep-whole .fs-balance-sigs{
+        margin-top:4mm !important;
+        padding-top:2mm !important;
+      }
+      .page.page-fs-stmt.stmt-keep-whole .fin-table,
+      .page.page-fs-stmt.stmt-keep-whole .fin-table tbody,
+      .page.page-fs-stmt.stmt-keep-whole .fin-table tr,
+      .page.page-fs-stmt.stmt-keep-whole .fin-table tfoot.fs-sigs-tfoot tr{
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+      }
+      .page.page-fs-stmt.stmt-allow-split{
+        break-inside:auto !important;
+        page-break-inside:auto !important;
+      }
+      .page.page-fs-stmt.stmt-allow-split.page-stmt-sigs{
+        display:block !important;
+      }
+      .page.page-fs-stmt.stmt-allow-split .fin-table{
+        break-inside:auto !important;
+        page-break-inside:auto !important;
+      }
+      .page.page-fs-stmt.stmt-allow-split .fin-table thead{
+        display:table-header-group !important;
+      }
+      .page.page-fs-stmt.stmt-allow-split .fin-table tbody{
+        break-inside:auto !important;
+        page-break-inside:auto !important;
+      }
+      .page.page-fs-stmt.stmt-allow-split .fin-table tr{
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+      }
       .page.page-stmt-sigs .fin-table,
       .page.page-stmt-sigs .fin-table tbody,
       .page.page-stmt-sigs .fin-table tr{
@@ -2048,6 +2110,48 @@
       }
       body.print-pdf-mode #print-package-host .page-label{
         display:none !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-fs-stmt{
+        break-before:page;
+        page-break-before:always;
+      }
+      body.print-pdf-mode #print-package-host .page.page-fs-stmt.stmt-keep-whole{
+        break-inside:avoid-page !important;
+        page-break-inside:avoid !important;
+        padding:6mm 8mm 5mm !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-fs-stmt.stmt-keep-whole.page-stmt-sigs{
+        display:flex !important;
+        flex-direction:column !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-fs-stmt.stmt-keep-whole .fin-table{
+        font-size:8pt !important;
+        margin:2px 0 !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-fs-stmt.stmt-keep-whole .fin-table th,
+      body.print-pdf-mode #print-package-host .page.page-fs-stmt.stmt-keep-whole .fin-table td{
+        padding:2px 4px !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-fs-stmt.stmt-keep-whole .fin-table,
+      body.print-pdf-mode #print-package-host .page.page-fs-stmt.stmt-keep-whole .fin-table tbody,
+      body.print-pdf-mode #print-package-host .page.page-fs-stmt.stmt-keep-whole .fin-table tr,
+      body.print-pdf-mode #print-package-host .page.page-fs-stmt.stmt-keep-whole .fin-table tfoot.fs-sigs-tfoot tr{
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-fs-stmt.stmt-allow-split{
+        break-inside:auto !important;
+        page-break-inside:auto !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-fs-stmt.stmt-allow-split.page-stmt-sigs{
+        display:block !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-fs-stmt.stmt-allow-split .fin-table thead{
+        display:table-header-group !important;
+      }
+      body.print-pdf-mode #print-package-host .page.page-fs-stmt.stmt-allow-split .fin-table tr{
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
       }
       body.print-pdf-mode #print-package-host .page.page-stmt-sigs .fin-table,
       body.print-pdf-mode #print-package-host .page.page-stmt-sigs .fin-table tbody,
@@ -9732,7 +9836,7 @@
           </div>
         ` : ``}
         <div class="pages">
-          <div class="page page-stmt-sigs" data-fs-order="2">
+          <div class="page page-fs-stmt page-stmt-sigs" data-fs-order="2">
             <div class="page-label">بيان ب – كشف العمليات الجارية</div>
             <div class="doc-subtitle">${state.selectedCompanyName || ""}</div>
             <div class="doc-sub2 doc-underline" style="margin:6px 0">${meta.fyEndDate ? `كشف العمليات الجارية للسنة المالية المنتهية في ${formatFyEndArabic(meta.fyEndDate)}` : ""}</div>
@@ -9823,7 +9927,7 @@
             ${buildFsStmtSigsScreenHtml(meta)}
           </div>
 
-          <div class="page" data-fs-order="3">
+          <div class="page page-fs-stmt" data-fs-order="3">
             <div class="page-label">بيان هـ – قائمة التدفقات النقدية (غير مباشرة)</div>
             <div class="doc-subtitle">${state.selectedCompanyName || ""}</div>
             <div class="doc-sub2 doc-underline" style="margin:6px 0">${meta.fyEndDate ? `للسنة المالية المنتهية في ${formatFyEndArabic(meta.fyEndDate)}` : ""}</div>
@@ -9996,7 +10100,7 @@
             </div>
           </div>
 
-          <div class="page page-stmt-sigs" data-fs-order="1">
+          <div class="page page-fs-stmt page-stmt-sigs" data-fs-order="1">
             <div class="page-label">بيان أ – قائمة المركز المالي</div>
             <div class="doc-subtitle">${state.selectedCompanyName || ""}</div>
             <div class="doc-sub2 doc-underline" style="margin:6px 0">${meta.fyEndDate ? `قائمة المركز المالي كما في ${formatFyEndArabic(meta.fyEndDate)}` : ""}</div>
@@ -11657,9 +11761,41 @@
       });
     }
 
+    function measureStatementPagePrintHeight(pageEl){
+      const pageH = getA4PrintableHeightPx();
+      const prevW = pageEl.style.width;
+      const prevBox = pageEl.style.boxSizing;
+      pageEl.style.width = "210mm";
+      pageEl.style.boxSizing = "border-box";
+      const h = pageEl.scrollHeight;
+      pageEl.style.width = prevW;
+      pageEl.style.boxSizing = prevBox;
+      return { h, pageH };
+    }
+
+    /** بيان أ/ب/التدفقات: صفحة واحدة إن أمكن؛ وإلا تقسيم مع تكرار رأس الجدول */
+    function prepareStatementsForPrint(root){
+      const scope = root || document;
+      scope.querySelectorAll('.page[data-fs-order="1"], .page[data-fs-order="2"], .page[data-fs-order="3"]').forEach((pageEl)=>{
+        pageEl.classList.remove("stmt-keep-whole", "stmt-allow-split");
+        const { h, pageH } = measureStatementPagePrintHeight(pageEl);
+        if(h > pageH * 0.88){
+          pageEl.classList.add("stmt-allow-split");
+        }else{
+          pageEl.classList.add("stmt-keep-whole");
+        }
+      });
+    }
+
     function resetSchedulesPrintClasses(root){
       (root || document).querySelectorAll(".card-schedule").forEach((card)=>{
         card.classList.remove("schedule-keep-whole", "schedule-allow-split");
+      });
+    }
+
+    function resetStatementsPrintClasses(root){
+      (root || document).querySelectorAll(".page-fs-stmt").forEach((pageEl)=>{
+        pageEl.classList.remove("stmt-keep-whole", "stmt-allow-split");
       });
     }
 
@@ -11700,6 +11836,59 @@
             flex:0 0 auto;
             margin-top:auto !important;
             padding-top:3mm !important;
+          }
+          .page.page-fs-stmt{
+            break-before:page;
+            page-break-before:always;
+          }
+          .page.page-fs-stmt.stmt-keep-whole{
+            break-inside:avoid-page !important;
+            page-break-inside:avoid !important;
+            padding:6mm 8mm 5mm !important;
+          }
+          .page.page-fs-stmt.stmt-keep-whole.page-stmt-sigs{
+            display:flex !important;
+            flex-direction:column !important;
+          }
+          .page.page-fs-stmt.stmt-keep-whole .doc-subtitle,
+          .page.page-fs-stmt.stmt-keep-whole .doc-sub2{ margin-bottom:2px !important; }
+          .page.page-fs-stmt.stmt-keep-whole .stmt-code{ margin-bottom:2px !important; }
+          .page.page-fs-stmt.stmt-keep-whole .fin-table{
+            font-size:8pt !important;
+            margin:2px 0 !important;
+          }
+          .page.page-fs-stmt.stmt-keep-whole .fin-table th,
+          .page.page-fs-stmt.stmt-keep-whole .fin-table td{ padding:2px 4px !important; }
+          .page.page-fs-stmt.stmt-keep-whole .fs-balance-sigs{
+            margin-top:4mm !important;
+            padding-top:2mm !important;
+          }
+          .page.page-fs-stmt.stmt-keep-whole .fin-table,
+          .page.page-fs-stmt.stmt-keep-whole .fin-table tbody,
+          .page.page-fs-stmt.stmt-keep-whole .fin-table tr,
+          .page.page-fs-stmt.stmt-keep-whole .fin-table tfoot.fs-sigs-tfoot tr{
+            break-inside:avoid !important;
+            page-break-inside:avoid !important;
+          }
+          .page.page-fs-stmt.stmt-allow-split{
+            break-inside:auto !important;
+            page-break-inside:auto !important;
+          }
+          .page.page-fs-stmt.stmt-allow-split.page-stmt-sigs{ display:block !important; }
+          .page.page-fs-stmt.stmt-allow-split .fin-table{
+            break-inside:auto !important;
+            page-break-inside:auto !important;
+          }
+          .page.page-fs-stmt.stmt-allow-split .fin-table thead{
+            display:table-header-group !important;
+          }
+          .page.page-fs-stmt.stmt-allow-split .fin-table tbody{
+            break-inside:auto !important;
+            page-break-inside:auto !important;
+          }
+          .page.page-fs-stmt.stmt-allow-split .fin-table tr{
+            break-inside:avoid !important;
+            page-break-inside:avoid !important;
           }
           .page.page-stmt-sigs .fin-table,
           .page.page-stmt-sigs .fin-table tbody,
@@ -11907,10 +12096,13 @@
           throw new Error("لا توجد صفحات كشوفات للطباعة. افتح سنة وشركة أولاً.");
         }
         prepareSchedulesForPrint(inPages);
+        prepareStatementsForPrint(inPages);
         const inner = buildPrintPackageInnerHtml();
         resetSchedulesPrintClasses(inPages);
+        resetStatementsPrintClasses(inPages);
         host.innerHTML = inner;
         prepareSchedulesForPrint(host);
+        prepareStatementsForPrint(host);
         host.setAttribute("aria-hidden", "false");
         document.body.classList.add("print-pdf-mode");
         const cleanup = ()=>{
@@ -11947,9 +12139,15 @@
       const mainStyle = document.querySelector("style")?.innerHTML || "";
       const printStyle = getPrintTabExtraStyles();
       const inPages = document.querySelector("#in-pages");
-      if(inPages) prepareSchedulesForPrint(inPages);
+      if(inPages){
+        prepareSchedulesForPrint(inPages);
+        prepareStatementsForPrint(inPages);
+      }
       const bodyContent = buildPrintPackageInnerHtml();
-      if(inPages) resetSchedulesPrintClasses(inPages);
+      if(inPages){
+        resetSchedulesPrintClasses(inPages);
+        resetStatementsPrintClasses(inPages);
+      }
       const html = `<!doctype html>
 <html dir="rtl" lang="ar">
 <head>
