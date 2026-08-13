@@ -1580,6 +1580,7 @@
       font-size:9pt;
       color:var(--text);
     }
+    .fa-summary .hint{ margin-top:4px; }
     .fa-print-wrap{
       break-inside:avoid-page;
       page-break-inside:avoid;
@@ -1587,6 +1588,7 @@
     @media print {
       .contracts-meta-screen{ display:none !important; }
       .contracts-meta-print{ display:block !important; }
+      .fa-summary .hint{ display:none !important; }
       /* افتراضي قبل القياس: يسمح بالتقسيم | schedule-keep-whole / schedule-allow-split يُضبطان عبر JS */
       .card-schedule.schedule-keep-whole,
       .card-schedule.schedule-keep-whole [data-body],
@@ -2065,6 +2067,9 @@
       body.print-pdf-mode #print-package-host .card-schedule-fa .fa-summary{
         display:block !important;
         font-size:8pt !important;
+      }
+      body.print-pdf-mode #print-package-host .card-schedule-fa .fa-summary .hint{
+        display:none !important;
       }
       body.print-pdf-mode #print-package-host .card-schedule-contracts .con-table{
         width:100% !important;
@@ -2724,11 +2729,11 @@
 
           <h3 id="help-schedules">الكشوفات والبيانات</h3>
           <ul>
-            <li><b>كشوف ٢–٧ (عمودية)</b> — تُدخل من الميزان فقط؛ مخفية من الصفحة الرئيسية لكنها <b>تُطبَع</b> في PDF.</li>
-            <li><b>كشف (١) موجودات ثابتة</b> — أفقي (أعمدة = أصول)؛ يظهر إذا «موجودات ثابتة = نعم».</li>
-            <li><b>كشف (٨) عقود</b> — يظهر إذا «عقود = نعم».</li>
-            <li><b>بيان د</b> — حركة المخزون؛ يظهر إذا «مخزون = نعم».</li>
-            <li><b>بيان ج</b> — التغيرات في حقوق الملكية؛ يُعدّل من 📋 كشف أو بطاقته.</li>
+            <li><b>كشوف ٢–٧ (عمودية)</b> — تُدخل من الميزان فقط؛ مخفية من الصفحة الرئيسية لكنها <b>تُطبَع</b> في PDF. عند إنشاء سنة جديدة يُحمَّل ختامي السنة السابقة إلى عمود المقارنة (PY).</li>
+            <li><b>كشف (١) موجودات ثابتة</b> — أفقي (أعمدة = أصول)؛ يظهر إذا «موجودات ثابتة = نعم». عند إنشاء سنة جديدة يُرحَّل ختامي السنة السابقة إلى الافتتاحي. اندثار المقارنة في بيان ب يُؤخذ من كشف السنة السابقة إن وُجد، وإلا يُدخل يدوياً لكل عمود (أو يُقدَّر من كلفة أول السنة × النسبة إن تُرك فارغاً).</li>
+            <li><b>كشف (٨) عقود</b> — يظهر إذا «عقود = نعم». تُنسخ المشاريع وإيراد السنة السابقة والتراكمي عند إنشاء سنة جديدة.</li>
+            <li><b>بيان د</b> — حركة المخزون؛ يظهر إذا «مخزون = نعم». الافتتاحي = ختامي السنة السابقة، ومواد العام السابق من تكلفة تلك السنة.</li>
+            <li><b>بيان ج</b> — التغيرات في حقوق الملكية؛ يُعدّل من 📋 كشف أو بطاقته. الافتتاحي = ختامي السنة السابقة.</li>
           </ul>
           <p>الكشف العمودي: كل <b>صف</b> = حساب (رمز، اسم، CY، PY). الكشف الأفقي للموجودات: كل <b>عمود</b> = أصل.</p>
 
@@ -4590,9 +4595,9 @@
       return {
         type: "horizontal_fixedAssets",
         columns: [
-          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" },
-          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" },
-          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" }
+          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", depPY:"", openAccDepPY:"" },
+          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", depPY:"", openAccDepPY:"" },
+          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", depPY:"", openAccDepPY:"" }
         ]
       };
     }
@@ -6726,23 +6731,8 @@
         const purchases = n(invBox.purchases);
         const closeInv = n(invBox.closeInv);
         const usedMaterialsCY = hasInv ? ((openInv + purchases) - closeInv) : 0;
-        // depreciation from FA sheet (rough, same as renderInPages)
-        const computeFixedAssetsDepCY = ()=>{
-          if(!hasFA) return 0;
-          const fa = dataById?.["sch-1"] || {};
-          const cols = Array.isArray(fa.columns) ? fa.columns : [];
-          let depCY = 0;
-          for(const c of cols){
-            const openCostPY = n(c.openCostPY);
-            const addCY = n(c.addCY);
-            const dispCY = n(c.dispCY);
-            const rate = n(c.ratePct) / 100;
-            const closeCostCY = openCostPY + addCY - dispCY;
-            depCY += (closeCostCY * rate);
-          }
-          return depCY;
-        };
-        const expCY = (expenseVertTotals.cy || 0) + (hasFA ? computeFixedAssetsDepCY() : 0) + (hasInv ? usedMaterialsCY : 0);
+        const faDepCY = hasFA ? computeFixedAssetsFromColumns((dataById?.["sch-1"] || {}).columns, n).depCY : 0;
+        const expCY = (expenseVertTotals.cy || 0) + faDepCY + (hasInv ? usedMaterialsCY : 0);
 
         const ctx0 = mdContext(companyDoc, yearDoc);
         const ctx = {
@@ -7373,29 +7363,26 @@
         const data = snap.data() || {};
         // Seed default schedules registry on first open
         if(!data.dynamicSchedules || !Array.isArray(data.dynamicSchedules.registry) || !data.dynamicSchedules.registry.length){
-          await setDoc(yearRef(companyId, yearId), {
-            dynamicSchedules: {
-              registry: [
-                { id:"sch-1", scheduleNo:1, title:"كشف (١) – الموجودات الثابتة واندثاراتها", type:"horizontal_fixedAssets", active:true },
-                { id:"sch-2", scheduleNo:2, title:"كشف (٢) – المدينون", type:"vertical", active:true },
-                { id:"sch-3", scheduleNo:3, title:"كشف (٣) – النقود", type:"vertical", active:true },
-                { id:"sch-4", scheduleNo:4, title:"كشف (٤) – الدائنون", type:"vertical", active:true },
-                { id:"sch-5", scheduleNo:5, title:"كشف (٥) – الرواتب والأجور", type:"vertical", active:true },
-                { id:"sch-6", scheduleNo:6, title:"كشف (٦) – المستلزمات السلعية", type:"vertical", active:true },
-                { id:"sch-7", scheduleNo:7, title:"كشف (٧) – المستلزمات الخدمية", type:"vertical", active:true },
-                { id:"sch-8", scheduleNo:8, title:"كشف (٨) – العقود ومصاريفها", type:"contracts", active:true }
-              ],
-              dataById: {
-                "sch-1": {
-                  type: "horizontal_fixedAssets",
-                  columns: [
-                    { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" },
-                    { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" },
-                    { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" }
-                  ]
+          const n0 = (v)=> Number(normalizeNumberString(String(v ?? "").trim())) || 0;
+          let registry = defaultSchedulesRegistry();
+          let dataById = { "sch-1": emptyFixedAssetsScheduleData() };
+          const yn = parseInt(String(yearId), 10);
+          if(Number.isFinite(yn)){
+            try{
+              const ps = await getDoc(yearRef(companyId, String(yn - 1)));
+              if(ps.exists()){
+                const seeded = seedAllSchedulesFromPriorDoc(ps.data() || {}, n0);
+                if(seeded){
+                  data.meta = { ...(data.meta || defaultYearMeta(yearId)), ...(seeded.metaPatch || {}) };
+                  if(Array.isArray(seeded.registry) && seeded.registry.length) registry = seeded.registry;
+                  if(seeded.dataById) dataById = seeded.dataById;
                 }
               }
-            },
+            }catch(_){}
+          }
+          await setDoc(yearRef(companyId, yearId), {
+            meta: data.meta || defaultYearMeta(yearId),
+            dynamicSchedules: { registry, dataById },
             updatedAt: serverTimestamp()
           }, { merge:true });
           const snap2 = await getDoc(yearRef(companyId, yearId));
@@ -7501,22 +7488,7 @@
       const closeInv = n(invBox.closeInv);
       const usedMaterialsCY = hasInv ? ((openInv + purchases) - closeInv) : 0;
       const usedMaterialsPY = hasInv ? n(invBox.prevUsedMaterials) : 0;
-      const faDepsFromDoc = ()=>{
-        const fa = dataById?.["sch-1"] || {};
-        const cols = Array.isArray(fa.columns) ? fa.columns : [];
-        let depCY = 0, depPY = 0;
-        for(const c of cols){
-          const openCostPY = n(c.openCostPY);
-          const addCY = n(c.addCY);
-          const dispCY = n(c.dispCY);
-          const rate = n(c.ratePct) / 100;
-          const closeCostCY = openCostPY + addCY - dispCY;
-          depCY += (closeCostCY * rate);
-          depPY += (openCostPY * rate);
-        }
-        return { depCY, depPY };
-      };
-      const faDep = hasFA ? faDepsFromDoc() : { depCY:0, depPY:0 };
+      const faDep = hasFA ? computeFixedAssetsFromColumns((dataById?.["sch-1"] || {}).columns, n) : { depCY:0, depPY:0 };
       const expCY = (expenseVertTotals.cy || 0) + (hasFA ? (faDep.depCY||0) : 0) + (hasInv ? usedMaterialsCY : 0);
       const expPY = (expenseVertTotals.py || 0) + (hasFA ? (faDep.depPY||0) : 0) + (hasInv ? usedMaterialsPY : 0);
       const pbtCY = revenueCY - expCY;
@@ -7832,8 +7804,8 @@
           nature: "debit",
           isBalance: true,
           section: "assets-fixed",
-          opening: params.faTotals?.nbvPY || 0,
-          movement: (params.faTotals?.nbvCY || 0) - (params.faTotals?.nbvPY || 0),
+          opening: (params.faTotals?.nbvOpen ?? params.faTotals?.nbvPY ?? 0),
+          movement: (params.faTotals?.nbvCY || 0) - ((params.faTotals?.nbvOpen ?? params.faTotals?.nbvPY ?? 0)),
           closing: params.faTotals?.nbvCY || 0
         });
         pushLine({
@@ -8015,8 +7987,8 @@
             nature: "debit",
             isBalance: true,
             section: "assets-fixed",
-            opening: params.faTotals?.nbvPY || 0,
-            movement: (params.faTotals?.nbvCY || 0) - (params.faTotals?.nbvPY || 0),
+            opening: (params.faTotals?.nbvOpen ?? params.faTotals?.nbvPY ?? 0),
+            movement: (params.faTotals?.nbvCY || 0) - ((params.faTotals?.nbvOpen ?? params.faTotals?.nbvPY ?? 0)),
             closing: params.faTotals?.nbvCY || 0,
             _meta: { source: "fixedAssets", schId: "sch-1", editable: false }
           });
@@ -8247,6 +8219,12 @@
       const sch = (reg || []).find((s)=> s?.id === panelKey);
       return sch?.type || "";
     }
+    function faEmptyColumn(){
+      return { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", depPY:"", openAccDepPY:"" };
+    }
+    function faHasManualDepPY(c){
+      return String(c?.depPY ?? "").trim() !== "";
+    }
     function faColCalcValues(c, n){
       const openCostPY = n(c.openCostPY);
       const addCY = n(c.addCY);
@@ -8257,7 +8235,422 @@
       const depCY = closeCostCY * rate;
       const closeAccCY = openAccPY + depCY;
       const nbvCY = closeCostCY - closeAccCY;
-      return { closeCostCY, depCY, closeAccCY, nbvCY };
+      const depPYEstimated = openCostPY * rate;
+      const depPYIsManual = faHasManualDepPY(c);
+      const depPY = depPYIsManual ? n(c.depPY) : depPYEstimated;
+      const nbvPY = openCostPY - openAccPY;
+      return { openCostPY, addCY, dispCY, closeCostCY, rate, openAccPY, depCY, closeAccCY, nbvCY, depOnOpening: depPYEstimated, depPYEstimated, depPY, depPYIsManual, nbvPY };
+    }
+    function faColumnHasContent(c, n){
+      if(!c) return false;
+      if(String(c.code || "").trim() || String(c.name || "").trim()) return true;
+      return !!(n(c.openCostPY) || n(c.addCY) || n(c.dispCY) || n(c.openAccDepPY) || faHasManualDepPY(c));
+    }
+    function faHasPriorDep(priorDoc, n){
+      return priorYearFixedAssetsColumns(priorDoc).some((c)=> faColumnHasContent(c, n));
+    }
+    function faColDepPYFromPrior(c, n, priorDoc){
+      const priorLive = priorYearFixedAssetsColumns(priorDoc).filter((x)=> faColumnHasContent(x, n));
+      if(!priorLive.length) return null;
+      const i = faMatchPriorColumnIndex(priorLive, c);
+      if(i < 0) return 0;
+      return faColCalcValues(priorLive[i], n).depCY;
+    }
+    function computeFixedAssetsFromColumns(cols, n){
+      const t = { depCY:0, depPY:0, accCY:0, accPY:0, nbvCY:0, nbvPY:0, addCYTotal:0, dispCYTotal:0, nbvOpen:0, accOpen:0, depPYEstimated:0, fromPriorYear:false, hasManualDepPY:false, openingMismatch:false };
+      if(!Array.isArray(cols)) return t;
+      for(const c of cols){
+        const v = faColCalcValues(c, n);
+        t.depCY += v.depCY;
+        t.depPY += v.depPY;
+        t.depPYEstimated += v.depPYEstimated;
+        t.hasManualDepPY = t.hasManualDepPY || v.depPYIsManual;
+        t.accPY += v.openAccPY;
+        t.accCY += v.closeAccCY;
+        t.nbvPY += v.nbvPY;
+        t.nbvCY += v.nbvCY;
+        t.addCYTotal += v.addCY;
+        t.dispCYTotal += v.dispCY;
+      }
+      t.nbvOpen = t.nbvPY;
+      t.accOpen = t.accPY;
+      return t;
+    }
+    function priorYearFixedAssetsColumns(priorDoc){
+      if(!priorDoc) return [];
+      if(String((priorDoc.meta || {}).companyHasFixedAssets || "no") !== "yes") return [];
+      const fa = ((priorDoc.dynamicSchedules || {}).dataById || {})["sch-1"] || {};
+      return Array.isArray(fa.columns) ? fa.columns : [];
+    }
+    function computeFixedAssetsTotals(dataById, n, priorDoc){
+      const fa = dataById?.["sch-1"] || {};
+      const cols = Array.isArray(fa.columns) ? fa.columns : [];
+      const t = computeFixedAssetsFromColumns(cols, n);
+      const priorLive = priorYearFixedAssetsColumns(priorDoc).filter((c)=> faColumnHasContent(c, n));
+      if(!priorLive.length) return t;
+      const prior = computeFixedAssetsFromColumns(priorLive, n);
+      t.depPY = prior.depCY;
+      t.nbvPY = prior.nbvCY;
+      t.accPY = prior.accCY;
+      t.fromPriorYear = true;
+      t.openingMismatch = Math.abs((t.nbvOpen || 0) - (prior.nbvCY || 0)) >= 1;
+      return t;
+    }
+    function faOpeningColumnFromPriorCol(c, n){
+      const v = faColCalcValues(c, n);
+      return {
+        code: String(c.code || ""),
+        name: String(c.name || ""),
+        openCostPY: v.closeCostCY ? fmtAmount(v.closeCostCY) : "",
+        addCY: "",
+        dispCY: "",
+        ratePct: String(c.ratePct ?? "10").trim() || "10",
+        depCY: "",
+        openAccDepPY: v.closeAccCY ? fmtAmount(v.closeAccCY) : ""
+      };
+    }
+    function faMatchPriorColumnIndex(cols, priorCol){
+      const code = toWesternDigits(String(priorCol.code || "").trim()).toLowerCase();
+      if(code){
+        const i = cols.findIndex((c)=> toWesternDigits(String(c.code || "").trim()).toLowerCase() === code);
+        if(i >= 0) return i;
+      }
+      const name = String(priorCol.name || "").trim();
+      if(name){
+        const i = cols.findIndex((c)=> String(c.name || "").trim() === name);
+        if(i >= 0) return i;
+      }
+      return -1;
+    }
+    function applyFaOpeningFromPrior(cols, priorCols, n){
+      const list = Array.isArray(cols) ? cols : [];
+      const priorLive = (priorCols || []).filter((c)=> faColumnHasContent(c, n));
+      for(const pc of priorLive){
+        const mapped = faOpeningColumnFromPriorCol(pc, n);
+        let i = faMatchPriorColumnIndex(list, pc);
+        if(i < 0){
+          i = list.findIndex((c)=> !faColumnHasContent(c, n));
+          if(i < 0){
+            list.push(mapped);
+            continue;
+          }
+        }
+        const cur = list[i] || {};
+        const wasBlank = !faColumnHasContent(cur, n);
+        list[i] = {
+          ...cur,
+          code: String(cur.code || "").trim() ? cur.code : mapped.code,
+          name: String(cur.name || "").trim() ? cur.name : mapped.name,
+          openCostPY: mapped.openCostPY,
+          openAccDepPY: mapped.openAccDepPY,
+          ratePct: wasBlank || !String(cur.ratePct || "").trim() ? mapped.ratePct : cur.ratePct
+        };
+      }
+      return list;
+    }
+    function seedFixedAssetsFromPriorDoc(priorDoc, n){
+      const priorLive = priorYearFixedAssetsColumns(priorDoc).filter((c)=> faColumnHasContent(c, n));
+      if(!priorLive.length) return null;
+      return {
+        type: "horizontal_fixedAssets",
+        columns: priorLive.map((c)=> faOpeningColumnFromPriorCol(c, n))
+      };
+    }
+    function defaultSchedulesRegistry(){
+      return [
+        { id:"sch-1", scheduleNo:1, title:"كشف (١) – الموجودات الثابتة واندثاراتها", type:"horizontal_fixedAssets", active:true },
+        { id:"sch-2", scheduleNo:2, title:"كشف (٢) – المدينون", type:"vertical", active:true },
+        { id:"sch-3", scheduleNo:3, title:"كشف (٣) – النقود", type:"vertical", active:true },
+        { id:"sch-4", scheduleNo:4, title:"كشف (٤) – الدائنون", type:"vertical", active:true },
+        { id:"sch-5", scheduleNo:5, title:"كشف (٥) – الرواتب والأجور", type:"vertical", active:true },
+        { id:"sch-6", scheduleNo:6, title:"كشف (٦) – المستلزمات السلعية", type:"vertical", active:true },
+        { id:"sch-7", scheduleNo:7, title:"كشف (٧) – المستلزمات الخدمية", type:"vertical", active:true },
+        { id:"sch-8", scheduleNo:8, title:"كشف (٨) – العقود ومصاريفها", type:"contracts", active:true }
+      ];
+    }
+    function cloneScheduleRegistry(reg){
+      try{ return JSON.parse(JSON.stringify(reg || [])); }
+      catch(_){ return (reg || []).map((s)=> ({ ...s })); }
+    }
+    function verticalRowHasContent(r){
+      if(!r) return false;
+      return !!(String(r.code || "").trim() || String(r.name || "").trim() || String(r.cy || "").trim() || String(r.py || "").trim());
+    }
+    function fmtAmtOrEmpty(v, n){
+      const s = String(v ?? "").trim();
+      if(s === "") return "";
+      return fmtAmount(n(v));
+    }
+    function seedVerticalRowsFromPrior(priorRows, n){
+      return (priorRows || []).filter(verticalRowHasContent).map((r)=>({
+        code: String(r.code || ""),
+        name: String(r.name || ""),
+        cy: "",
+        py: fmtAmtOrEmpty(r.cy, n)
+      }));
+    }
+    function matchVerticalPriorRow(rows, priorRow){
+      const code = toWesternDigits(String(priorRow?.code || "").trim()).toLowerCase();
+      if(code){
+        const i = rows.findIndex((r)=> toWesternDigits(String(r?.code || "").trim()).toLowerCase() === code);
+        if(i >= 0) return i;
+      }
+      const name = String(priorRow?.name || "").trim();
+      if(name){
+        const i = rows.findIndex((r)=> String(r?.name || "").trim() === name);
+        if(i >= 0) return i;
+      }
+      return -1;
+    }
+    function applyVerticalPyFromPrior(rows, priorRows, n, opts){
+      const overwrite = !!opts?.overwrite;
+      const addMissing = !!opts?.addMissing;
+      const list = Array.isArray(rows) ? rows : [];
+      for(const pr of (priorRows || []).filter(verticalRowHasContent)){
+        const pyVal = fmtAmtOrEmpty(pr.cy, n);
+        let i = matchVerticalPriorRow(list, pr);
+        if(i < 0){
+          if(!addMissing) continue;
+          list.push({ code: String(pr.code || ""), name: String(pr.name || ""), cy: "", py: pyVal });
+          continue;
+        }
+        if(overwrite || String(list[i].py ?? "").trim() === ""){
+          list[i].py = pyVal;
+          if(!String(list[i].code || "").trim()) list[i].code = pr.code || "";
+          if(!String(list[i].name || "").trim()) list[i].name = pr.name || "";
+        }
+      }
+      return list;
+    }
+    function priorContractsRevenueCY(priorDoc, n){
+      if(!priorDoc) return 0;
+      if(String((priorDoc.meta || {}).companyHasContracts || "yes") === "no") return 0;
+      const con = ((priorDoc.dynamicSchedules || {}).dataById || {})["sch-8"]
+        || Object.values(((priorDoc.dynamicSchedules || {}).dataById) || {}).find((x)=> x && x.type === "contracts")
+        || {};
+      const exRate = Number.isFinite(n(con.exchangeRate)) && n(con.exchangeRate) > 0 ? n(con.exchangeRate) : 0;
+      const rows = Array.isArray(con.rows) ? con.rows : [];
+      return rows.reduce((s, r)=>{
+        const rate = exRate || n(r?.exchangeRate) || 0;
+        const revIqd = n(r?.revIqd) || (rate ? n(r?.revUsd) * rate : 0);
+        return s + revIqd;
+      }, 0);
+    }
+    function seedContractsFromPrior(priorCon, n){
+      const src = priorCon || {};
+      const exRate = Number.isFinite(n(src.exchangeRate)) && n(src.exchangeRate) > 0 ? n(src.exchangeRate) : 0;
+      const rows = (Array.isArray(src.rows) ? src.rows : []).map((r)=>{
+        const rate = exRate || n(r?.exchangeRate) || 0;
+        const revIqd = n(r?.revIqd) || (rate ? n(r?.revUsd) * rate : 0);
+        const prevCum = n(r?.prevCumIqd) + revIqd;
+        return {
+          projectName: String(r.projectName || r.name || ""),
+          name: String(r.name || r.projectName || ""),
+          contractUsd: r.contractUsd || "",
+          contractIqd: r.contractIqd || "",
+          exchangeRate: r.exchangeRate || "",
+          revUsd: "",
+          revIqd: "",
+          expensesIqd: "",
+          prevCumIqd: prevCum ? fmtAmount(prevCum) : ""
+        };
+      });
+      const revPy = priorContractsRevenueCY({ meta: { companyHasContracts: "yes" }, dynamicSchedules: { dataById: { "sch-8": src } } }, n);
+      return {
+        type: "contracts",
+        exchangeRate: src.exchangeRate || "",
+        revenueAcctCode: src.revenueAcctCode || "",
+        revPyTotalIqd: revPy ? fmtAmount(revPy) : "",
+        rows
+      };
+    }
+    function priorInventoryClose(priorDoc, n){
+      if(!priorDoc || String((priorDoc.meta || {}).companyHasInventory || "no") !== "yes") return 0;
+      const inv = ((priorDoc.dynamicSchedules || {}).dataById || {})["_invBox"] || {};
+      return n(inv.closeInv);
+    }
+    function priorInventoryUsed(priorDoc, n){
+      if(!priorDoc || String((priorDoc.meta || {}).companyHasInventory || "no") !== "yes") return 0;
+      const inv = ((priorDoc.dynamicSchedules || {}).dataById || {})["_invBox"] || {};
+      return (n(inv.openInv) + n(inv.purchases)) - n(inv.closeInv);
+    }
+    function seedInventoryFromPrior(priorInv, n){
+      const src = priorInv || {};
+      const used = (n(src.openInv) + n(src.purchases)) - n(src.closeInv);
+      return {
+        openInv: fmtAmtOrEmpty(src.closeInv, n),
+        purchases: "",
+        closeInv: "",
+        prevUsedMaterials: used ? fmtAmount(used) : (String(src.closeInv || src.openInv || src.purchases || "").trim() ? fmtAmount(used) : "")
+      };
+    }
+    function computeEquityClosingFromYearDoc(yearDoc, n){
+      const eq = ((yearDoc?.dynamicSchedules || {}).dataById || {})["_equityStmt"] || { opening: {}, deductions: {} };
+      const open = eq.opening || {};
+      const ded = eq.deductions || {};
+      let reserveAdd = 0, surplusAdd = 0, deficitAdd = 0;
+      try{
+        const yearLabel = String((yearDoc?.meta || {}).fiscalYear || "");
+        const taxPat = incomeStatementTaxPatFromYearDoc(yearDoc, yearLabel, n);
+        const reserveRate = n((yearDoc?.meta || {}).legalReserveRatePct) / 100;
+        reserveAdd = taxPat.patCY > 0 ? (taxPat.patCY * reserveRate) : 0;
+        surplusAdd = taxPat.patCY > 0 ? (taxPat.patCY - reserveAdd) : 0;
+        deficitAdd = taxPat.patCY < 0 ? Math.abs(taxPat.patCY) : 0;
+      }catch(_){}
+      return {
+        capital: n(open.capital) - n(ded.capital),
+        reserve: n(open.reserve) + reserveAdd - n(ded.reserve),
+        surplus: n(open.surplus) + surplusAdd - n(ded.surplus),
+        deficit: n(open.deficit) + deficitAdd - n(ded.deficit)
+      };
+    }
+    function seedEquityFromPrior(priorDoc, n){
+      const closing = computeEquityClosingFromYearDoc(priorDoc, n);
+      const fmtK = (v)=> v ? fmtAmount(v) : "";
+      return {
+        opening: {
+          capital: fmtK(closing.capital),
+          reserve: fmtK(closing.reserve),
+          surplus: fmtK(closing.surplus),
+          deficit: fmtK(closing.deficit)
+        },
+        deductions: { capital: "", reserve: "", surplus: "", deficit: "" }
+      };
+    }
+    function seedAllSchedulesFromPriorDoc(priorDoc, n){
+      if(!priorDoc) return null;
+      const priorDs = priorDoc.dynamicSchedules || {};
+      const priorReg = Array.isArray(priorDs.registry) ? cloneScheduleRegistry(priorDs.registry) : [];
+      const priorData = priorDs.dataById || {};
+      const priorMeta = priorDoc.meta || {};
+      const registry = priorReg.length ? priorReg : defaultSchedulesRegistry();
+      const dataById = {};
+      dataById["sch-1"] = seedFixedAssetsFromPriorDoc(priorDoc, n) || emptyFixedAssetsScheduleData();
+      for(const sch of registry){
+        if(sch.type === "vertical"){
+          dataById[sch.id] = { type: "vertical", rows: seedVerticalRowsFromPrior(priorData[sch.id]?.rows, n) };
+        }else if(sch.type === "contracts" || sch.id === "sch-8"){
+          dataById[sch.id] = seedContractsFromPrior(priorData[sch.id] || priorData["sch-8"], n);
+        }
+      }
+      if(!dataById["sch-8"]) dataById["sch-8"] = seedContractsFromPrior(priorData["sch-8"], n);
+      dataById["_invBox"] = seedInventoryFromPrior(priorData["_invBox"], n);
+      dataById["_equityStmt"] = seedEquityFromPrior(priorDoc, n);
+      const metaPatch = {};
+      if(String(priorMeta.companyHasFixedAssets || "no") === "yes") metaPatch.companyHasFixedAssets = "yes";
+      if(String(priorMeta.companyHasInventory || "no") === "yes") metaPatch.companyHasInventory = "yes";
+      if(priorMeta.companyHasContracts != null) metaPatch.companyHasContracts = String(priorMeta.companyHasContracts);
+      if(String(priorMeta.incomeTaxRatePct ?? "").trim() !== "") metaPatch.incomeTaxRatePct = priorMeta.incomeTaxRatePct;
+      if(String(priorMeta.legalReserveRatePct ?? "").trim() !== "") metaPatch.legalReserveRatePct = priorMeta.legalReserveRatePct;
+      return { registry, dataById, metaPatch };
+    }
+    function applyPriorYearToWorkingData(dataById, registry, priorDoc, n, opts){
+      if(!priorDoc || !dataById) return false;
+      const overwrite = !!opts?.overwrite;
+      const addMissing = !!opts?.addMissing;
+      const only = String(opts?.only || "").trim();
+      const want = (k)=> !only || only === k;
+      const priorData = (priorDoc.dynamicSchedules || {}).dataById || {};
+      const fillIfEmpty = (obj, key, val)=>{
+        if(val === "" || val == null) return;
+        if(overwrite || String(obj[key] ?? "").trim() === "") obj[key] = val;
+      };
+      if(want("vertical") || want("contracts")){
+        for(const sch of registry || []){
+          if(want("vertical") && sch.type === "vertical"){
+            if(!dataById[sch.id]) dataById[sch.id] = { type: "vertical", rows: [] };
+            if(!Array.isArray(dataById[sch.id].rows)) dataById[sch.id].rows = [];
+            applyVerticalPyFromPrior(dataById[sch.id].rows, priorData[sch.id]?.rows, n, { overwrite, addMissing });
+          }else if(want("contracts") && (sch.type === "contracts" || sch.id === "sch-8")){
+            const slot = dataById[sch.id] || dataById["sch-8"] || (dataById[sch.id] = emptyContractsScheduleData());
+            const revPy = priorContractsRevenueCY(priorDoc, n);
+            fillIfEmpty(slot, "revPyTotalIqd", revPy ? fmtAmount(revPy) : "");
+            if(addMissing){
+              const seeded = seedContractsFromPrior(priorData[sch.id] || priorData["sch-8"], n);
+              if(!Array.isArray(slot.rows) || !slot.rows.length) slot.rows = seeded.rows;
+              if(!String(slot.exchangeRate || "").trim()) slot.exchangeRate = seeded.exchangeRate;
+              if(!String(slot.revenueAcctCode || "").trim()) slot.revenueAcctCode = seeded.revenueAcctCode;
+              if(overwrite){
+                fillIfEmpty(slot, "revPyTotalIqd", seeded.revPyTotalIqd);
+              }
+            }
+          }
+        }
+      }
+      if(want("inventory") && String((priorDoc.meta || {}).companyHasInventory || "no") === "yes"){
+        const inv = dataById["_invBox"] || (dataById["_invBox"] = emptyInventoryBoxData());
+        const close = priorInventoryClose(priorDoc, n);
+        const used = priorInventoryUsed(priorDoc, n);
+        fillIfEmpty(inv, "openInv", close ? fmtAmount(close) : "");
+        fillIfEmpty(inv, "prevUsedMaterials", fmtAmount(used));
+      }
+      if(want("equity")){
+        const eq = dataById["_equityStmt"] || (dataById["_equityStmt"] = { opening: {}, deductions: {} });
+        eq.opening = eq.opening || {};
+        const closing = computeEquityClosingFromYearDoc(priorDoc, n);
+        const priorOpen = (((priorDoc.dynamicSchedules || {}).dataById || {})["_equityStmt"] || {}).opening || {};
+        const hasPriorEq = ["capital", "reserve", "surplus", "deficit"].some((k)=> String(priorOpen[k] ?? "").trim() !== "" || closing[k]);
+        if(hasPriorEq){
+          ["capital", "reserve", "surplus", "deficit"].forEach((k)=>{
+            fillIfEmpty(eq.opening, k, fmtAmount(closing[k]));
+          });
+        }
+      }
+      if(want("fa")){
+        const fa = dataById["sch-1"];
+        if(fa && Array.isArray(fa.columns)){
+          const priorCols = priorYearFixedAssetsColumns(priorDoc);
+          if(priorCols.some((c)=> faColumnHasContent(c, n))){
+            if(overwrite || !fa.columns.some((c)=> faColumnHasContent(c, n))){
+              applyFaOpeningFromPrior(fa.columns, priorCols, n);
+            }
+          }
+        }
+      }
+      return true;
+    }
+    function verticalRowComparative(row, priorDoc, schId, n){
+      const pyStr = String(row?.py ?? "").trim();
+      if(pyStr !== "") return n(row.py);
+      const fromPrior = trialBalancePriorClosing(priorDoc, schId, row?.code, row?.name, n);
+      return fromPrior != null ? fromPrior : 0;
+    }
+    function appendPriorFillButton(parent, label, enabled, onFill){
+      if(!enabled || !parent) return;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "tb-btn";
+      btn.textContent = label;
+      btn.style.marginTop = "10px";
+      btn.style.marginRight = "8px";
+      btn.addEventListener("click", ()=> onFill?.());
+      parent.appendChild(btn);
+    }
+    function faScheduleSummaryHtml(totals, fmt){
+      const pyNote = totals.fromPriorYear
+        ? `<div class="hint">اندثار المقارنة في بيان ب = اندثار السنة السابقة الفعلي (<b dir="ltr">${fmt(totals.depPY)}</b>) من كشف تلك السنة — لا يُعدَّل هنا.</div>`
+        : totals.hasManualDepPY
+          ? `<div class="hint">اندثار المقارنة من الإدخال اليدوي لكل عمود (<b dir="ltr">${fmt(totals.depPY)}</b>). الحقل الفارغ = كلفة أول السنة × النسبة.</div>`
+          : `<div class="hint">لا يوجد اندثار للسنة السابقة في النظام — أدخل «اندثار السنة السابقة» يدوياً لكل عمود، أو اتركه فارغاً ليُحسب: كلفة أول السنة × النسبة (<b dir="ltr">${fmt(totals.depPYEstimated || totals.depPY)}</b>).</div>`;
+      const mismatch = totals.fromPriorYear && totals.openingMismatch
+        ? `<div class="hint" style="color:var(--status-error,#D90429)">تنبيه: صافي أول السنة في هذا الكشف لا يطابق صافي ختامي السنة السابقة. استخدم «تعبئة الافتتاحي من السنة السابقة» أو راجع الكلفة/المخصص.</div>`
+        : "";
+      return `إجمالي اهتلاك CY: <b dir="ltr">${fmt(totals.depCY)}</b> — مجمع CY: <b dir="ltr">${fmt(totals.accCY)}</b> — صافي موجودات ثابتة CY: <b dir="ltr">${fmt(totals.nbvCY)}</b>${pyNote}${mismatch}`;
+    }
+    function appendFaPriorFillButton(parent, cols, n, onDone){
+      const priorCols = priorYearFixedAssetsColumns(state.priorYearDocForCashFlow);
+      if(!priorCols.some((c)=> faColumnHasContent(c, n))) return;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "tb-btn";
+      btn.textContent = "تعبئة الافتتاحي من السنة السابقة";
+      btn.style.marginTop = "10px";
+      btn.style.marginRight = "8px";
+      btn.addEventListener("click", ()=>{
+        applyFaOpeningFromPrior(cols, priorCols, n);
+        onDone?.();
+      });
+      parent.appendChild(btn);
     }
     function mountTbInlineVerticalSchedule(host, meta, c){
       const n = c.n || ((v)=> Number(String(v||"").replaceAll(",",""))||0);
@@ -8351,6 +8744,20 @@
           <button type="button" class="tb-btn" data-delrow>🗑 حذف السطر المحدد</button>
           <span class="hint">كشف عمودي — كل صف = حساب (رمز، اسم، ${CY}، ${PY}). انقر على سطر لتحديده.</span>`;
         wrap.appendChild(btns);
+        appendPriorFillButton(
+          btns,
+          "تعبئة السنة السابقة",
+          (((state.priorYearDocForCashFlow?.dynamicSchedules || {}).dataById || {})[schId]?.rows || []).some(verticalRowHasContent),
+          ()=>{
+            applyVerticalPyFromPrior(
+              saved,
+              ((state.priorYearDocForCashFlow?.dynamicSchedules || {}).dataById || {})[schId]?.rows || [],
+              n,
+              { overwrite: true, addMissing: true }
+            );
+            render();
+          }
+        );
         btns.querySelector("[data-add-col]").addEventListener("click", ()=>{
           saved.push({ code:"", name:"", cy:"", py:"" });
           selectedRow = saved.length - 1;
@@ -8446,6 +8853,7 @@
       const n = c.n || ((v)=> Number(String(v||"").replaceAll(",",""))||0);
       const fmt = fmtAmount;
       const CY = c.CY || "CY";
+      const PY = c.PY || "PY";
       const schId = meta?.schId || "sch-1";
       const dataById = c.getWorkingDataById?.() || {};
       if(!dataById[schId]) dataById[schId] = { type:"horizontal_fixedAssets", columns: [] };
@@ -8455,9 +8863,9 @@
       const hlCol = Number.isFinite(Number(meta?.colIndex)) ? Number(meta.colIndex) : -1;
       if(cols.length === 0){
         cols.push(
-          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" },
-          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" },
-          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" }
+          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", depPY:"", openAccDepPY:"" },
+          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", depPY:"", openAccDepPY:"" },
+          { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", depPY:"", openAccDepPY:"" }
         );
       }
       const wrap = document.createElement("div");
@@ -8479,6 +8887,7 @@
             </th>`).join("")}
             <th>المجموع دينار</th>
           </tr></thead>`;
+        const depPYFromPrior = faHasPriorDep(state.priorYearDocForCashFlow, n);
         const rows = [
           { k:"openCostPY", label:`الكلفة كما في ١ كانون الثاني ${CY}` },
           { k:"addCY", label:"الاضافات خلال السنة" },
@@ -8487,6 +8896,7 @@
           { k:"ratePct", label:"نسبة الاندثار / قسط ثابت" },
           { k:"openAccDepPY", label:`المخصص كما في ١ كانون الثاني ${CY}` },
           { k:"depCY", label:"اندثار السنة الحالية", computed:true },
+          { k:"depPY", label:`اندثار السنة السابقة ${PY}`, computed: depPYFromPrior },
           { k:"closeAccDepCY", label:`المخصص كما في ٣١ كانون الاول ${CY}`, computed:true, rowTotal:true },
           { k:"nbvCY", label:`القيمة الدفترية كما في ٣١ كانون الاول ${CY}`, computed:true, rowTotal:true }
         ];
@@ -8497,13 +8907,24 @@
           let total = 0;
           const tds = cols.map((col, idx)=>{
             const c2 = faColCalcValues(col, n);
+            const hl = idx === hlCol ? " col-hl" : "";
+            if(r.k === "depPY"){
+              const priorVal = faColDepPYFromPrior(col, n, state.priorYearDocForCashFlow);
+              const resolved = priorVal != null ? priorVal : c2.depPY;
+              total += resolved;
+              if(r.computed){
+                return `<td dir="ltr" class="amount-col${hl}">${fmt(resolved)}</td>`;
+              }
+              const stored = String(col.depPY ?? "").trim();
+              const shown = stored ? fmt(n(stored)) : "";
+              return `<td class="amount-col${hl}"><input dir="ltr" value="${escAttr(shown)}" placeholder="${escAttr(fmt(c2.depPYEstimated))}" title="اتركه فارغاً لاستخدام كلفة أول السنة × النسبة" data-fa="${idx}" data-k="depPY"/></td>`;
+            }
             const val = r.computed ? (
               r.k === "closeCostCY" ? fmt(c2.closeCostCY) :
               r.k === "closeAccDepCY" ? fmt(c2.closeAccCY) :
               r.k === "nbvCY" ? fmt(c2.nbvCY) :
               r.k === "depCY" ? fmt(c2.depCY) : ""
             ) : (col?.[r.k] ?? "");
-            const hl = idx === hlCol ? " col-hl" : "";
             if(r.computed){
               const num =
                 r.k === "closeCostCY" ? c2.closeCostCY :
@@ -8529,20 +8950,20 @@
         const faWrap = document.createElement("div");
         faWrap.className = "fa-print-wrap";
         faWrap.appendChild(table);
-        let depCY = 0, accCY = 0, nbvCY = 0;
-        cols.forEach((col)=>{ const c2 = faColCalcValues(col, n); depCY += c2.depCY; accCY += c2.closeAccCY; nbvCY += c2.nbvCY; });
+        const totals = computeFixedAssetsTotals({ "sch-1": { columns: cols } }, n, state.priorYearDocForCashFlow);
         const sumBox = document.createElement("div");
         sumBox.className = "fa-summary";
-        sumBox.innerHTML = `إجمالي اهتلاك CY: <b dir="ltr">${fmt(depCY)}</b> — مجمع CY: <b dir="ltr">${fmt(accCY)}</b> — صافي موجودات ثابتة CY: <b dir="ltr">${fmt(nbvCY)}</b>`;
+        sumBox.innerHTML = faScheduleSummaryHtml(totals, fmt);
         faWrap.appendChild(sumBox);
         wrap.appendChild(faWrap);
+        appendFaPriorFillButton(wrap, cols, n, ()=> render());
         const addCol = document.createElement("button");
         addCol.type = "button";
         addCol.className = "tb-btn";
         addCol.textContent = "➕ إضافة عمود";
         addCol.style.marginTop = "10px";
         addCol.addEventListener("click", ()=>{
-          cols.push({ code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" });
+          cols.push({ code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", depPY:"", openAccDepPY:"" });
           render();
         });
         wrap.appendChild(addCol);
@@ -9308,38 +9729,14 @@
       };
       // Force English digits for numeric fields (whole amounts, no decimals)
       const fmt = fmtAmount;
+      const priorDoc = state.priorYearDocForCashFlow;
+      if(priorDoc) applyPriorYearToWorkingData(dataById, reg, priorDoc, n, { overwrite: false, addMissing: false });
       const sumVertical = (schId)=>{
         const rows = (dataById?.[schId]?.rows) || [];
-        return rows.reduce((acc,r)=>({ cy: acc.cy + n(r?.cy), py: acc.py + n(r?.py) }), { cy:0, py:0 });
+        return rows.reduce((acc,r)=>({ cy: acc.cy + n(r?.cy), py: acc.py + verticalRowComparative(r, priorDoc, schId, n) }), { cy:0, py:0 });
       };
       const getMeta = ()=> ({ ...defaultYearMeta(state.selectedYearId), ...(yearDoc?.meta||{}) });
-      const computeFixedAssets = ()=>{
-        const fa = dataById?.["sch-1"] || {};
-        const cols = Array.isArray(fa.columns) ? fa.columns : [];
-        let depCY = 0, depPY = 0, accCY = 0, accPY = 0, nbvCY = 0, nbvPY = 0;
-        let addCYTotal = 0, dispCYTotal = 0;
-        for(const c of cols){
-          const openCostPY = n(c.openCostPY);
-          const addCY = n(c.addCY);
-          const dispCY = n(c.dispCY);
-          const rate = n(c.ratePct) / 100;
-          const openAccPY = n(c.openAccDepPY);
-          const closeCostCY = openCostPY + addCY - dispCY;
-          const dep = (closeCostCY * rate);
-          // عمود PY في قائمة المقارنة: اندثار على أساس الكلفة في أول السنة (نفس الكلفة الافتتاحية المعروضة)
-          const depOnOpening = openCostPY * rate;
-          const closeAccCY = openAccPY + dep;
-          depCY += dep;
-          depPY += depOnOpening;
-          accPY += openAccPY;
-          accCY += closeAccCY;
-          nbvPY += (openCostPY - openAccPY);
-          nbvCY += (closeCostCY - closeAccCY);
-          addCYTotal += addCY;
-          dispCYTotal += dispCY;
-        }
-        return { depCY, depPY, accCY, accPY, nbvCY, nbvPY, addCYTotal, dispCYTotal };
-      };
+      const computeFixedAssets = ()=> computeFixedAssetsTotals(dataById, n, priorDoc);
 
       // ===== Auto statements (CY/PY) =====
       const sumsByNo = {};
@@ -9394,8 +9791,10 @@
       const revenueCY = revenueFromContractsCY + (revenueVertTotals.cy || 0);
       const contractsExpCY = (hasContracts ? conRows.reduce((s,r)=>s + contractRowComputed(r).expensesIqd, 0) : 0);
       const vertExpForIncome = vertExpenseTotalsForIncome(incomeExpenseSchedules, sumVertical, hasInv);
-      // PY contracts revenue is a single manual field on schedule (8)
-      const revenuePY = (hasContracts ? (n(contracts.revPyTotalIqd) || 0) : 0) + (revenueVertTotals.py || 0);
+      // PY contracts revenue: الحقل اليدوي، وإلا إيراد العقود الفعلي من السنة السابقة
+      const revenuePY = (hasContracts
+        ? (String(contracts.revPyTotalIqd ?? "").trim() !== "" ? n(contracts.revPyTotalIqd) : priorContractsRevenueCY(priorDoc, n))
+        : 0) + (revenueVertTotals.py || 0);
       /** رمز/رموز الدليل لصف الإيرادات الواحد: كشف العقود + كشوف مصنّفة إيرادات، بدون تكرار */
       const revenueAcctCodesCombined = (()=>{
         const parts = [];
@@ -9425,7 +9824,9 @@
       const usedMaterialsCY = hasInv ? ((openInv + purchases) - closeInv) : 0;
       // Schedule (6) remains a normal schedule always
       // Inventory movement adds an extra expense line (321) when enabled
-      const usedMaterialsPY = hasInv ? n(invBox.prevUsedMaterials) : 0;
+      const usedMaterialsPY = hasInv
+        ? (String(invBox.prevUsedMaterials ?? "").trim() !== "" ? n(invBox.prevUsedMaterials) : priorInventoryUsed(priorDoc, n))
+        : 0;
       const expCY = vertExpForIncome.cy + (hasFA ? (faTotals.depCY||0) : 0) + (hasInv ? usedMaterialsCY : 0);
       const expPY = vertExpForIncome.py + (hasFA ? (faTotals.depPY||0) : 0) + (hasInv ? usedMaterialsPY : 0);
       const expMismatch = hasContracts && Math.round(contractsExpCY) !== Math.round(expCY);
@@ -9607,7 +10008,6 @@
       const netCashChangeCY = cfoCY + cfiCY + cffCY;
       const cashDiffCY = d(bs.assets.cash.cy, bs.assets.cash.py);
       const cfsDiffCY = cashDiffCY - netCashChangeCY;
-      const priorDoc = state.priorYearDocForCashFlow;
       const contractsSchNo = (reg.find(s=>s?.active!==false && (s?.id==="sch-8" || s?.type==="contracts"))?.scheduleNo) || 8;
 
       const tbFmtAmt = (v, { total = false } = {})=>{
@@ -10390,6 +10790,21 @@
                 inp.value = inv[k];
               });
             });
+            appendPriorFillButton(
+              mountEl,
+              "تعبئة من السنة السابقة",
+              String((state.priorYearDocForCashFlow?.meta || {}).companyHasInventory || "no") === "yes",
+              ()=>{
+                applyPriorYearToWorkingData(
+                  { _invBox: inv },
+                  [],
+                  state.priorYearDocForCashFlow,
+                  n,
+                  { overwrite: true, addMissing: false, only: "inventory" }
+                );
+                renderInv();
+              }
+            );
           }
         };
 
@@ -10592,6 +11007,21 @@
                 renderEq(eqActiveMount);
               });
             });
+            appendPriorFillButton(
+              mountEl,
+              "تعبئة الافتتاحي من السنة السابقة",
+              !!(state.priorYearDocForCashFlow && ((state.priorYearDocForCashFlow.dynamicSchedules || {}).dataById || {})["_equityStmt"]),
+              ()=>{
+                applyPriorYearToWorkingData(
+                  { _equityStmt: eq },
+                  [],
+                  state.priorYearDocForCashFlow,
+                  n,
+                  { overwrite: true, addMissing: false, only: "equity" }
+                );
+                renderEq(eqActiveMount);
+              }
+            );
           }
         };
 
@@ -10704,9 +11134,9 @@
             // default 3 editable/removable columns (like 0.0.1 initial look)
             if(cols.length === 0){
               cols.push(
-                { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" },
-                { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" },
-                { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" }
+                { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", depPY:"", openAccDepPY:"" },
+                { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", depPY:"", openAccDepPY:"" },
+                { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", depPY:"", openAccDepPY:"" }
               );
             }
             const table = document.createElement("table");
@@ -10732,6 +11162,7 @@
                 <th>المجموع دينار</th>
               </tr></thead>
             `;
+            const depPYFromPrior = faHasPriorDep(state.priorYearDocForCashFlow, n);
             const rows = [
               { k:"openCostPY", label:`الكلفة كما في ١ كانون الثاني ${CY}` },
               { k:"addCY", label:"الاضافات خلال السنة" },
@@ -10740,28 +11171,29 @@
               { k:"ratePct", label:"نسبة الاندثار / قسط ثابت" },
               { k:"openAccDepPY", label:`المخصص كما في ١ كانون الثاني ${CY}` },
               { k:"depCY", label:"اندثار السنة الحالية", computed:true },
+              { k:"depPY", label:`اندثار السنة السابقة ${PY}`, computed: depPYFromPrior },
               { k:"closeAccDepCY", label:`المخصص كما في ٣١ كانون الاول ${CY}` , computed:true, rowTotal:true },
               { k:"nbvCY", label:`القيمة الدفترية كما في ٣١ كانون الاول ${CY}` , computed:true, rowTotal:true }
             ];
             table.innerHTML = `${head}<tbody></tbody>`;
             const tbod = table.querySelector("tbody");
-            const calc = (c)=>{
-              const openCostPY = n(c.openCostPY);
-              const addCY = n(c.addCY);
-              const dispCY = n(c.dispCY);
-              const closeCostCY = openCostPY + addCY - dispCY;
-              const rate = n(c.ratePct)/100;
-              const openAccPY = n(c.openAccDepPY);
-              const depCY = (closeCostCY * rate);
-              const closeAccCY = openAccPY + depCY;
-              const nbvCY = closeCostCY - closeAccCY;
-              return { closeCostCY, depCY, closeAccCY, nbvCY };
-            };
+            const calc = (c)=> faColCalcValues(c, n);
             rows.forEach((r)=>{
               const tr = document.createElement("tr");
               let total = 0;
               const tds = cols.map((c,idx)=>{
                 const c2 = calc(c);
+                if(r.k === "depPY"){
+                  const priorVal = faColDepPYFromPrior(c, n, state.priorYearDocForCashFlow);
+                  const resolved = priorVal != null ? priorVal : c2.depPY;
+                  total += resolved;
+                  if(r.computed || !editing){
+                    return `<td dir="ltr" class="amount-col">${fmt(resolved)}</td>`;
+                  }
+                  const stored = String(c.depPY ?? "").trim();
+                  const shown = stored ? fmt(n(stored)) : "";
+                  return `<td class="amount-col"><input dir="ltr" value="${escHtml(shown)}" placeholder="${escHtml(fmt(c2.depPYEstimated))}" title="اتركه فارغاً لاستخدام كلفة أول السنة × النسبة" data-fa="${idx}" data-k="depPY"/></td>`;
+                }
                 const val = r.computed ? (
                   r.k === "closeCostCY" ? fmt(c2.closeCostCY) :
                   r.k === "closeAccDepCY" ? fmt(c2.closeAccCY) :
@@ -10808,17 +11240,18 @@
             const totals = computeFixedAssets();
             const sumBox = document.createElement("div");
             sumBox.className = "fa-summary";
-            sumBox.innerHTML = `إجمالي اهتلاك CY: <b dir="ltr">${fmt(totals.depCY)}</b> — مجمع CY: <b dir="ltr">${fmt(totals.accCY)}</b> — صافي موجودات ثابتة CY: <b dir="ltr">${fmt(totals.nbvCY)}</b>`;
+            sumBox.innerHTML = faScheduleSummaryHtml(totals, fmt);
             faWrap.appendChild(sumBox);
             body.appendChild(faWrap);
 
             if(editing){
+              appendFaPriorFillButton(body, cols, n, ()=> renderFA());
               const addCol = document.createElement("button");
               addCol.className = "tb-btn";
               addCol.textContent = "➕ إضافة عمود";
               addCol.style.marginTop = "10px";
               addCol.addEventListener("click", ()=>{
-                cols.push({ code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" });
+                cols.push({ code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", depPY:"", openAccDepPY:"" });
                 renderFA();
               });
               body.appendChild(addCol);
@@ -11010,6 +11443,20 @@
                 <span class="hint">انقر على سطر لتحديده ثم «حذف». عند كتابة الرمز أو الاسم يظهر اقتراح من دليل الحسابات (اختياري).</span>
               `;
               body.appendChild(btns);
+              appendPriorFillButton(
+                btns,
+                "تعبئة السنة السابقة",
+                (((state.priorYearDocForCashFlow?.dynamicSchedules || {}).dataById || {})[sch.id]?.rows || []).some(verticalRowHasContent),
+                ()=>{
+                  applyVerticalPyFromPrior(
+                    saved,
+                    ((state.priorYearDocForCashFlow?.dynamicSchedules || {}).dataById || {})[sch.id]?.rows || [],
+                    n,
+                    { overwrite: true, addMissing: true }
+                  );
+                  renderTable();
+                }
+              );
               btns.querySelector("button[data-add]").addEventListener("click", ()=>{
                 saved.push({code:"",name:"",cy:"",py:""});
                 selectedRow = saved.length - 1;
@@ -11379,6 +11826,22 @@
                 <span class="hint">نسبة الإنجاز تُحسب تلقائياً.</span>
               `;
               conActiveMount.appendChild(btns);
+              appendPriorFillButton(
+                btns,
+                "تعبئة من السنة السابقة",
+                priorContractsRevenueCY(state.priorYearDocForCashFlow, n) > 0
+                  || ((((state.priorYearDocForCashFlow?.dynamicSchedules || {}).dataById || {})["sch-8"] || {}).rows || []).length > 0,
+                ()=>{
+                  applyPriorYearToWorkingData(
+                    dataById,
+                    reg,
+                    state.priorYearDocForCashFlow,
+                    n,
+                    { overwrite: true, addMissing: true, only: "contracts" }
+                  );
+                  renderContracts();
+                }
+              );
               btns.querySelector("button[data-add]").addEventListener("click", ()=>{
                 rows.push({ projectName:"", contractUsd:"", contractIqd:"", revUsd:"", revIqd:"", prevCumIqd:"", expensesIqd:"" });
                 selectedRow = rows.length - 1;
@@ -12340,29 +12803,29 @@
         // prevent duplicates
         const existing = await getDoc(yearRef(companyId, yearId));
         if(existing.exists()) throw new Error("هذه السنة موجودة مسبقاً ولا يمكن تكرارها.");
-        await setDoc(yearRef(companyId, yearId), {
-          meta: defaultYearMeta(yearId),
-          dynamicSchedules: {
-            registry: [
-              { id:"sch-1", scheduleNo:1, title:"كشف (١) – الموجودات الثابتة واندثاراتها", type:"horizontal_fixedAssets", active:true },
-              { id:"sch-2", scheduleNo:2, title:"كشف (٢) – المدينون", type:"vertical", active:true },
-              { id:"sch-3", scheduleNo:3, title:"كشف (٣) – النقود", type:"vertical", active:true },
-              { id:"sch-4", scheduleNo:4, title:"كشف (٤) – الدائنون", type:"vertical", active:true },
-              { id:"sch-5", scheduleNo:5, title:"كشف (٥) – الرواتب والأجور", type:"vertical", active:true },
-              { id:"sch-6", scheduleNo:6, title:"كشف (٦) – المستلزمات السلعية", type:"vertical", active:true },
-              { id:"sch-7", scheduleNo:7, title:"كشف (٧) – المستلزمات الخدمية", type:"vertical", active:true },
-              { id:"sch-8", scheduleNo:8, title:"كشف (٨) – العقود ومصاريفها", type:"contracts", active:true }
-            ],
-            dataById: {
-              "sch-1": {
-                type: "horizontal_fixedAssets",
-                columns: [
-                  { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" },
-                  { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" },
-                  { code:"", name:"", openCostPY:"", addCY:"", dispCY:"", ratePct:"10", depCY:"", openAccDepPY:"" }
-                ]
+        const nFa = (v)=> Number(normalizeNumberString(String(v ?? "").trim())) || 0;
+        const meta = defaultYearMeta(yearId);
+        let registry = defaultSchedulesRegistry();
+        let dataById = { "sch-1": emptyFixedAssetsScheduleData() };
+        const yn = parseInt(String(yearId), 10);
+        if(Number.isFinite(yn)){
+          try{
+            const ps = await getDoc(yearRef(companyId, String(yn - 1)));
+            if(ps.exists()){
+              const seeded = seedAllSchedulesFromPriorDoc(ps.data() || {}, nFa);
+              if(seeded){
+                Object.assign(meta, seeded.metaPatch || {});
+                if(Array.isArray(seeded.registry) && seeded.registry.length) registry = seeded.registry;
+                if(seeded.dataById) dataById = seeded.dataById;
               }
             }
+          }catch(_){}
+        }
+        await setDoc(yearRef(companyId, yearId), {
+          meta,
+          dynamicSchedules: {
+            registry,
+            dataById
           },
           linkCfg: {},
           mdAbout: [],
@@ -12504,7 +12967,7 @@
         const hasFAData = faCols.some(c=>
           hasAnyText(c?.code) || hasAnyText(c?.name) ||
           hasAnyNumberLike(c?.openCostPY) || hasAnyNumberLike(c?.addCY) || hasAnyNumberLike(c?.dispCY) ||
-          hasAnyNumberLike(c?.ratePct) || hasAnyNumberLike(c?.openAccDepPY)
+          hasAnyNumberLike(c?.ratePct) || hasAnyNumberLike(c?.openAccDepPY) || hasAnyNumberLike(c?.depPY)
         );
 
         // Inventory movement box (_invBox)
